@@ -5,6 +5,7 @@ Created on Wed Dec  1 16:31:52 2021
 
 @author: ljia
 """
+import os
 import sys
 import urllib
 # import requests
@@ -23,7 +24,7 @@ def fetch_dataset(ds_name, **kwargs):
 #%%
 
 
-def fetch_thermophysical(fname='../datasets/thermophysical/thermophysical.csv'):
+def fetch_thermophysical(fname='../datasets/Thermophysical/thermophysical.csv'):
 
 	url = 'https://polymerdatabase.com/home.html'
 
@@ -31,6 +32,7 @@ def fetch_thermophysical(fname='../datasets/thermophysical/thermophysical.csv'):
 	df_main = _process_a_class_page(url)
 
 	# Save dataset to file.
+	os.makedirs(os.path.dirname(fname), exist_ok=True)
 	df_main.to_csv(fname)
 
 	return fname
