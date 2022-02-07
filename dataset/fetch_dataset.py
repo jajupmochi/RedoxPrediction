@@ -176,16 +176,15 @@ def _get_mol_info_from_page(url):
 	tr_nodes = tables[0].xpath('tbody/tr')
 	class_ = tr_nodes[0].xpath('td')[1].text.strip()
 	name = tr_nodes[1].xpath('td')[1].text.strip()
-	curly_smiles = tr_nodes[5].xpath('td')[1].text
+	curly_smiles = _get_smiles_from_node(tr_nodes[5].xpath('td')[1])
 	if curly_smiles is None:
 		curly_smiles = ''
 	else:
-		curly_smiles = curly_smiles.strip()
+		curly_smiles = curly_smiles.strip().replace(' ', '')
 
 	# The second table.
 	tr_nodes = tables[1].xpath('tbody/tr')
-	smiles = tr_nodes[2].xpath('td')[1].text.strip()
-
+	smiles = _get_smiles_from_node(tr_nodes[2].xpath('td')[1])
 	# The third table.
 # 	caption = tables[2].getprevious().xpath('.//text()')[1]
 # 	if 'Experimental' in caption:
@@ -200,6 +199,9 @@ def _get_mol_info_from_page(url):
 	# else:
 	else:
 		Tg_range_exp = ('' if Tg_range_exp is None else _mystrip((Tg_range_exp)))
+	Tg_range_exp = Tg_range_exp.replace('\t', '')
+#	Tg_range_exp = Tg_range_exp.replace('\t', '').replace('\n', '')
+# 	Tg_range_exp = Tg_range_exp.translate(Tg_range_exp.maketrans(dict.fromkeys('\t\n', '')))
 	Tg_preferred_exp = ('' if Tg_preferred_exp is None else _mystrip(Tg_preferred_exp))
 # 	if Tg_preferred_exp != '':
 # 		Tg_preferred_exp = float(Tg_preferred_exp)
@@ -221,6 +223,9 @@ def _get_mol_info_from_page(url):
 		# else:
 		else:
 			Tg_range_cal = ('' if Tg_range_cal is None else _mystrip(Tg_range_cal))
+		Tg_range_cal = Tg_range_cal.replace('\t', '')
+# 		Tg_range_cal = Tg_range_cal.replace('\t', '').replace('\n', '')
+# 		Tg_range_cal = Tg_range_cal.translate(Tg_range_cal.maketrans(dict.fromkeys('\t\n', '')))
 		Tg_preferred_cal = ('' if Tg_preferred_cal is None else _mystrip(Tg_preferred_cal))
 	# 	if Tg_preferred_cal != '':
 	# 		Tg_preferred_cal = float(Tg_preferred_cal)
@@ -228,9 +233,18 @@ def _get_mol_info_from_page(url):
 		Tg_range_cal, Tg_preferred_cal = '', ''
 
 
-
 	return [name, smiles, curly_smiles, Tg_range_exp, Tg_preferred_exp, Tg_range_cal, Tg_preferred_cal, class_]
 
 
 def _mystrip(str_):
 	return str_.strip().lstrip('(').rstrip(')').strip()
+
+
+def _get_smiles_from_node(td_node):
+	text = td_node.xpath('normalize-space()').strip().replace(' ', '')
+	return text
+
+
+if __name__ == 	'__main__':
+	url = 'https://polymerdatabase.com/polymers/PTMO-diphenylmethanediisocyanate.html'
+	results = _get_mol_info_from_page(url)

@@ -1,0 +1,21 @@
+conda install tensorflow~=2.4
+conda install deepchem -c conda-forge 
+conda install rdkit -c conda-forge 
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+conda install pyg -c pyg -c conda-forge
+conda install -c dglteam dgl-cuda11.3
+conda install dgllife -c dglteam
+
+#conda update -c conda-forge deepchem
+#conda install numexpr
+#conda update pandas
+
+
+python3 -m pip install --no-cache-dir --user tensorflow~=2.4
+python3 -m pip install --no-cache-dir --user deepchem
+python3 -m pip install --no-cache-dir --user rdkit-pypi
+python3 -m pip install --no-cache-dir --user torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+python3 -m pip install --no-cache-dir --user torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.10.0+cu113.html
+python3 -m pip install --no-cache-dir --user dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
+python3 -m pip install --no-cache-dir --user dgllife
+
