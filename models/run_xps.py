@@ -35,6 +35,7 @@ def run_xp(smiles, y, output_result, mode, hyperparams, nb_epoch=100):
 	results = xp_GCN(smiles, y,
 				  mode=mode,
 				  nb_epoch=nb_epoch,
+				  output_file=output_result,
 # 				  ds_name=resu['dataset'],
 				  **hyperparams)
 # 	print('results: ', results)
@@ -177,7 +178,7 @@ if __name__ == "__main__":
 	mode = ('reg' if args.mode is None else args.mode)
 	# Run.
 
-	for nb_epoch in range(0, 1001, 5):
+	for nb_epoch in range(100, 101, 1):
 		for task in list(task_grid):
 			print()
 			print(task)
