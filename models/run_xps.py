@@ -104,6 +104,22 @@ def parse_args():
 
 	parser.add_argument('-l', "--level", type=str, choices=['pbe', 'pbe0'], help='the level of chemical computational method.')
 
+	# -------------------------------------------------------------------------
+
+	parser.add_argument('-D', "--ds_name", type=str, help='the name of dataset')
+
+	parser.add_argument("-f", "--feature_scaling", type=str, choices=['none', 'minmax', 'standard', 'minmax_x', 'standard_x', 'minmax_y', 'standard_y', 'minmax_xy', 'standard_xy'], help="the method to scale the input features")
+
+	parser.add_argument('-M', "--model", type=str, help='the prediction model')
+
+	parser.add_argument('-r', "--metric", type=str, help='the metric to measure the performance')
+
+	parser.add_argument('-a', "--activation_fn", type=str, help='the activation function')
+
+	parser.add_argument('-p', "--graph_pool", type=str, help='the graph pooling method')
+
+	parser.add_argument('-C', "--cv", type=str, help='the CV protocol')
+
 	args = parser.parse_args()
 
 	return args
@@ -156,15 +172,34 @@ if __name__ == "__main__":
 # 	Dis_List = (['euclidean', 'manhattan'] if args.y_distance is None else [args.y_distance])
 # # 	Target_List = (list(deltaG.keys()) if args.target is None else [args.target])
 # 	Target_List = (['dGred', 'dGox'] if args.target is None else [args.target])
-	Model_List = ['GCN', 'GAT']
-	DS_Name_List = ['poly200', 'thermo_exp', 'thermo_cal']
-	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
-	Metric_List = ['RMSE', 'MAE', 'R2']
+	DS_Name_List = (['poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
+	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
+	Metric_List = (['RMSE', 'MAE', 'R2'] if args.metric is None else [args.metric])
+	# network structural hyperparameters.
+	Model_List = (['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
+	Activation_Fn_List = (['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
+# 					'exponetial',
+					'tanh', 'softmax', 'sigmoid']#, 'normalize']
+					   if args.activation_fn is None else [args.activation_fn])
+	Graph_Pool_List = (['max', 'none'] if args.graph_pool is None else [args.graph_pool])
+# 	N_Layer_List = [1, 2, 3, 4]
+# 	Loss_List = []
+	# network non-structural hyperparameters.
+# 	Learning_Rate_List = []
+	Batch_Norm_List = [False, True]
+# 	Dropout_List = []
+	Residual_List = [True, False]
+# 	Batch_Size_List = []
+	CV_List = ['811', '622']
 	task_grid = ParameterGrid({
-							'model': Model_List[1:2],
 							'ds_name': DS_Name_List[0:1], # @todo: to change back.
 							'feature_scaling': Feature_Scaling_List[0:1],
-							'metric': Metric_List[1:2],
+							'metric': Metric_List[0:1],
+							# network structural hyperparameters.
+							'model': Model_List[0:1],
+							'activation_fn': Activation_Fn_List[0:1],
+							'graph_pool': Graph_Pool_List[0:1],
+							'cv': CV_List[0:],
 # 							'level': Level_List[0:],
 # 							'stratified': Stratified_List[0:],
 # 							'edit_cost': Edit_Cost_List[0:],
@@ -176,27 +211,33 @@ if __name__ == "__main__":
 
 # 	unlabeled = args.unlabeled # False # @todo: Not actually used. Automatically set in run_xp().
 	mode = ('reg' if args.mode is None else args.mode)
+	nb_epoch = 20000 # @todo: to change it back.
 	# Run.
 
-	for nb_epoch in range(100, 101, 1):
-		for task in list(task_grid):
-			print()
-			print(task)
+	for task in list(task_grid):
+		print()
+		print(task)
 
-			### Load dataset.
-			smiles, y = get_data(task['ds_name'])
+		### Load dataset.
+		smiles, y = get_data(task['ds_name'])
 
-			op_dir = '../outputs/gnn/'
-			os.makedirs(op_dir, exist_ok=True)
-	# 		str_stratified = '.stratified' if task['stratified'] else ''
-	# 		output_result = op_dir + 'results.' + '.'.join([task['level'], task['edit_cost'], task['distance'], task['target']]) + str_stratified + '.shuffle.5folds.no_seed.pkl'
-	# 		output_result = op_dir + 'results.' + '.'.join([task['model']]) + '.shuffle.5folds.no_seed.pkl'
-			output_result = op_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.' + str(nb_epoch) + '.shuffle.5folds.no_seed.pkl'
-	# 		output_result = op_dir + 'results.shuffle.5folds.no_seed.pkl'
-			print('output file: %s.' % output_result)
+		op_dir = '../outputs/gnn/'
+		os.makedirs(op_dir, exist_ok=True)
+# 		str_stratified = '.stratified' if task['stratified'] else ''
+# 		output_result = op_dir + 'results.' + '.'.join([task['level'], task['edit_cost'], task['distance'], task['target']]) + str_stratified + '.shuffle.5folds.no_seed.pkl'
+# 		output_result = op_dir + 'results.' + '.'.join([task['model']]) + '.shuffle.5folds.no_seed.pkl'
+		output_result = op_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.random_cv.shuffle.5folds.no_seed.pkl'
+# 		output_result = op_dir + 'results.shuffle.5folds.no_seed.pkl'
+		print('output file: %s.' % output_result)
 
 # 			if os.path.isfile(output_result):
-			if not os.path.isfile(output_result): # @todo: to check it back
-				run_xp(smiles, y, output_result, mode, task, nb_epoch=nb_epoch)
-			else:
-				print('The output file already exsits, skip the computation.')
+		if os.path.isfile(output_result) and os.path.getsize(output_result) != 0: # @todo: to check it back
+			# backup exsiting file.
+			print('Backing up exsiting file...')
+			from datetime import datetime
+			result_bk = output_result + '.bk.' + datetime.now().strftime("%Y%m%d%H%M%S%f")
+			from shutil import copyfile
+			copyfile(output_result, result_bk)
+# 		else:
+
+		run_xp(smiles, y, output_result, mode, task, nb_epoch=nb_epoch)
