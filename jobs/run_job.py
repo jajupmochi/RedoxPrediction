@@ -63,7 +63,7 @@ if __name__ == '__main__':
 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
 	Metric_List = ['RMSE', 'MAE', 'R2']
 	# network structural hyperparameters.
-	Model_List = ['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
+	Model_List = ['GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
 	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
 # 					'exponetial',
 					'tanh', 'softmax', 'sigmoid']#, 'normalize']

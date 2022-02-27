@@ -68,12 +68,16 @@ def plot_perf_vs_epoch(all_scores, fig_name, epoch_interval=10):
 # 	return fit_params
 
 
-def get_model_params(**kwargs):
+def get_model_params(model_name, **kwargs):
 	model_params = {}
 
-	# graph_conv_layers
+	# graph_conv_layers / graph_attention_layers
 	if 'n_graph_layers' in kwargs and 'w_graph_channels' in kwargs:
-		model_params['graph_conv_layers'] = [kwargs['w_graph_channels']] * kwargs['n_graph_layers']
+		if model_name.lower() == 'graphconvmodelext':
+			model_params['graph_conv_layers'] = [kwargs['w_graph_channels']] * kwargs['n_graph_layers']
+		elif model_name.lower() == 'gatmodelext':
+			model_params['graph_attention_layers'] = [kwargs['w_graph_channels']] * kwargs['n_graph_layers']
+
 
 	# loss
 	if 'loss' in kwargs:
@@ -86,7 +90,13 @@ def get_model_params(**kwargs):
 					'possible candidates include "l1", "l2".' % kwargs['loss'])
 
 	# Get other available parameters.
-	key_params = ['dropout', 'batch_size', 'learning_rate', 'dense_layer_size']
+	key_params = ['dropout', 'batch_size', 'learning_rate']
+	if model_name.lower() == 'graphconvmodelext':
+		key_params += ['dense_layer_size']
+	elif model_name.lower() == 'gatmodelext':
+		key_params += ['n_attention_heads', 'agg_modes', 'residual',
+				  'predictor_hidden_feats', 'predictor_dropout', 'self_loop']
+
 	for key in key_params:
 		if key in kwargs:
 			model_params[key] = kwargs[key]
@@ -98,11 +108,12 @@ def get_model(model_name, **kwargs):
 
 	# Get parameters.
 	n_layers = kwargs.get('n_graph_layers', 2)
+	backend = ('tf' if model_name == 'graphconvmodelext' else 'pytorch')
 	activation_fns = get_activation_fns(kwargs.get('activation_fn', 'relu'),
-									  n_layers=n_layers)
+									  n_layers=n_layers, backend=backend)
 	graph_pools = get_graph_pools(kwargs.get('graph_pool', 'max'),
 							   n_layers=n_layers)
-	model_params = get_model_params(**kwargs)
+	model_params = get_model_params(model_name, **kwargs)
 
 	# Create the model.
 	if model_name.lower() == 'graphconvmodelext':
@@ -112,15 +123,22 @@ def get_model(model_name, **kwargs):
 							graph_pools=graph_pools,
 							**model_params)
 
+	elif model_name.lower() == 'gatmodelext':
+		from models.dc_models import GATModelExt
+		model = GATModelExt(mode='regression', n_tasks=1,
+					  activation=activation_fns,
+					  graph_pools=graph_pools,
+					  **model_params)
+
 	elif model_name.lower() == 'gcnmodel':
 		model = dc.models.GCNModel(mode='regression', n_tasks=1,
 							 activation=activation_fns[0],
 							 **model_params)
 # 							 wandb=logger)
-	elif model_name.lower() == 'gatmodel':
-		model = dc.models.GATModel(mode='regression', n_tasks=1,
-							 activation=activation_fns[0],
-							 **model_params)
+# 	elif model_name.lower() == 'gatmodel':
+# 		model = dc.models.GATModel(mode='regression', n_tasks=1,
+# 							 activation=activation_fns[0],
+# 							 **model_params)
 # 							 model_dir='model_test/', log_frequency=10)
 # 							 wandb=logger)
 # 		model = dc.models.GATModel(mode='regression', n_tasks=len(chembl_tasks),
@@ -135,32 +153,69 @@ def get_model(model_name, **kwargs):
 
 
 def get_activation_fns(func_name, n_layers=2, backend='tf'):
-	import tensorflow as tf
+	if backend == 'tf':
+		import tensorflow as tf
 
-	if func_name.lower() == 'relu':
-		return [tf.keras.activations.relu for _ in range(n_layers)]
-	elif func_name.lower() == 'elu':
-		return [tf.keras.activations.elu for _ in range(n_layers)]
-	elif func_name.lower() == 'leaky_relu':
-		return [tf.nn.leaky_relu for _ in range(n_layers)]
-	elif func_name.lower() == 'selu':
-		return [tf.keras.activations.selu for _ in range(n_layers)]
-	elif func_name.lower() == 'gelu':
-		return [tf.keras.activations.gelu for _ in range(n_layers)]
-	elif func_name.lower() == 'linear':
-		return [tf.keras.activations.linear for _ in range(n_layers)]
-	elif func_name.lower() == 'exponetial':
-		return [tf.keras.activations.exponetial for _ in range(n_layers)]
-	elif func_name.lower() == 'tanh':
-		return [tf.keras.activations.tanh for _ in range(n_layers)]
-	elif func_name.lower() == 'softmax':
-		return [tf.keras.activations.softmax for _ in range(n_layers)]
-	elif func_name.lower() == 'sigmoid':
-		return [tf.keras.activations.sigmoid for _ in range(n_layers)]
-# 	elif func_name.lower() == 'normalize':
-# 		return [tf.nn.relu for _ in range(n_layers)]
+		if func_name.lower() == 'relu':
+			return [tf.keras.activations.relu for _ in range(n_layers)]
+		elif func_name.lower() == 'elu':
+			return [tf.keras.activations.elu for _ in range(n_layers)]
+		elif func_name.lower() == 'leaky_relu':
+			return [tf.nn.leaky_relu for _ in range(n_layers)]
+		elif func_name.lower() == 'selu':
+			return [tf.keras.activations.selu for _ in range(n_layers)]
+		elif func_name.lower() == 'gelu':
+			return [tf.keras.activations.gelu for _ in range(n_layers)]
+		elif func_name.lower() == 'linear':
+			return [tf.keras.activations.linear for _ in range(n_layers)]
+		elif func_name.lower() == 'exponetial':
+			return [tf.keras.activations.exponetial for _ in range(n_layers)]
+		elif func_name.lower() == 'tanh':
+			return [tf.keras.activations.tanh for _ in range(n_layers)]
+		elif func_name.lower() == 'softmax':
+			return [tf.keras.activations.softmax for _ in range(n_layers)]
+		elif func_name.lower() == 'sigmoid':
+			return [tf.keras.activations.sigmoid for _ in range(n_layers)]
+	# 	elif func_name.lower() == 'normalize':
+	# 		return [tf.nn.relu for _ in range(n_layers)]
+		else:
+			raise ValueError('The given activation function "%s" can not be '
+					'recognized.' % func_name)
+
+	elif backend == 'pytorch':
+		import torch.nn.functional as F
+
+		if func_name.lower() == 'relu':
+			return [F.relu for _ in range(n_layers)]
+		elif func_name.lower() == 'elu':
+			return [F.elu for _ in range(n_layers)]
+		elif func_name.lower() == 'leaky_relu':
+			return [F.leaky_relu for _ in range(n_layers)]
+		elif func_name.lower() == 'selu':
+			return [F.selu for _ in range(n_layers)]
+		elif func_name.lower() == 'gelu':
+			return [F.gelu for _ in range(n_layers)]
+		elif func_name.lower() == 'linear':
+			return [F.linear for _ in range(n_layers)]
+		elif func_name.lower() == 'exponetial':
+			raise NotImplementedError('Sorry dear, the activation "exponetial" '
+							 'under the backend "pytorch" has not been '
+							 'implemented yet.')
+		elif func_name.lower() == 'tanh':
+			return [F.tanh for _ in range(n_layers)]
+		elif func_name.lower() == 'softmax':
+			return [F.softmax for _ in range(n_layers)]
+		elif func_name.lower() == 'sigmoid':
+			return [F.sigmoid for _ in range(n_layers)]
+	# 	elif func_name.lower() == 'normalize':
+	# 		return [tf.nn.relu for _ in range(n_layers)]
+		else:
+			raise ValueError('The given activation function "%s" can not be '
+					'recognized.' % func_name)
+
 	else:
-		raise ValueError('The given activation function can not be recognized.')
+		raise ValueError('Backend "%s" can not be recognized, possible candidates '
+				   'include "tf" and "pytorch".' % backend)
 
 
 def get_graph_pools(func_name, n_layers=2, backend='tf'):
@@ -351,7 +406,7 @@ def cross_validation(train_dataset, valid_dataset, test_dataset,
 def evaluate_GNN(train_dataset, valid_dataset, test_dataset, mode='reg',
 				 nb_epoch=100, output_dir=None, trial_index=1, **kwargs):
 	### Get hyperparameters.
-	model_name = kwargs.get('model', 'GCN')
+	model_name = kwargs.get('model', 'GCNModel')
 	feature_scaling = kwargs.get('feature_scaling', 'standard_y')
 	metric_name = kwargs.get('metric', 'RMSE')
 	activation_fn = kwargs.get('activation_fn', 'relu')
@@ -386,22 +441,7 @@ def evaluate_GNN(train_dataset, valid_dataset, test_dataset, mode='reg',
 
 
 	### Do CV.
-	param_grid = {
-		'n_graph_layers': [1, 2, 3, 4, 5],# [2, 3, 4], # No.2
-		'w_graph_channels': [32, 64, 128], # No.1
-		'dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5], # [0.0, 0.25, 0.5], # No.5
-		'batch_size': [8, 16, 32, 64, 128], # [16], # [8, 16, 32, 64, 128], # No.7
-		'learning_rate': [0.1, 0.01, 0.001, 0.0001], # [0.001]# No.4
-		'loss': ['l1', 'l2'], # No.3
-		'dense_layer_size': [128, 256, 512], # [128], #, # No.6
-# 		'n_graph_layers': [1],
-# 		'w_graph_channels': [32],
-# 		'dropout': [0.0],
-# 		'batch_size': [8],
-# 		'learning_rate': [0.01],
-# 		'loss': ['l1', 'l2'],
-# 		'dense_layer_size': [128],
-		}
+	param_grid = set_param_grid(model_name)
 
 	results = cross_validation(train_dataset, valid_dataset, test_dataset,
 						  model_name, param_grid=param_grid,
@@ -450,6 +490,43 @@ def evaluate_GNN(train_dataset, valid_dataset, test_dataset, mode='reg',
 	model = best_params # @todo: change it back.
 
 	return train_score, valid_score, test_score, model
+
+
+def set_param_grid(model_name):
+	param_grid = {
+		'n_graph_layers': [1, 2, 3, 4, 5],# [2, 3, 4], # No.2
+		'w_graph_channels': [32, 64, 128], # No.1
+		'dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5], # [0.0, 0.25, 0.5], # No.5
+		'batch_size': [8, 16, 32, 64, 128], # [16], # [8, 16, 32, 64, 128], # No.7
+		'learning_rate': [0.1, 0.01, 0.001, 0.0001], # [0.001]# No.4
+		'loss': ['l1', 'l2'], # No.3
+# 		'n_graph_layers': [1],
+# 		'w_graph_channels': [32],
+# 		'dropout': [0.0],
+# 		'batch_size': [8],
+# 		'learning_rate': [0.01],
+# 		'loss': ['l1', 'l2'],
+# 		'dense_layer_size': [128],
+		}
+
+	if model_name.lower() == 'graphconvmodelext':
+		pg_ext = {
+			'dense_layer_size': [128, 256, 512], # [128], #, # No.6
+			}
+		param_grid.update(pg_ext)
+
+	if model_name.lower() == 'gatmodelext':
+		pg_ext = {
+			'n_attention_heads': [4, 8, 16],
+			'agg_modes': [None, 'flatten', 'mean'],
+			'residual': [True, False],
+			'predictor_hidden_feats': [128, 256, 512],
+			'predictor_dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
+			'self_loop': [True, False],
+			}
+		param_grid.update(pg_ext)
+
+	return param_grid
 
 
 def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
@@ -541,7 +618,7 @@ def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
 		# featurize.
 		if kwargs['model'].lower() in ['graphconvmodel', 'graphconvmodelext']:
 			featurizer = dc.feat.ConvMolFeaturizer()
-		elif kwargs['model'].lower() in ['gcnmodel', 'gatmodel']:
+		elif kwargs['model'].lower() in ['gcnmodel', 'gatmodel', 'gatmodelext']:
 			featurizer = dc.feat.MolGraphConvFeaturizer()
 		else:
 			raise ValueError('Model "%s" can not be recognized.' % kwargs['model'])

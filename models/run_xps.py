@@ -176,7 +176,7 @@ if __name__ == "__main__":
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
 	Metric_List = (['RMSE', 'MAE', 'R2'] if args.metric is None else [args.metric])
 	# network structural hyperparameters.
-	Model_List = (['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
+	Model_List = (['GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
 	Activation_Fn_List = (['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
 # 					'exponetial',
 					'tanh', 'softmax', 'sigmoid']#, 'normalize']
