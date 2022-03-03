@@ -251,16 +251,18 @@ def check_param_grid(param_grid, cv_scheme='random'):
 
 	if cv_scheme == 'grid':
 		param_grid_list = list(ParameterGrid(param_grid))
+		nb_max_params = len(param_grid_list)
 	elif cv_scheme == 'random':
 		grid_tmp = ParameterGrid(param_grid)
 		nb_params = len(grid_tmp)
-		i_rand = np.random.randint(0, nb_params, size=60) # @todo: change size as needed.
+		i_rand = np.random.randint(0, nb_params, size=nb_params) # @todo: change size as needed.
 		param_grid_list = [grid_tmp[i] for i in i_rand]
+		nb_max_params = 60
 	else:
 		raise ValueError('The cv_scheme "%s" can not be recognized, possible '
 				   'candidates include "random" and "grid".' % cv_scheme)
 
-	return param_grid_list
+	return param_grid_list, nb_max_params
 
 
 def train_valid_test_model(train_dataset, valid_dataset, test_dataset,
@@ -369,29 +371,43 @@ def cross_validation(train_dataset, valid_dataset, test_dataset,
 					  **kwargs):
 
 	# Get hyperparameter grid list.
-	param_grid_list = check_param_grid(param_grid, cv_scheme=cv_scheme)
+	param_grid_list, nb_max_params = check_param_grid(param_grid, cv_scheme=cv_scheme)
 
 	### hyperparameters selection
 	all_scores = [] # scores of all hyperparameter settings
+	cnt_nb_p = 0 # number of params tried
 	# for each hyperparameter setting
 	for params in param_grid_list:
+
+		cnt_nb_p += 1
+		if cnt_nb_p > nb_max_params:
+			break
 
 		if verbose:
 			print('----------- current hyperparameters: ------------')
 			print(params)
 
-		cur_scores = train_valid_test_model(train_dataset, valid_dataset, test_dataset,
-								 model_name,
-								 metric=metric,
-								 refit=refit,
-								 hyperparams=params,
-								 save_scores=save_scores,
-								 plot_scores=plot_scores,
-								 verbose=verbose,
-								 **kwargs)
+		try:
+			cur_scores = train_valid_test_model(train_dataset,
+									  valid_dataset, test_dataset,
+									  model_name,
+									  metric=metric,
+									  refit=refit,
+									  hyperparams=params,
+									  save_scores=save_scores,
+									  plot_scores=plot_scores,
+									  verbose=verbose,
+									  **kwargs)
+		except RuntimeError as e:
+			if verbose:
+				print('UnboundLocalError: ' + repr(e) + '\n')
+			cur_scores = None
+			cnt_nb_p -= 1
 
-		all_scores.append({'scores': [i for i in cur_scores[0:-1]],
-					'params': params})
+
+		if cur_scores is not None:
+			all_scores.append({'scores': [i for i in cur_scores[0:-1]],
+						'params': params})
 
 
 	best_results = select_model(all_scores)
@@ -500,12 +516,12 @@ def set_param_grid(model_name):
 		'batch_size': [8, 16, 32, 64, 128], # [16], # [8, 16, 32, 64, 128], # No.7
 		'learning_rate': [0.1, 0.01, 0.001, 0.0001], # [0.001]# No.4
 		'loss': ['l1', 'l2'], # No.3
-# 		'n_graph_layers': [1],
-# 		'w_graph_channels': [32],
+# 		'n_graph_layers': [5],
+# 		'w_graph_channels': [128],
 # 		'dropout': [0.0],
-# 		'batch_size': [8],
-# 		'learning_rate': [0.01],
-# 		'loss': ['l1', 'l2'],
+# 		'batch_size': [64],
+# 		'learning_rate': [0.1],
+# 		'loss': ['l2'],
 # 		'dense_layer_size': [128],
 		}
 
@@ -517,12 +533,18 @@ def set_param_grid(model_name):
 
 	if model_name.lower() == 'gatmodelext':
 		pg_ext = {
-			'n_attention_heads': [4, 8, 16],
-			'agg_modes': [None, 'flatten', 'mean'],
-			'residual': [True, False],
-			'predictor_hidden_feats': [128, 256, 512],
-			'predictor_dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
-			'self_loop': [True, False],
+ 			'n_attention_heads': [4, 8, 16],
+ 			'agg_modes': [None, 'flatten', 'mean'],
+ 			'residual': [True, False],
+ 			'predictor_hidden_feats': [128, 256, 512],
+ 			'predictor_dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
+ 			'self_loop': [True, False],
+# 			'n_attention_heads': [16],
+# 			'agg_modes': ['mean'],
+# 			'residual': [True],
+# 			'predictor_hidden_feats': [256],
+# 			'predictor_dropout': [0.0],
+# 			'self_loop': [False],
 			}
 		param_grid.update(pg_ext)
 
