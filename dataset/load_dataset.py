@@ -9,10 +9,8 @@ import os
 import sys
 import pandas as pd
 sys.path.insert(0, '../')
-from dataset.format_dataset import to_smiles
 
-
-def load_dataset(ds_name, format_='smiles', **kwargs):
+def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 	"""Load pre-defined datasets.
 
 	Parameters
@@ -37,9 +35,18 @@ def load_dataset(ds_name, format_='smiles', **kwargs):
 		kwargs_data = ({'path': kwargs['path']} if 'path' in kwargs else {})
 		data = load_thermophysical(**kwargs_data)
 
+	elif ds_name.lower() == 'sugarmono':
+		kwargs_data = ({'path': kwargs['path']} if 'path' in kwargs else {})
+		data = load_sugarmono(**kwargs_data)
+
 	# Format data.
-	if format_ == 'smiles':
+	if format_.lower() == 'smiles':
+		from dataset.format_dataset import to_smiles
 		data = to_smiles(data, ds_name.lower(), **kwargs)
+
+	elif format_.lower() == 'networkx':
+		from dataset.format_dataset import to_nxgraphs
+		data = to_nxgraphs(data, ds_name.lower(), **kwargs)
 
 	return data
 
@@ -64,21 +71,65 @@ def load_polyacrylates200(path='../datasets/Polyacrylates200/'):
 	return df
 
 
-if __name__ == '__main__':
-	dataset = load_dataset('thermophysical')
-	dataset2 = load_dataset('polyacrylates200')
+def load_sugarmono(path='../datasets/Sugarmono/', rm_replicate=False):
+	### Load raw data from file.
+	fname = os.path.join(path, 'oxygenated_polymers.csv')
+	df = pd.read_csv(fname, header=None)
 
-	# Check overlaps in the two datasets.
-	dataset['X'] = list(set(dataset['X']))
-	dataset2['X'] = list(set(dataset2['X']))
-	overlaps = []
-	exclusive_1 = []
-	for s in dataset['X']:
-		if s in dataset2['X']:
-			overlaps.append(s)
+	### Retrieve dataset from the raw data.
+	smiles = df.iloc[:, 2]
+	targets = df.iloc[:, 6]
+	families = df.iloc[:, 5]
+
+	# Save data to dataset while removing useless lines.
+	import numpy as np
+	dataset = {'X': [], 'targets': [], 'families': []}
+	for idx, t in enumerate(targets):
+		try:
+			tf = float(t)
+		except ValueError:
+# 			raise
+			pass
 		else:
-			exclusive_1.append(s)
-	exclusive_2 = []
-	for s in dataset2['X']:
-		if s not in dataset['X']:
-			exclusive_2.append(s)
+			if not np.isnan(tf) and isinstance(smiles[idx], str):
+				dataset['X'].append(smiles[idx].strip())
+				dataset['targets'].append(tf)
+				dataset['families'].append(families[idx].strip())
+
+	if rm_replicate:
+		X, targets, families = [], [], []
+		for idx, s in enumerate(dataset['X']):
+			if s not in X:
+				X.append(s)
+				targets.append(dataset['targets'][idx])
+				families.append(dataset['families'][idx])
+		dataset['X'] = X
+		dataset['targets'] = targets
+		dataset['families'] = families
+
+	return dataset
+
+
+if __name__ == '__main__':
+# 	#%%
+# 	dataset = load_dataset('thermophysical')
+# 	dataset2 = load_dataset('polyacrylates200')
+
+# 	# Check overlaps in the two datasets.
+# 	dataset['X'] = list(set(dataset['X']))
+# 	dataset2['X'] = list(set(dataset2['X']))
+# 	overlaps = []
+# 	exclusive_1 = []
+# 	for s in dataset['X']:
+# 		if s in dataset2['X']:
+# 			overlaps.append(s)
+# 		else:
+# 			exclusive_1.append(s)
+# 	exclusive_2 = []
+# 	for s in dataset2['X']:
+# 		if s not in dataset['X']:
+# 			exclusive_2.append(s)
+
+
+	#%%
+	dataset = load_dataset('sugarmono', rm_replicate=False)
