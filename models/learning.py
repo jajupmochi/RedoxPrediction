@@ -257,7 +257,7 @@ def check_param_grid(param_grid, cv_scheme='random'):
 		nb_params = len(grid_tmp)
 		i_rand = np.random.randint(0, nb_params, size=nb_params) # @todo: change size as needed.
 		param_grid_list = [grid_tmp[i] for i in i_rand]
-		nb_max_params = 60
+		nb_max_params = 100
 	else:
 		raise ValueError('The cv_scheme "%s" can not be recognized, possible '
 				   'candidates include "random" and "grid".' % cv_scheme)
