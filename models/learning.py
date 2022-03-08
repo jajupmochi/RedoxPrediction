@@ -73,7 +73,7 @@ def get_model_params(model_name, **kwargs):
 
 	# graph_conv_layers / graph_attention_layers
 	if 'n_graph_layers' in kwargs and 'w_graph_channels' in kwargs:
-		if model_name.lower() == 'graphconvmodelext':
+		if model_name.lower() in ['gcnmodelext', 'graphconvmodelext']:
 			model_params['graph_conv_layers'] = [kwargs['w_graph_channels']] * kwargs['n_graph_layers']
 		elif model_name.lower() == 'gatmodelext':
 			model_params['graph_attention_layers'] = [kwargs['w_graph_channels']] * kwargs['n_graph_layers']
@@ -96,6 +96,10 @@ def get_model_params(model_name, **kwargs):
 	elif model_name.lower() == 'gatmodelext':
 		key_params += ['n_attention_heads', 'agg_modes', 'residual',
 				  'predictor_hidden_feats', 'predictor_dropout', 'self_loop']
+	elif model_name.lower() == 'gcnmodelext':
+		key_params += ['residual', 'batchnorm',
+				  'predictor_hidden_feats', 'predictor_dropout', 'self_loop']
+
 
 	for key in key_params:
 		if key in kwargs:
@@ -130,10 +134,17 @@ def get_model(model_name, **kwargs):
 					  graph_pools=graph_pools,
 					  **model_params)
 
-	elif model_name.lower() == 'gcnmodel':
-		model = dc.models.GCNModel(mode='regression', n_tasks=1,
-							 activation=activation_fns[0],
-							 **model_params)
+	elif model_name.lower() == 'gcnmodelext':
+		from models.dc_models import GCNModelExt
+		model = GCNModelExt(mode='regression', n_tasks=1,
+					  activation=activation_fns,
+					  graph_pools=graph_pools,
+					  **model_params)
+
+# 	elif model_name.lower() == 'gcnmodel':
+# 		model = dc.models.GCNModel(mode='regression', n_tasks=1,
+# 							 activation=activation_fns[0],
+# 							 **model_params)
 # 							 wandb=logger)
 # 	elif model_name.lower() == 'gatmodel':
 # 		model = dc.models.GATModel(mode='regression', n_tasks=1,
@@ -422,7 +433,7 @@ def cross_validation(train_dataset, valid_dataset, test_dataset,
 def evaluate_GNN(train_dataset, valid_dataset, test_dataset, mode='reg',
 				 nb_epoch=100, output_dir=None, trial_index=1, **kwargs):
 	### Get hyperparameters.
-	model_name = kwargs.get('model', 'GCNModel')
+	model_name = kwargs.get('model', 'GATModelExt')
 	feature_scaling = kwargs.get('feature_scaling', 'standard_y')
 	metric_name = kwargs.get('metric', 'RMSE')
 	activation_fn = kwargs.get('activation_fn', 'relu')
@@ -531,11 +542,27 @@ def set_param_grid(model_name):
 			}
 		param_grid.update(pg_ext)
 
-	if model_name.lower() == 'gatmodelext':
+	elif model_name.lower() == 'gatmodelext':
 		pg_ext = {
  			'n_attention_heads': [4, 8, 16],
  			'agg_modes': [None, 'flatten', 'mean'],
  			'residual': [True, False],
+ 			'predictor_hidden_feats': [128, 256, 512],
+ 			'predictor_dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
+ 			'self_loop': [True, False],
+# 			'n_attention_heads': [16],
+# 			'agg_modes': ['mean'],
+# 			'residual': [True],
+# 			'predictor_hidden_feats': [256],
+# 			'predictor_dropout': [0.0],
+# 			'self_loop': [False],
+			}
+		param_grid.update(pg_ext)
+
+	elif model_name.lower() == 'gcnmodelext':
+		pg_ext = {
+			'residual': [True, False],
+			'batchnorm': [False, True],
  			'predictor_hidden_feats': [128, 256, 512],
  			'predictor_dropout': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
  			'self_loop': [True, False],
@@ -640,7 +667,7 @@ def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
 		# featurize.
 		if kwargs['model'].lower() in ['graphconvmodel', 'graphconvmodelext']:
 			featurizer = dc.feat.ConvMolFeaturizer()
-		elif kwargs['model'].lower() in ['gcnmodel', 'gatmodel', 'gatmodelext']:
+		elif kwargs['model'].lower() in ['gcnmodel', 'gatmodel', 'gatmodelext', 'gcnmodelext']:
 			featurizer = dc.feat.MolGraphConvFeaturizer()
 		else:
 			raise ValueError('Model "%s" can not be recognized.' % kwargs['model'])

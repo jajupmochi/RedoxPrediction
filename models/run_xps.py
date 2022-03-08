@@ -73,6 +73,11 @@ def get_data(ds_name):
 		smiles = [s for i, s in enumerate(smiles) if i not in idx_rm]
 		y = [y for i, y in enumerate(y) if i not in idx_rm]
 		y = np.reshape(y, (len(y), 1))
+	elif ds_name.lower() == 'sugarmono':
+		data = load_dataset('sugarmono', format_='smiles')
+		smiles = data['X']
+		y = data['targets']
+		y = np.reshape(y, (len(y), 1))
 	else:
 		raise ValueError('Dataset name %s can not be recognized.' % ds_name)
 
@@ -172,11 +177,11 @@ if __name__ == "__main__":
 # 	Dis_List = (['euclidean', 'manhattan'] if args.y_distance is None else [args.y_distance])
 # # 	Target_List = (list(deltaG.keys()) if args.target is None else [args.target])
 # 	Target_List = (['dGred', 'dGox'] if args.target is None else [args.target])
-	DS_Name_List = (['sugarmomo', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
+	DS_Name_List = (['sugarmono', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
 	Metric_List = (['MAE', 'RMSE', 'R2'] if args.metric is None else [args.metric])
 	# network structural hyperparameters.
-	Model_List = (['GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
+	Model_List = (['GCNModelExt', 'GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
 	Activation_Fn_List = (['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
 # 					'exponetial',
 					'tanh', 'softmax', 'sigmoid']#, 'normalize']
@@ -185,7 +190,7 @@ if __name__ == "__main__":
 	# CV hyperparameters.
 	CV_List = (['811', '622'] if args.cv is None else [args.cv])
 	task_grid = ParameterGrid({
-							'ds_name': DS_Name_List[1:2], # @todo: to change back.
+							'ds_name': DS_Name_List[0:1], # @todo: to change back.
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
