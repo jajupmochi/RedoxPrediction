@@ -172,9 +172,9 @@ if __name__ == "__main__":
 # 	Dis_List = (['euclidean', 'manhattan'] if args.y_distance is None else [args.y_distance])
 # # 	Target_List = (list(deltaG.keys()) if args.target is None else [args.target])
 # 	Target_List = (['dGred', 'dGox'] if args.target is None else [args.target])
-	DS_Name_List = (['poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
+	DS_Name_List = (['sugarmomo', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
-	Metric_List = (['RMSE', 'MAE', 'R2'] if args.metric is None else [args.metric])
+	Metric_List = (['MAE', 'RMSE', 'R2'] if args.metric is None else [args.metric])
 	# network structural hyperparameters.
 	Model_List = (['GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
 	Activation_Fn_List = (['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
@@ -182,22 +182,15 @@ if __name__ == "__main__":
 					'tanh', 'softmax', 'sigmoid']#, 'normalize']
 					   if args.activation_fn is None else [args.activation_fn])
 	Graph_Pool_List = (['max', 'none'] if args.graph_pool is None else [args.graph_pool])
-# 	N_Layer_List = [1, 2, 3, 4]
-# 	Loss_List = []
-	# network non-structural hyperparameters.
-# 	Learning_Rate_List = []
-	Batch_Norm_List = [False, True]
-# 	Dropout_List = []
-	Residual_List = [True, False]
-# 	Batch_Size_List = []
-	CV_List = ['811', '622']
+	# CV hyperparameters.
+	CV_List = (['811', '622'] if args.cv is None else [args.cv])
 	task_grid = ParameterGrid({
-							'ds_name': DS_Name_List[0:1], # @todo: to change back.
+							'ds_name': DS_Name_List[1:2], # @todo: to change back.
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
 							'model': Model_List[0:1],
-							'activation_fn': Activation_Fn_List[0:1],
+							'activation_fn': Activation_Fn_List[0:],
 							'graph_pool': Graph_Pool_List[0:1],
 							'cv': CV_List[0:],
 # 							'level': Level_List[0:],
@@ -211,7 +204,7 @@ if __name__ == "__main__":
 
 # 	unlabeled = args.unlabeled # False # @todo: Not actually used. Automatically set in run_xp().
 	mode = ('reg' if args.mode is None else args.mode)
-	nb_epoch = 20000 # @todo: to change it back.
+	nb_epoch = 10000 # @todo: to change it back.
 	# Run.
 
 	for task in list(task_grid):
