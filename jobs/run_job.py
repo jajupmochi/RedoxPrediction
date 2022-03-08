@@ -12,7 +12,66 @@ import re
 cur_path = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_job_script(args):
+def get_job_script(args, device='gpu'):
+	if device == 'gpu':
+		return get_job_script_gpu(args)
+	elif device == 'cpu':
+		return get_job_script_cpu(args)
+
+
+def get_job_script_gpu(args):
+# 		ds_name = args['ds_name']
+# 		kernel = args['kernel']
+# 		feature_scaling = args['feature_scaling']
+# 		remove_sig_errs = args['remove_sig_errs']
+		id_str = '.'.join([v for k, v in args.items()])
+
+		script = r"""
+#!/bin/bash
+
+# Not shared resources
+#SBATCH --exclusive
+#SBATCH --job-name="octo.""" + id_str + r""""
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=jajupmochi@gmail.com
+#SBATCH --output="outputs/octo.""" + id_str + r""".o%J"
+#SBATCH --error="errors/octo.""" + id_str + r""".e%J"
+#
+# GPUs architecture and number
+# ----------------------------
+#SBATCH --partition=gpu_p100 # @todo: to change it back
+# GPUs per compute node
+#   gpu:4 (maximum) for gpu_k80
+#   gpu:2 (maximum) for gpu_p100
+##SBATCH --gres gpu:4
+#SBATCH --gres gpu:1
+# ----------------------------
+# Job time (hh:mm:ss)
+#SBATCH --time=48:00:00 # @todo: to change it back
+##SBATCH --ntasks=1
+##SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=4000
+
+# environments
+# ---------------------------------
+# module load cuda/9.0
+module load -s python3-DL/3.8.5
+module list
+
+hostname
+cd """ + cur_path + r"""/../models/
+echo Working directory : $PWD
+echo Local work dir : $LOCAL_WORK_DIR
+python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()])
+		script = script.strip()
+		script = re.sub('\n\t+', '\n', script)
+		script = re.sub('\n +', '\n', script)
+
+		return script
+
+
+def get_job_script_cpu(args):
 # 		ds_name = args['ds_name']
 # 		kernel = args['kernel']
 # 		feature_scaling = args['feature_scaling']
@@ -24,7 +83,7 @@ def get_job_script(args):
 
 #SBATCH --exclusive
 #SBATCH --job-name="octo.""" + id_str + r""""
-#SBATCH --partition=tcourt # @todo: to change it back
+#SBATCH --partition=court # @todo: to change it back
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=jajupmochi@gmail.com
 #SBATCH --output="outputs/octo.""" + id_str + r""".o%J"
@@ -33,7 +92,7 @@ def get_job_script(args):
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=24:00:00 # @todo: to change it back
+#SBATCH --time=48:00:00 # @todo: to change it back
 #SBATCH --mem-per-cpu=4000
 
 module load -s python3-DL/3.8.5
@@ -61,31 +120,24 @@ if __name__ == '__main__':
 	# Get task grid.
 	DS_Name_List = ['poly200', 'thermo_exp', 'thermo_cal']
 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
-	Metric_List = ['RMSE', 'MAE', 'R2']
+	Metric_List = ['MAE', 'RMSE', 'R2']
 	# network structural hyperparameters.
-	Model_List = ['GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
+	Model_List = ['GCNModelExt', 'GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
 	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
 # 					'exponetial',
 					'tanh', 'softmax', 'sigmoid']#, 'normalize']
 	Graph_Pool_List = ['max', 'none']
-# 	N_Layer_List = [1, 2, 3, 4]
-# 	Loss_List = []
-	# network non-structural hyperparameters.
-# 	Learning_Rate_List = []
-	Batch_Norm_List = [False, True]
-# 	Dropout_List = []
-	Residual_List = [True, False]
+	# CV hyperparameters.
 	CV_List = ['811', '622']
-# 	Batch_Size_List = []
 	task_grid = ParameterGrid({
 							'ds_name': DS_Name_List[0:1], # @todo: to change back.
 							'feature_scaling': Feature_Scaling_List[0:1],
-							'metric': Metric_List[1:2],
+							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
 							'model': Model_List[0:1],
 							'activation_fn': Activation_Fn_List[0:],
 							'graph_pool': Graph_Pool_List[0:1],
-							'cv': CV_List[0:],
+							'cv': CV_List[0:1],
 # 							'level': Level_List[0:],
 # 							'stratified': Stratified_List[0:],
 # 							'edit_cost': Edit_Cost_List[0:],
