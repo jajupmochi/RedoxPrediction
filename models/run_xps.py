@@ -224,7 +224,7 @@ if __name__ == "__main__":
 # 		str_stratified = '.stratified' if task['stratified'] else ''
 # 		output_result = op_dir + 'results.' + '.'.join([task['level'], task['edit_cost'], task['distance'], task['target']]) + str_stratified + '.shuffle.5folds.no_seed.pkl'
 # 		output_result = op_dir + 'results.' + '.'.join([task['model']]) + '.shuffle.5folds.no_seed.pkl'
-		output_result = op_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.random_cv.shuffle.5folds.no_seed.pkl'
+		output_result = op_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.random_cv.use_edge_chirality.shuffle.5folds.no_seed.pkl'
 # 		output_result = op_dir + 'results.shuffle.5folds.no_seed.pkl'
 		print('output file: %s.' % output_result)
 

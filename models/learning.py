@@ -668,7 +668,9 @@ def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
 		if kwargs['model'].lower() in ['graphconvmodel', 'graphconvmodelext']:
 			featurizer = dc.feat.ConvMolFeaturizer()
 		elif kwargs['model'].lower() in ['gcnmodel', 'gatmodel', 'gatmodelext', 'gcnmodelext']:
-			featurizer = dc.feat.MolGraphConvFeaturizer()
+			featurizer = dc.feat.MolGraphConvFeaturizer(use_edges=True,
+											   use_chirality=True,
+											   use_partial_charge=False)
 		else:
 			raise ValueError('Model "%s" can not be recognized.' % kwargs['model'])
 
