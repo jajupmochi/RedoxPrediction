@@ -45,9 +45,12 @@ def run_xp(smiles, y, output_result, mode, hyperparams, nb_epoch=100):
 	return output_result
 
 
-def get_data(ds_name):
+def get_data(ds_name, descriptor='smiles', format_='smiles'):
+	if descriptor.lower() == 'smiles+xyz_obabel':
+		format_ = 'rdkit'
+
 	if ds_name.lower() == 'poly200':
-		data = load_dataset('polyacrylates200', format_='smiles')
+		data = load_dataset('polyacrylates200', descriptor=descriptor, format_=format_)
 		smiles = data['X']
 		# smiles[192] = '(OCCCC)O.O=C=Nc1ccc(cc1)Cc1ccc(cc1)N=C=O'
 		y = data['targets']
@@ -55,7 +58,7 @@ def get_data(ds_name):
 		y = [y for i, y in enumerate(y) if i not in [6]]
 		y = np.reshape(y, (len(y), 1))
 	elif ds_name.lower() == 'thermo_exp':
-		data = load_dataset('thermophysical', format_='smiles', t_type='exp')
+		data = load_dataset('thermophysical', descriptor=descriptor, format_=format_, t_type='exp')
 		smiles = data['X']
 		y = data['targets']
 		idx_rm = [168, 169, 170, 171, 172]
@@ -66,7 +69,7 @@ def get_data(ds_name):
 # 		X_app = featurizer.featurize(smiles)
 		y = np.reshape(y, (len(y), 1))
 	elif ds_name.lower() == 'thermo_cal':
-		data = load_dataset('thermophysical', format_='smiles', t_type='cal')
+		data = load_dataset('thermophysical', descriptor=descriptor, format_=format_, t_type='cal')
 		smiles = data['X']
 		y = data['targets']
 		idx_rm = [151, 198, 199]
@@ -74,7 +77,7 @@ def get_data(ds_name):
 		y = [y for i, y in enumerate(y) if i not in idx_rm]
 		y = np.reshape(y, (len(y), 1))
 	elif ds_name.lower() == 'sugarmono':
-		data = load_dataset('sugarmono', format_='smiles')
+		data = load_dataset('sugarmono', descriptor=descriptor, format_=format_)
 		smiles = data['X']
 		y = data['targets']
 		y = np.reshape(y, (len(y), 1))
@@ -112,6 +115,8 @@ def parse_args():
 	# -------------------------------------------------------------------------
 
 	parser.add_argument('-D', "--ds_name", type=str, help='the name of dataset')
+
+	parser.add_argument("-d", "--descriptor", type=str, help='the descriptor used for each molecule as an input of ML models.')
 
 	parser.add_argument("-f", "--feature_scaling", type=str, choices=['none', 'minmax', 'standard', 'minmax_x', 'standard_x', 'minmax_y', 'standard_y', 'minmax_xy', 'standard_xy'], help="the method to scale the input features")
 
@@ -178,6 +183,7 @@ if __name__ == "__main__":
 # # 	Target_List = (list(deltaG.keys()) if args.target is None else [args.target])
 # 	Target_List = (['dGred', 'dGox'] if args.target is None else [args.target])
 	DS_Name_List = (['sugarmono', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
+	Descriptor_List = (['smiles+xyz_obabel', 'smiles'] if args.descriptor is None else [args.descriptor])
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
 	Metric_List = (['MAE', 'RMSE', 'R2'] if args.metric is None else [args.metric])
 	# network structural hyperparameters.
@@ -190,7 +196,8 @@ if __name__ == "__main__":
 	# CV hyperparameters.
 	CV_List = (['811', '622'] if args.cv is None else [args.cv])
 	task_grid = ParameterGrid({
-							'ds_name': DS_Name_List[0:1], # @todo: to change back.
+							'ds_name': DS_Name_List[1:2], # @todo: to change back.
+							'descriptor': Descriptor_List[0:1],
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
@@ -217,7 +224,7 @@ if __name__ == "__main__":
 		print(task)
 
 		### Load dataset.
-		smiles, y = get_data(task['ds_name'])
+		smiles, y = get_data(task['ds_name'], descriptor=task['descriptor'])
 
 		op_dir = '../outputs/gnn/'
 		os.makedirs(op_dir, exist_ok=True)

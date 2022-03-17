@@ -100,7 +100,6 @@ def get_model_params(model_name, **kwargs):
 		key_params += ['residual', 'batchnorm',
 				  'predictor_hidden_feats', 'predictor_dropout', 'self_loop']
 
-
 	for key in key_params:
 		if key in kwargs:
 			model_params[key] = kwargs[key]
@@ -118,6 +117,8 @@ def get_model(model_name, **kwargs):
 	graph_pools = get_graph_pools(kwargs.get('graph_pool', 'max'),
 							   n_layers=n_layers)
 	model_params = get_model_params(model_name, **kwargs)
+	if 'number_atom_features' in kwargs:
+		model_params['number_atom_features'] = kwargs['number_atom_features']
 
 	# Create the model.
 	if model_name.lower() == 'graphconvmodelext':
@@ -289,9 +290,11 @@ def train_valid_test_model(train_dataset, valid_dataset, test_dataset,
 	kw_metric = kwargs.get('kw_metric', 'mean-mae_score')
 	max_epochs = kwargs.get('max_epochs', 100)
 	epoch_interval = kwargs.get('epoch_interval', 10)
+	number_atom_features = train_dataset.X[0].node_features.shape[1]
 
 	# Get model.
-	model = get_model(model_name, **hyperparams, **kwargs)
+	model = get_model(model_name, number_atom_features=number_atom_features,
+				    **hyperparams, **kwargs)
 
 	### Iterate over epochs.
 	all_scores = {'train_scores':  [], 'valid_scores': [], 'test_scores': [],
@@ -668,16 +671,25 @@ def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
 		if kwargs['model'].lower() in ['graphconvmodel', 'graphconvmodelext']:
 			featurizer = dc.feat.ConvMolFeaturizer()
 		elif kwargs['model'].lower() in ['gcnmodel', 'gatmodel', 'gatmodelext', 'gcnmodelext']:
-			featurizer = dc.feat.MolGraphConvFeaturizer(use_edges=True,
+			if kwargs['descriptor'].lower() == 'smiles':
+				featurizer = dc.feat.MolGraphConvFeaturizer(use_edges=True,
 											   use_chirality=True,
-											   use_partial_charge=False)
+											   use_partial_charge=False,
+											   coords_scaling='auto')
+			elif kwargs['descriptor'].lower() == 'smiles+xyz_obabel':
+				from dataset.feat import DCMolGraphFeaturizer
+				featurizer = DCMolGraphFeaturizer(use_edges=True,
+											   use_chirality=True,
+											   use_partial_charge=False,
+											   coords_scaling='auto')
 		else:
 			raise ValueError('Model "%s" can not be recognized.' % kwargs['model'])
 
 # 		X_app = featurizer.featurize(G_app)
 		X_train = featurizer.featurize(G_train)
-		X_valid = featurizer.featurize(G_valid)
-		X_test = featurizer.featurize(G_test)
+		coords_scaler = featurizer.coords_scaler
+		X_valid = featurizer.featurize(G_valid, coords_scaler=coords_scaler)
+		X_test = featurizer.featurize(G_test, coords_scaler=coords_scaler)
 # 		train_dataset = dc.data.NumpyDataset(X=X_app, y=y_app)
 		train_dataset = dc.data.NumpyDataset(X=X_train, y=y_train)
 		valid_dataset = dc.data.NumpyDataset(X=X_valid, y=y_valid)

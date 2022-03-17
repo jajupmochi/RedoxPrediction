@@ -904,20 +904,20 @@ class GCNModelExt(TorchModel):
 	"""
 
 	def __init__(self,
-							 n_tasks: int,
-							 graph_conv_layers: list = None,
-							 activation_fns=None,
-				 graph_pools=None,
-							 residual: bool = True,
-							 batchnorm: bool = False,
-							 dropout: float = 0.,
-							 predictor_hidden_feats: int = 128,
-							 predictor_dropout: float = 0.,
-							 mode: str = 'regression',
-							 number_atom_features=30,
-							 n_classes: int = 2,
-							 self_loop: bool = True,
-							 **kwargs):
+			  n_tasks: int,
+			  graph_conv_layers: list = None,
+			  activation_fns=None,
+			  graph_pools=None,
+			  residual: bool = True,
+			  batchnorm: bool = False,
+			  dropout: float = 0.,
+			  predictor_hidden_feats: int = 128,
+			  predictor_dropout: float = 0.,
+			  mode: str = 'regression',
+			  number_atom_features=30,
+			  n_classes: int = 2,
+			  self_loop: bool = True,
+			  **kwargs):
 		"""
 		Parameters
 		----------

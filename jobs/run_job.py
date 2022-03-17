@@ -119,6 +119,7 @@ if __name__ == '__main__':
 
 	# Get task grid.
 	DS_Name_List = ['sugarmono', 'poly200', 'thermo_exp', 'thermo_cal']
+	Descriptor_List = ['smiles+xyz_obabel', 'smiles']
 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
 	Metric_List = ['MAE', 'RMSE', 'R2']
 	# network structural hyperparameters.
@@ -131,10 +132,11 @@ if __name__ == '__main__':
 	CV_List = ['811', '622']
 	task_grid = ParameterGrid({
 							'ds_name': DS_Name_List[1:2], # @todo: to change back.
+							'descriptor': Descriptor_List[1:2],
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
-							'model': Model_List[0:1],
+							'model': Model_List[0:2],
 							'activation_fn': Activation_Fn_List[0:],
 							'graph_pool': Graph_Pool_List[0:1],
 							'cv': CV_List[0:],

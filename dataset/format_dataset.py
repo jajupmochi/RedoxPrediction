@@ -5,7 +5,44 @@ Created on Fri Dec  3 14:48:39 2021
 
 @author: ljia
 """
+import os
 import numpy as np
+
+
+def to_rdkit_mols(data, descriptor='smiles+xyz_obabel',
+				  ds_name='', ds_dir='', **kwargs):
+	if descriptor == 'smiles+xyz_obabel':
+		mols = []
+		data = to_smiles(data, ds_name.lower(), **kwargs)
+		smiles = data['X']
+
+		coords_dir = os.path.join(ds_dir, 'obabel.sdf')
+		os.makedirs(coords_dir, exist_ok=True)
+		# for each smiles, labelings starting from 1.
+		for i, sm in enumerate(smiles):
+			# Compute 3d coordinates and generate the .sdf file by OpenBabel
+			# command line tools if the file does not exist.
+# 			print(i)
+			fn_sdf = os.path.join(coords_dir, 'out' + str(i + 1) + '.sdf')
+			if not os.path.isfile(fn_sdf):
+				command = 'obabel -:"' + sm + '" -O "' + fn_sdf + '" -h --gen3d'
+				os.system(command)
+
+			# Create the rdkit mol from the .sdf file.
+			from rdkit import Chem
+			# Add Hydrogens.
+# 			with Chem.SDMolSupplier(fn_sdf, removeHs=False) as suppl:
+# 				mol = suppl[0]
+			mol = Chem.SDMolSupplier(fn_sdf, removeHs=False)[0]
+# 				if mol is None:
+# 					raise Exception('Molecule # %d can not be loaded as a rdkit mol.' % (i + 1))
+# 			for a in mol.GetAtoms():
+# 			    print(a.GetSymbol())
+
+			mols.append(mol)
+
+	data['X'] = mols
+	return data
 
 
 def to_nxgraphs(data, ds_name, verbose=True, **kwargs):

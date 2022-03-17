@@ -10,6 +10,7 @@ import sys
 import pandas as pd
 sys.path.insert(0, '../')
 
+
 def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 	"""Load pre-defined datasets.
 
@@ -48,7 +49,27 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 		from dataset.format_dataset import to_nxgraphs
 		data = to_nxgraphs(data, ds_name.lower(), **kwargs)
 
+	elif format_.lower() == 'rdkit':
+		ds_dir = get_ds_dir(ds_name.lower())
+		from dataset.format_dataset import to_rdkit_mols
+		data = to_rdkit_mols(data, ds_name=ds_name.lower(),
+					   descriptor=descriptor,
+					   ds_dir=ds_dir, **kwargs)
+
 	return data
+
+
+def get_ds_dir(ds_name):
+	# Get folder name.
+	if ds_name in ['', 'polyacrylates200', 'poly200']:
+		folder_name = 'Polyacrylates200'
+	elif ds_name == 'sugarmono':
+		folder_name = 'Sugarmono'
+
+	cur_path = os.path.dirname(os.path.abspath(__file__))
+	ds_dir = os.path.join(cur_path, '../datasets/' + folder_name + '/')
+
+	return ds_dir
 
 
 def load_thermophysical(path='../datasets/Thermophysical/'):
