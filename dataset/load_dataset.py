@@ -101,6 +101,7 @@ def load_sugarmono(path='../datasets/Sugarmono/', rm_replicate=False):
 	smiles = df.iloc[:, 2]
 	targets = df.iloc[:, 6]
 	families = df.iloc[:, 5]
+	mononer2 = df.iloc[:, 4]
 
 	# Save data to dataset while removing useless lines.
 	import numpy as np
@@ -113,9 +114,12 @@ def load_sugarmono(path='../datasets/Sugarmono/', rm_replicate=False):
 			pass
 		else:
 			if not np.isnan(tf) and isinstance(smiles[idx], str):
-				dataset['X'].append(smiles[idx].strip())
-				dataset['targets'].append(tf)
-				dataset['families'].append(families[idx].strip())
+				# Remove the polymers (the combination of 2 monomers).
+				mono2 = mononer2[idx]
+				if pd.isnull(mono2) or mono2.strip() == '':
+					dataset['X'].append(smiles[idx].strip())
+					dataset['targets'].append(tf)
+					dataset['families'].append(families[idx].strip())
 
 	if rm_replicate:
 		X, targets, families = [], [], []
