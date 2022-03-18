@@ -301,7 +301,7 @@ def train_valid_test_model(train_dataset, valid_dataset, test_dataset,
 	### Iterate over epochs.
 	all_scores = {'train_scores':  [], 'valid_scores': [], 'test_scores': [],
 			   'loss': []}
-	nb_i_no_better, max_nb_i_no_better = 0, 20 # for early stop.
+	nb_i_no_better, max_nb_i_no_better = 0, 30 # for early stop.
 	best_valid_mean = np.inf
 	for epoch in range(epoch_interval, max_epochs + epoch_interval, epoch_interval):
 
@@ -691,15 +691,25 @@ def xp_GCN(smiles, y_all, families,
 				featurizer = DCMolGraphFeaturizer(use_edges=True,
 											   use_chirality=True,
 											   use_partial_charge=False,
-											   coords_scaling='auto')
+											   use_distance_stats=False,
+											   use_xyz=True,
+											   feature_scaling='auto')
+			elif kwargs['descriptor'].lower() == 			 'smiles+dis_stats_obabel':
+				from dataset.feat import DCMolGraphFeaturizer
+				featurizer = DCMolGraphFeaturizer(use_edges=True,
+											   use_chirality=True,
+											   use_partial_charge=False,
+											   use_distance_stats=True,
+											   use_xyz=False,
+											   feature_scaling='auto')
 		else:
 			raise ValueError('Model "%s" can not be recognized.' % kwargs['model'])
 
 # 		X_app = featurizer.featurize(G_app)
 		X_train = featurizer.featurize(G_train)
-		coords_scaler = featurizer.coords_scaler
-		X_valid = featurizer.featurize(G_valid, coords_scaler=coords_scaler)
-		X_test = featurizer.featurize(G_test, coords_scaler=coords_scaler)
+		feature_scaler = featurizer.feature_scaler
+		X_valid = featurizer.featurize(G_valid, feature_scaler=feature_scaler)
+		X_test = featurizer.featurize(G_test, feature_scaler=feature_scaler)
 # 		train_dataset = dc.data.NumpyDataset(X=X_app, y=y_app)
 		train_dataset = dc.data.NumpyDataset(X=X_train, y=y_train)
 		valid_dataset = dc.data.NumpyDataset(X=X_valid, y=y_valid)

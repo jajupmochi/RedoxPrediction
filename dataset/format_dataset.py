@@ -11,7 +11,7 @@ import numpy as np
 
 def to_rdkit_mols(data, descriptor='smiles+xyz_obabel',
 				  ds_name='', ds_dir='', **kwargs):
-	if descriptor == 'smiles+xyz_obabel':
+	if descriptor in ['smiles+dis_stats_obabel', 'smiles+xyz_obabel']:
 		mols = []
 		data = to_smiles(data, ds_name.lower(), **kwargs)
 		smiles = data['X']

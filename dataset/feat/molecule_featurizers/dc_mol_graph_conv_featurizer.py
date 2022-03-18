@@ -27,6 +27,7 @@ from deepchem.utils.molecule_feature_utils import get_bond_is_conjugated_one_hot
 from deepchem.utils.molecule_feature_utils import get_bond_stereo_one_hot
 
 from dataset.utils.molecule_feature_utils import get_atoms_3d_coordinates
+from dataset.utils.molecule_feature_utils import get_atoms_distance_stats
 
 
 def _construct_atom_feature(
@@ -142,7 +143,9 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 			  use_edges: bool = False,
 			  use_chirality: bool = False,
 			  use_partial_charge: bool = False,
-			  coords_scaling: str = 'auto'):
+			  use_distance_stats: bool = False,
+			  use_xyz: bool = False,
+			  feature_scaling: str = 'auto'):
 		"""
 		Parameters
 		----------
@@ -160,8 +163,10 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 		self.use_edges = use_edges
 		self.use_partial_charge = use_partial_charge
 		self.use_chirality = use_chirality
-		self.coords_scaling = coords_scaling
-		self.coords_scaler = None
+		self.use_distance_stats = use_distance_stats
+		self.use_xyz = use_xyz
+		self.feature_scaling = feature_scaling
+		self.feature_scaler = None
 
 
 	def featurize(self, datapoints, log_every_n=1000, **kwargs) -> np.ndarray:
@@ -183,17 +188,19 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 		features = super(DCMolGraphFeaturizer, self).featurize(datapoints,
 														 log_every_n=log_every_n,
 														 **kwargs)
-		# Scale 3d coordinates.
-		if self.coords_scaling == 'auto':
-			# in "auto" mode, the scaler will be set to `MinMaxScaler()` if it
-			# is not given in method argument.
-			from sklearn.preprocessing import MinMaxScaler
-			self.coords_scaler = kwargs.get('coords_scaler',
-								   MinMaxScaler(feature_range=(0, 1)))
-			self.scale_3d_coordinates(features, self.coords_scaler)
-		else:
-			raise ValueError('coords_scaling: "%s" can not be recognized. '
-					'Possible candidates include "auto".' % self.coords_scaling)
+
+		if self.use_distance_stats or self.use_xyz:
+			# Scale real value features.
+			if self.feature_scaling == 'auto':
+				# in "auto" mode, the scaler will be set to `MinMaxScaler()` if it
+				# is not given in method argument.
+				from sklearn.preprocessing import MinMaxScaler
+				self.feature_scaler = kwargs.get('feature_scaler',
+									   MinMaxScaler(feature_range=(0, 1)))
+				self.scale_real_value_features(features, self.feature_scaler)
+			else:
+				raise ValueError('feature_scaling: "%s" can not be recognized. '
+						'Possible candidates include "auto".' % self.feature_scaling)
 
 		return features
 
@@ -238,12 +245,23 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 				],
 				dtype=float,
 		)
+
+		# Add statistical features of distances between the given atom and others.
+		if self.use_distance_stats:
+			# Keep the statistical features right before the 3d coordinate
+			# features to keep the method `scale_real_value_features()` correct.
+			stats = get_atoms_distance_stats(datapoint,
+										use_bohr=False, complete_coords=False)
+			atom_features = np.concatenate([atom_features, stats], axis=1)
+
 		# Add 3d coordinates.
-		# Keep the coordinates at the end of the feature vectors to keep the
-		# method `scale_3d_coordinates` correct.
-		coords = get_atoms_3d_coordinates(datapoint,
-									use_bohr=False, complete_coords=False)
-		atom_features = np.concatenate([atom_features, coords], axis=1)
+		if self.use_xyz:
+			# Keep the coordinates at the end of the feature vectors to keep the
+			# method `scale_real_value_features()` correct.
+			coords = get_atoms_3d_coordinates(datapoint,
+										use_bohr=False, complete_coords=False)
+			atom_features = np.concatenate([atom_features, coords], axis=1)
+
 
 		# construct edge (bond) index
 		src, dest = [], []
@@ -267,39 +285,41 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 				edge_features=bond_features)
 
 
-	def scale_3d_coordinates(self, features, scaler):
+	def scale_real_value_features(self, features, scaler):
+		nb_features = (6 if (self.use_distance_stats and self.use_xyz) else 3)
+
 		# Fit scaler if needed.
 		from sklearn.utils.validation import check_is_fitted
 		from sklearn.exceptions import NotFittedError
 		try:
 			check_is_fitted(scaler)
 		except NotFittedError:
-			# Retrieve all coordinates.
-			coords = np.empty((0, 3))
+			# Retrieve all real value features.
+			feats_real = np.empty((0, nb_features))
 			for gdata in features:
-				coords = np.concatenate((coords, gdata.node_features[:, -3:]),
+				feats_real = np.concatenate((feats_real, gdata.node_features[:, -nb_features:]),
 							axis=0)
 			# Fit the scaler.
-			scaler.fit(coords)
+			scaler.fit(feats_real)
 
 # 			# Find min and max values.
-# 			min_coords = np.full((1, 3), np.inf)
-# 			max_coords = np.full((1, 3), -np.inf)
+# 			min_feats_real = np.full((1, 3), np.inf)
+# 			max_feats_real = np.full((1, 3), -np.inf)
 
 
 # 			# Find min and max values.
-# 			min_coords = np.full((1, 3), np.inf)
-# 			max_coords = np.full((1, 3), -np.inf)
+# 			min_feats_real = np.full((1, 3), np.inf)
+# 			max_feats_real = np.full((1, 3), -np.inf)
 # 			for gdata in features:
-# 				coords = gdata.node_features[:, -3:]
-# 				cur_min = coords.max(axis=0)
-# 				cur_max = coords.min(axis=0)
+# 				feats_real = gdata.node_features[:, -3:]
+# 				cur_min = feats_real.max(axis=0)
+# 				cur_max = feats_real.min(axis=0)
 
 		# Transform data.
 		for gdata in features:
-			coords = gdata.node_features[:, -3:]
-			coords_fitted = scaler.transform(coords)
-			gdata.node_features[:, -3:] = coords_fitted
+			feats_real = gdata.node_features[:, -nb_features:]
+			feats_real_fitted = scaler.transform(feats_real)
+			gdata.node_features[:, -nb_features:] = feats_real_fitted
 
 
 # 	@property

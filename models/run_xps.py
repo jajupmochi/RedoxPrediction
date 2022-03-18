@@ -72,7 +72,7 @@ def get_data(ds_name, descriptor='smiles', format_='smiles'):
 		return smiles, y, families
 
 
-	if descriptor.lower() == 'smiles+xyz_obabel':
+	if descriptor.lower() in ['smiles+dis_stats_obabel', 'smiles+xyz_obabel']:
 		format_ = 'rdkit'
 
 	if ds_name.lower() == 'poly200':
@@ -213,7 +213,7 @@ if __name__ == "__main__":
 # # 	Target_List = (list(deltaG.keys()) if args.target is None else [args.target])
 # 	Target_List = (['dGred', 'dGox'] if args.target is None else [args.target])
 	DS_Name_List = (['poly200+sugarmono','sugarmono', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
-	Descriptor_List = (['smiles+xyz_obabel', 'smiles'] if args.descriptor is None else [args.descriptor])
+	Descriptor_List = (['smiles+dis_stats_obabel', 'smiles+xyz_obabel', 'smiles'] if args.descriptor is None else [args.descriptor])
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
 	Metric_List = (['MAE', 'RMSE', 'R2'] if args.metric is None else [args.metric])
 

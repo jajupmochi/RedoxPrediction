@@ -40,7 +40,7 @@ def get_job_script_gpu(args):
 #
 # GPUs architecture and number
 # ----------------------------
-#SBATCH --partition=gpu_p100 # @todo: to change it back
+#SBATCH --partition=gpu_v100 # @todo: to change it back p100
 # GPUs per compute node
 #   gpu:4 (maximum) for gpu_k80
 #   gpu:2 (maximum) for gpu_p100
@@ -123,7 +123,7 @@ if __name__ == '__main__':
 
 	# Get task grid.
 	DS_Name_List = ['poly200+sugarmono', 'sugarmono', 'poly200', 'thermo_exp', 'thermo_cal']
-	Descriptor_List = ['smiles+xyz_obabel', 'smiles']
+	Descriptor_List = ['smiles+dis_stats_obabel', 'smiles+xyz_obabel', 'smiles']
 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
 	Metric_List = ['MAE', 'RMSE', 'R2']
 	# network structural hyperparameters.
@@ -135,8 +135,8 @@ if __name__ == '__main__':
 	# CV hyperparameters.
 	CV_List = ['811', '622']
 	task_grid = ParameterGrid({
-							'ds_name': DS_Name_List[1:2], # @todo: to change back.
-							'descriptor': Descriptor_List[1:2],
+							'ds_name': DS_Name_List[0:1], # @todo: to change back.
+							'descriptor': Descriptor_List[0:1],
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
