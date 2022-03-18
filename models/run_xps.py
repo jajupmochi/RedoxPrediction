@@ -16,7 +16,7 @@ sys.path.insert(0, '../')
 from dataset.load_dataset import load_dataset
 
 
-def run_xp(smiles, y, output_result, mode, hyperparams, nb_epoch=100):
+def run_xp(smiles, y, families, output_result, mode, hyperparams, nb_epoch=100):
 	from learning import xp_GCN
 
 	resu = {}
@@ -32,7 +32,7 @@ def run_xp(smiles, y, output_result, mode, hyperparams, nb_epoch=100):
 # 	else:
 # 		stratified_y = None
 
-	results = xp_GCN(smiles, y,
+	results = xp_GCN(smiles, y, families,
 				  mode=mode,
 				  nb_epoch=nb_epoch,
 				  output_file=output_result,
@@ -57,6 +57,8 @@ def get_data(ds_name, descriptor='smiles', format_='smiles'):
 		smiles = [s for i, s in enumerate(smiles) if i not in [6]]
 		y = [y for i, y in enumerate(y) if i not in [6]]
 		y = np.reshape(y, (len(y), 1))
+		families = [ds_name] * len(smiles)
+
 	elif ds_name.lower() == 'thermo_exp':
 		data = load_dataset('thermophysical', descriptor=descriptor, format_=format_, t_type='exp')
 		smiles = data['X']
@@ -68,6 +70,8 @@ def get_data(ds_name, descriptor='smiles', format_='smiles'):
 # 		featurizer = dc.feat.MolGraphConvFeaturizer()
 # 		X_app = featurizer.featurize(smiles)
 		y = np.reshape(y, (len(y), 1))
+		families = [ds_name] * len(smiles)
+
 	elif ds_name.lower() == 'thermo_cal':
 		data = load_dataset('thermophysical', descriptor=descriptor, format_=format_, t_type='cal')
 		smiles = data['X']
@@ -76,15 +80,23 @@ def get_data(ds_name, descriptor='smiles', format_='smiles'):
 		smiles = [s for i, s in enumerate(smiles) if i not in idx_rm]
 		y = [y for i, y in enumerate(y) if i not in idx_rm]
 		y = np.reshape(y, (len(y), 1))
+		families = [ds_name] * len(smiles)
+
 	elif ds_name.lower() == 'sugarmono':
 		data = load_dataset('sugarmono', descriptor=descriptor, format_=format_)
 		smiles = data['X']
 		y = data['targets']
+		families = data['families']
+		idx_rm = [17] # Generated atomic 3d coordinates are all 0s.
+		smiles = [s for i, s in enumerate(smiles) if i not in idx_rm]
+		y = [y for i, y in enumerate(y) if i not in idx_rm]
+		families = [f for i, f in enumerate(families) if i not in idx_rm]
 		y = np.reshape(y, (len(y), 1))
+
 	else:
 		raise ValueError('Dataset name %s can not be recognized.' % ds_name)
 
-	return smiles, y
+	return smiles, y, families
 
 
 def parse_args():
@@ -108,8 +120,6 @@ def parse_args():
 
 	parser.add_argument("-x", "--target", type=str, help="the name of targets/experiment")
 
-	parser.add_argument("-s", "--stratified", type=str, help="whether to stratify the data or not.")
-
 	parser.add_argument('-l', "--level", type=str, choices=['pbe', 'pbe0'], help='the level of chemical computational method.')
 
 	# -------------------------------------------------------------------------
@@ -129,6 +139,8 @@ def parse_args():
 	parser.add_argument('-p', "--graph_pool", type=str, help='the graph pooling method')
 
 	parser.add_argument('-C', "--cv", type=str, help='the CV protocol')
+
+	parser.add_argument("-s", "--stratified", type=str, help="whether to stratify the data or not.")
 
 	args = parser.parse_args()
 
@@ -186,6 +198,7 @@ if __name__ == "__main__":
 	Descriptor_List = (['smiles+xyz_obabel', 'smiles'] if args.descriptor is None else [args.descriptor])
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
 	Metric_List = (['MAE', 'RMSE', 'R2'] if args.metric is None else [args.metric])
+
 	# network structural hyperparameters.
 	Model_List = (['GCNModelExt', 'GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'] if args.model is None else [args.model])
 	Activation_Fn_List = (['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
@@ -193,10 +206,13 @@ if __name__ == "__main__":
 					'tanh', 'softmax', 'sigmoid']#, 'normalize']
 					   if args.activation_fn is None else [args.activation_fn])
 	Graph_Pool_List = (['max', 'none'] if args.graph_pool is None else [args.graph_pool])
+
 	# CV hyperparameters.
 	CV_List = (['811', '622'] if args.cv is None else [args.cv])
+	Stratified_List = ([True, False] if args.stratified is None else [args.stratified == 'True'])
+
 	task_grid = ParameterGrid({
-							'ds_name': DS_Name_List[1:2], # @todo: to change back.
+							'ds_name': DS_Name_List[0:1], # @todo: to change back.
 							'descriptor': Descriptor_List[0:1],
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
@@ -204,7 +220,9 @@ if __name__ == "__main__":
 							'model': Model_List[0:1],
 							'activation_fn': Activation_Fn_List[0:],
 							'graph_pool': Graph_Pool_List[0:1],
-							'cv': CV_List[0:],
+							# CV hyperparameters.
+							'cv': CV_List[1:2],
+							'stratified': Stratified_List[0:1],
 # 							'level': Level_List[0:],
 # 							'stratified': Stratified_List[0:],
 # 							'edit_cost': Edit_Cost_List[0:],
@@ -224,14 +242,16 @@ if __name__ == "__main__":
 		print(task)
 
 		### Load dataset.
-		smiles, y = get_data(task['ds_name'], descriptor=task['descriptor'])
+		smiles, y, families = get_data(task['ds_name'],
+								  descriptor=task['descriptor'])
 
 		op_dir = '../outputs/gnn/'
 		os.makedirs(op_dir, exist_ok=True)
 # 		str_stratified = '.stratified' if task['stratified'] else ''
 # 		output_result = op_dir + 'results.' + '.'.join([task['level'], task['edit_cost'], task['distance'], task['target']]) + str_stratified + '.shuffle.5folds.no_seed.pkl'
 # 		output_result = op_dir + 'results.' + '.'.join([task['model']]) + '.shuffle.5folds.no_seed.pkl'
-		output_result = op_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.random_cv.use_edge_chirality.shuffle.5folds.no_seed.pkl'
+		str_stratified = '.stratified' if task['stratified'] else ''
+		output_result = op_dir + 'results.' + '.'.join([v for k, v in task.items() if k != 'stratified']) + '.random_cv.use_edge_chirality' + str_stratified + '.shuffle.5folds.no_seed.pkl'
 # 		output_result = op_dir + 'results.shuffle.5folds.no_seed.pkl'
 		print('output file: %s.' % output_result)
 
@@ -245,4 +265,4 @@ if __name__ == "__main__":
 			copyfile(output_result, result_bk)
 # 		else:
 
-		run_xp(smiles, y, output_result, mode, task, nb_epoch=nb_epoch)
+		run_xp(smiles, y, families, output_result, mode, task, nb_epoch=nb_epoch)

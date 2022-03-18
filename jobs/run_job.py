@@ -24,9 +24,10 @@ def get_job_script_gpu(args):
 # 		kernel = args['kernel']
 # 		feature_scaling = args['feature_scaling']
 # 		remove_sig_errs = args['remove_sig_errs']
-		id_str = '.'.join([v for k, v in args.items()])
+	str_stra = ('.stratified' if stratified == 'True' else '')
+	id_str = '.'.join([v for k, v in args.items()]) + str_stra
 
-		script = r"""
+	script = r"""
 #!/bin/bash
 
 # Not shared resources
@@ -63,12 +64,12 @@ hostname
 cd """ + cur_path + r"""/../models/
 echo Working directory : $PWD
 echo Local work dir : $LOCAL_WORK_DIR
-python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()])
-		script = script.strip()
-		script = re.sub('\n\t+', '\n', script)
-		script = re.sub('\n +', '\n', script)
+python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" -stratified """ + stratified
+	script = script.strip()
+	script = re.sub('\n\t+', '\n', script)
+	script = re.sub('\n +', '\n', script)
 
-		return script
+	return script
 
 
 def get_job_script_cpu(args):
@@ -76,9 +77,10 @@ def get_job_script_cpu(args):
 # 		kernel = args['kernel']
 # 		feature_scaling = args['feature_scaling']
 # 		remove_sig_errs = args['remove_sig_errs']
-		id_str = '.'.join([v for k, v in args.items()])
+	str_stra = ('.stratified' if stratified == 'True' else '')
+	id_str = '.'.join([v for k, v in args.items()]) + str_stra
 
-		script = r"""
+	script = r"""
 #!/bin/bash
 
 #SBATCH --exclusive
@@ -102,12 +104,12 @@ hostname
 cd """ + cur_path + r"""/../models/
 echo Working directory : $PWD
 echo Local work dir : $LOCAL_WORK_DIR
-python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()])
-		script = script.strip()
-		script = re.sub('\n\t+', '\n', script)
-		script = re.sub('\n +', '\n', script)
+python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" -stratified """ + stratified
+	script = script.strip()
+	script = re.sub('\n\t+', '\n', script)
+	script = re.sub('\n +', '\n', script)
 
-		return script
+	return script
 
 
 if __name__ == '__main__':
@@ -116,6 +118,8 @@ if __name__ == '__main__':
 	os.makedirs('errors/', exist_ok=True)
 
 	from sklearn.model_selection import ParameterGrid
+
+	stratified = 'True'
 
 	# Get task grid.
 	DS_Name_List = ['sugarmono', 'poly200', 'thermo_exp', 'thermo_cal']

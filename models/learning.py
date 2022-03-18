@@ -239,12 +239,14 @@ def get_graph_pools(func_name, n_layers=2, backend='tf'):
 		raise ValueError('The given graph pool method can not be recognized.')
 
 
-def split_data(D, y, train_index, test_index):
+def split_data(D, y, F, train_index, test_index):
 	D_app = [D[i] for i in train_index]
 	D_test = [D[i] for i in test_index]
 	y_app = [y[i] for i in train_index]
 	y_test = [y[i] for i in test_index]
-	return D_app, D_test, y_app, y_test
+	F_app = [F[i] for i in train_index]
+	F_test = [F[i] for i in test_index]
+	return D_app, D_test, y_app, y_test, F_app, F_test
 
 
 def select_model(all_scores):
@@ -267,9 +269,9 @@ def check_param_grid(param_grid, cv_scheme='random'):
 	elif cv_scheme == 'random':
 		grid_tmp = ParameterGrid(param_grid)
 		nb_params = len(grid_tmp)
-		i_rand = np.random.randint(0, nb_params, size=nb_params) # @todo: change size as needed.
+		i_rand = np.random.randint(0, nb_params, size=nb_params)
 		param_grid_list = [grid_tmp[i] for i in i_rand]
-		nb_max_params = 100
+		nb_max_params = 100 # @todo: change size as needed.
 	else:
 		raise ValueError('The cv_scheme "%s" can not be recognized, possible '
 				   'candidates include "random" and "grid".' % cv_scheme)
@@ -581,7 +583,8 @@ def set_param_grid(model_name):
 	return param_grid
 
 
-def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
+def xp_GCN(smiles, y_all, families,
+		   mode='reg', nb_epoch=100, output_file=None, **kwargs):
 	'''
 	Perform a GCN regressor on given dataset.
 	'''
@@ -596,27 +599,31 @@ def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
 
 	from sklearn.model_selection import ShuffleSplit, StratifiedShuffleSplit, StratifiedKFold, train_test_split
 
-
 # 	stratified = False
 	if mode == 'classif':
-		stratified = True
+		stratified = True # @todo: to change it as needed.
+	else:
+		stratified = kwargs.get('stratified', True)
 
-# 	if stratified:
-# 		rs = StratifiedShuffleSplit(n_splits=5, test_size=.2, random_state=None)
-# 	else:
-# # 		rs = ShuffleSplit(n_splits=10, test_size=.1) #, random_state=0)
-# 		rs = ShuffleSplit(n_splits=5, test_size=.1, random_state=0)
 	cv = kwargs.get('cv')
 	test_size = (0.1 if cv == '811' else 0.2)
-	rs = ShuffleSplit(n_splits=5, test_size=test_size, random_state=0) # @todo: to change it back.
 
-# 	if stratified:
-# 		split_scheme = rs.split(Gn, stratified_y)
-# 	else:
-# 		split_scheme = rs.split(Gn)
-	split_scheme = rs.split(smiles)
+	import collections
+	if np.ceil(test_size * len(smiles)) < len(collections.Counter(families)):
+		stratified = False # ValueError: The test_size should be greater or equal to the number of classes.
+		# @todo: at least let each data in test set has different family?
 
-# 	results = []
+	if stratified:
+		# @todo: to guarantee that at least one sample is in train set (, valid set and test set).
+		rs = StratifiedShuffleSplit(n_splits=5, test_size=test_size,
+							   random_state=0)
+		split_scheme = rs.split(smiles, families)
+	else:
+# 		rs = ShuffleSplit(n_splits=10, test_size=.1) #, random_state=0)
+		rs = ShuffleSplit(n_splits=5, test_size=test_size, random_state=0) # @todo: to change it back.
+		split_scheme = rs.split(smiles)
+
+
 	i = 1
 	for app_index, test_index in split_scheme:
 		print()
@@ -630,15 +637,18 @@ def xp_GCN(smiles, y_all, mode='reg', nb_epoch=100, output_file=None, **kwargs):
 
 		cur_results = {}
 		# Get splitted data
-		G_app, G_test, y_app, y_test = split_data(smiles, y_all,
-												  app_index, test_index)
+		G_app, G_test, y_app, y_test, F_app, F_test = split_data(smiles,
+											   y_all, families,
+											   app_index, test_index)
 
 		# Split evaluation set.
 		valid_size = test_size / (1 - test_size)
+		stratify = (F_app if stratified else None)
 		G_train, G_valid, y_train, y_valid = train_test_split(G_app, y_app,
 														test_size=valid_size,
 														random_state=0,
-														shuffle=True)
+														shuffle=True,
+														stratify=stratify)
 
 		cur_results['y_app'] = y_app
 		cur_results['y_test'] = y_test

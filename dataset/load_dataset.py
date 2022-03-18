@@ -119,6 +119,7 @@ def load_sugarmono(path='../datasets/Sugarmono/', rm_replicate=False):
 				if pd.isnull(mono2) or mono2.strip() == '':
 					dataset['X'].append(smiles[idx].strip())
 					dataset['targets'].append(tf)
+					# @todo: Make sure that family names are case sensitive.
 					dataset['families'].append(families[idx].strip())
 
 	if rm_replicate:
