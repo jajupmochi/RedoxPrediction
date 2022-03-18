@@ -122,7 +122,7 @@ if __name__ == '__main__':
 	stratified = 'True'
 
 	# Get task grid.
-	DS_Name_List = ['sugarmono', 'poly200', 'thermo_exp', 'thermo_cal']
+	DS_Name_List = ['poly200+sugarmono', 'sugarmono', 'poly200', 'thermo_exp', 'thermo_cal']
 	Descriptor_List = ['smiles+xyz_obabel', 'smiles']
 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
 	Metric_List = ['MAE', 'RMSE', 'R2']

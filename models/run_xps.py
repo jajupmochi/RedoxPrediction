@@ -46,10 +46,8 @@ def run_xp(smiles, y, families, output_result, mode, hyperparams, nb_epoch=100):
 
 
 def get_data(ds_name, descriptor='smiles', format_='smiles'):
-	if descriptor.lower() == 'smiles+xyz_obabel':
-		format_ = 'rdkit'
 
-	if ds_name.lower() == 'poly200':
+	def get_poly200(descriptor, format_):
 		data = load_dataset('polyacrylates200', descriptor=descriptor, format_=format_)
 		smiles = data['X']
 		# smiles[192] = '(OCCCC)O.O=C=Nc1ccc(cc1)Cc1ccc(cc1)N=C=O'
@@ -58,6 +56,27 @@ def get_data(ds_name, descriptor='smiles', format_='smiles'):
 		y = [y for i, y in enumerate(y) if i not in [6]]
 		y = np.reshape(y, (len(y), 1))
 		families = [ds_name] * len(smiles)
+		return smiles, y, families
+
+
+	def get_sugarmono(descriptor, format_):
+		data = load_dataset('sugarmono', descriptor=descriptor, format_=format_)
+		smiles = data['X']
+		y = data['targets']
+		families = data['families']
+		idx_rm = [17] # Generated atomic 3d coordinates are all 0s.
+		smiles = [s for i, s in enumerate(smiles) if i not in idx_rm]
+		y = [y for i, y in enumerate(y) if i not in idx_rm]
+		families = [f for i, f in enumerate(families) if i not in idx_rm]
+		y = np.reshape(y, (len(y), 1))
+		return smiles, y, families
+
+
+	if descriptor.lower() == 'smiles+xyz_obabel':
+		format_ = 'rdkit'
+
+	if ds_name.lower() == 'poly200':
+		smiles, y, families = get_poly200(descriptor, format_)
 
 	elif ds_name.lower() == 'thermo_exp':
 		data = load_dataset('thermophysical', descriptor=descriptor, format_=format_, t_type='exp')
@@ -83,15 +102,14 @@ def get_data(ds_name, descriptor='smiles', format_='smiles'):
 		families = [ds_name] * len(smiles)
 
 	elif ds_name.lower() == 'sugarmono':
-		data = load_dataset('sugarmono', descriptor=descriptor, format_=format_)
-		smiles = data['X']
-		y = data['targets']
-		families = data['families']
-		idx_rm = [17] # Generated atomic 3d coordinates are all 0s.
-		smiles = [s for i, s in enumerate(smiles) if i not in idx_rm]
-		y = [y for i, y in enumerate(y) if i not in idx_rm]
-		families = [f for i, f in enumerate(families) if i not in idx_rm]
-		y = np.reshape(y, (len(y), 1))
+		smiles, y, families = get_sugarmono(descriptor, format_)
+
+	elif ds_name.lower() == 'poly200+sugarmono':
+		smiles1, y1, families1 = get_poly200(descriptor, format_)
+		smiles2, y2, families2 = get_sugarmono(descriptor, format_)
+		smiles = smiles1 + smiles2
+		y = np.concatenate((y1, y2), axis=0)
+		families = families1 + families2
 
 	else:
 		raise ValueError('Dataset name %s can not be recognized.' % ds_name)
@@ -194,7 +212,7 @@ if __name__ == "__main__":
 # 	Dis_List = (['euclidean', 'manhattan'] if args.y_distance is None else [args.y_distance])
 # # 	Target_List = (list(deltaG.keys()) if args.target is None else [args.target])
 # 	Target_List = (['dGred', 'dGox'] if args.target is None else [args.target])
-	DS_Name_List = (['sugarmono', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
+	DS_Name_List = (['poly200+sugarmono','sugarmono', 'poly200', 'thermo_exp', 'thermo_cal'] if args.ds_name is None else [args.ds_name])
 	Descriptor_List = (['smiles+xyz_obabel', 'smiles'] if args.descriptor is None else [args.descriptor])
 	Feature_Scaling_List = (['standard_y', 'minmax_y', 'none'] if args.feature_scaling is None else [args.feature_scaling])
 	Metric_List = (['MAE', 'RMSE', 'R2'] if args.metric is None else [args.metric])
@@ -221,7 +239,7 @@ if __name__ == "__main__":
 							'activation_fn': Activation_Fn_List[0:],
 							'graph_pool': Graph_Pool_List[0:1],
 							# CV hyperparameters.
-							'cv': CV_List[1:2],
+							'cv': CV_List[0:1],
 							'stratified': Stratified_List[0:1],
 # 							'level': Level_List[0:],
 # 							'stratified': Stratified_List[0:],
