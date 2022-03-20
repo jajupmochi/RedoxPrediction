@@ -64,7 +64,7 @@ hostname
 cd """ + cur_path + r"""/../models/
 echo Working directory : $PWD
 echo Local work dir : $LOCAL_WORK_DIR
-python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" -stratified """ + stratified
+python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" --stratified """ + stratified
 	script = script.strip()
 	script = re.sub('\n\t+', '\n', script)
 	script = re.sub('\n +', '\n', script)
