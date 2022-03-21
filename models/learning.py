@@ -684,8 +684,7 @@ def xp_GCN(smiles, y_all, families,
 			if kwargs['descriptor'].lower() == 'smiles':
 				featurizer = dc.feat.MolGraphConvFeaturizer(use_edges=True,
 											   use_chirality=True,
-											   use_partial_charge=False,
-											   coords_scaling='auto')
+											   use_partial_charge=False)
 			elif kwargs['descriptor'].lower() == 'smiles+xyz_obabel':
 				from dataset.feat import DCMolGraphFeaturizer
 				featurizer = DCMolGraphFeaturizer(use_edges=True,
@@ -694,7 +693,7 @@ def xp_GCN(smiles, y_all, families,
 											   use_distance_stats=False,
 											   use_xyz=True,
 											   feature_scaling='auto')
-			elif kwargs['descriptor'].lower() == 			 'smiles+dis_stats_obabel':
+			elif kwargs['descriptor'].lower() == 'smiles+dis_stats_obabel':
 				from dataset.feat import DCMolGraphFeaturizer
 				featurizer = DCMolGraphFeaturizer(use_edges=True,
 											   use_chirality=True,
