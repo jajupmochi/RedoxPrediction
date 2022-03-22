@@ -42,7 +42,7 @@ def get_job_script_gpu(args, id_str):
 #!/bin/bash
 
 # Not shared resources
-#SBATCH --exclusive
+##SBATCH --exclusive
 #SBATCH --job-name="octo.""" + id_str + r""""
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=jajupmochi@gmail.com
@@ -85,7 +85,7 @@ def get_job_script_cpu(args, id_str):
 	script = r"""
 #!/bin/bash
 
-#SBATCH --exclusive
+##SBATCH --exclusive
 #SBATCH --job-name="octo.""" + id_str + r""""
 #SBATCH --partition=court # @todo: to change it back
 #SBATCH --mail-type=ALL
