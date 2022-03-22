@@ -12,20 +12,31 @@ import re
 cur_path = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_job_script(args, device='gpu'):
-	if device == 'gpu':
-		return get_job_script_gpu(args)
-	elif device == 'cpu':
-		return get_job_script_cpu(args)
-
-
-def get_job_script_gpu(args):
+def get_job_script(args, device='cpu'):
 # 		ds_name = args['ds_name']
 # 		kernel = args['kernel']
 # 		feature_scaling = args['feature_scaling']
 # 		remove_sig_errs = args['remove_sig_errs']
 	str_stra = ('.stratified' if stratified == 'True' else '')
 	id_str = '.'.join([v for k, v in args.items()]) + str_stra
+
+	if device == 'gpu':
+		script = get_job_script_gpu(args, id_str)
+	elif device == 'cpu':
+		script = get_job_script_cpu(args, id_str)
+	elif device is None:
+		script = ''
+
+	script += r"""
+python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" --stratified """ + stratified
+	script = script.strip()
+	script = re.sub('\n\t+', '\n', script)
+	script = re.sub('\n +', '\n', script)
+
+	return script
+
+
+def get_job_script_gpu(args, id_str):
 
 	script = r"""
 #!/bin/bash
@@ -40,7 +51,7 @@ def get_job_script_gpu(args):
 #
 # GPUs architecture and number
 # ----------------------------
-#SBATCH --partition=gpu_v100 # @todo: to change it back p100
+#SBATCH --partition=gpu_p100 # @todo: to change it back p100, v100
 # GPUs per compute node
 #   gpu:4 (maximum) for gpu_k80
 #   gpu:2 (maximum) for gpu_p100
@@ -64,21 +75,12 @@ hostname
 cd """ + cur_path + r"""/../models/
 echo Working directory : $PWD
 echo Local work dir : $LOCAL_WORK_DIR
-python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" --stratified """ + stratified
-	script = script.strip()
-	script = re.sub('\n\t+', '\n', script)
-	script = re.sub('\n +', '\n', script)
+"""
 
 	return script
 
 
-def get_job_script_cpu(args):
-# 		ds_name = args['ds_name']
-# 		kernel = args['kernel']
-# 		feature_scaling = args['feature_scaling']
-# 		remove_sig_errs = args['remove_sig_errs']
-	str_stra = ('.stratified' if stratified == 'True' else '')
-	id_str = '.'.join([v for k, v in args.items()]) + str_stra
+def get_job_script_cpu(args, id_str):
 
 	script = r"""
 #!/bin/bash
@@ -104,10 +106,7 @@ hostname
 cd """ + cur_path + r"""/../models/
 echo Working directory : $PWD
 echo Local work dir : $LOCAL_WORK_DIR
-python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" --stratified """ + stratified
-	script = script.strip()
-	script = re.sub('\n\t+', '\n', script)
-	script = re.sub('\n +', '\n', script)
+"""
 
 	return script
 
@@ -135,8 +134,8 @@ if __name__ == '__main__':
 	# CV hyperparameters.
 	CV_List = ['811', '622']
 	task_grid = ParameterGrid({
-							'ds_name': DS_Name_List[0:1], # @todo: to change back.
-							'descriptor': Descriptor_List[0:1],
+							'ds_name': DS_Name_List[2:3], # @todo: to change back.
+							'descriptor': Descriptor_List[2:3],
 							'feature_scaling': Feature_Scaling_List[0:1],
 							'metric': Metric_List[0:1],
 							# network structural hyperparameters.
@@ -155,9 +154,19 @@ if __name__ == '__main__':
 	for task in list(task_grid):
 		print()
 		print(task)
-		job_script = get_job_script(task)
+		job_script = get_job_script(task, device='gpu')  # @todo: to change it as needed.
 		command = 'sbatch <<EOF\n' + job_script + '\nEOF'
+
 # 		print(command)
-		os.system(command)
+		output = os.system(command)
 # 		os.popen(command)
 # 		output = stream.readlines()
+
+
+# 		import subprocess
+# 		try:
+# 			subprocess.run([command], check=True)
+# 		except subprocess.CalledProcessError:
+# 			print('Error happened when using "sbatch". Use command line instead.')
+# 			job_script = get_job_script(task, device=None)
+# 			subprocess.run([job_script], check=True)
