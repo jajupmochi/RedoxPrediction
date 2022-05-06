@@ -300,20 +300,22 @@ def organize_results_by_xps(results, xps):
 			'test' : []
 		}
 
-		all_results = results[xp]['results']
+		if xp in results:
+			all_results = results[xp]['results']
 
-		for i, split_res in enumerate(all_results):
-			results_xp['train'].append(split_res['perf_train'])
-			results_xp['valid'].append(split_res['perf_valid'])
-			results_xp['test'].append(split_res['perf_test'])
-		results_by_xp[xp] = results_xp
+			for i, split_res in enumerate(all_results):
+				results_xp['train'].append(split_res['perf_train'])
+				results_xp['valid'].append(split_res['perf_valid'])
+				results_xp['test'].append(split_res['perf_test'])
+			results_by_xp[xp] = results_xp
 	return results_by_xp
 
 
-def plot_a_task(ax, model_name, graph_pool, metric_name, title, y_label):
+def plot_a_task(ax, model_name, row_name, descriptor, metric_name, title, y_label):
 # 	DS_Name_List = ['poly200', 'thermo_exp', 'thermo_cal']
-	ds_name = 'poly200'
-	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][1:2]
+	graph_pool, cv = row_name['graph_pool'], row_name['cv']
+# 	ds_name = 'poly200'
+	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][0:1]
 	feature_scaling = Feature_Scaling_List[0]
 
 	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
@@ -321,13 +323,15 @@ def plot_a_task(ax, model_name, graph_pool, metric_name, title, y_label):
 
 	# Load data.
 	root_dir = '../outputs/gnn/'
-# 	str_stra = ('.stratified' if stratified else '')
+	nm_stra = ('.use_edge_chirality' if use_edge_chirality else '')
+	nm_stra += ('.stratified' if stratified else '')
 	results = {}
 	for activation_fn in Activation_Fn_List:
-		task = {'ds_name': ds_name, 'feature_scaling': feature_scaling,
+		task = {'cv': cv, 'descriptor': descriptor,
+		  'ds_name': ds_name, 'feature_scaling': feature_scaling,
 		  'metric': metric_name, 'model': model_name,
 		  'activation_fn': activation_fn, 'graph_pool': graph_pool}
-		fn = root_dir + 'results.' + '.'.join([v[1] for v in sorted(task.items())]) + '.911.shuffle.5folds.no_seed.pkl'
+		fn = root_dir + 'results.' + '.'.join([v[1] for v in sorted(task.items())]) + '.random_cv' + nm_stra + '.shuffle.5folds.no_seed.pkl'
 		if os.path.isfile(fn):
 			with open(fn, 'rb') as file:
 				result = pickle.load(file)
@@ -337,14 +341,28 @@ def plot_a_task(ax, model_name, graph_pool, metric_name, title, y_label):
 		return None, None
 
 
-	### show best hyperparameters.
-	print('Best hyperparameters:')
+	### show best performance and hyperparameters.
 	for k, v in results.items():
 		print('-----------------')
 		print(k)
+		print('Best performance:')
+		for i, item in enumerate(v['results']):
+# 			print('trial ' + str(i), end=': ')
+			print('%d train: %.4f, valid: %.4f, test: %.4f.' %
+			 (i, item['perf_train'], item['perf_valid'], item['perf_test']))
+		print('Best hyperparameters:')
 		for i, item in enumerate(v['results']):
 # 			print('trial ' + str(i), end=': ')
 			print(item['clf'])
+
+# 	### show best hyperparameters.
+# 		print('Best hyperparameters:')
+# 		for k, v in results.items():
+# 			print('-----------------')
+# 			print(k)
+# 			for i, item in enumerate(v['results']):
+# 	# 			print('trial ' + str(i), end=': ')
+# 				print(item['clf'])
 
 
 	# Compute data.
@@ -412,28 +430,37 @@ if __name__ == '__main__':
 # 	from sklearn.model_selection import ParameterGrid
 	import pickle
 
-	stratified = False
+	stratified = True
+	use_edge_chirality = True
 
 	# Get task grid.
-	Model_List = ['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'][0:1]
-	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][0:1]
+	DS_Name_List = ['poly200+sugarmono','sugarmono', 'poly200'][0:1]
+	Model_List = ['GCNModelExt', 'GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'][0:2]
+	Descriptor_List = ['smiles+dis_stats_obabel', 'smiles+xyz_obabel', 'smiles'][0:3]
+# 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][0:1]
 	Metric_List = ['RMSE', 'MAE', 'R2'][1:2]
 	# network structural hyperparameters.
-	Model_List = ['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
-	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
-					'exponetial', 'tanh', 'softmax', 'sigmoid']#, 'normalize']
+# 	Model_List = ['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'][0:1]
+# 	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
+# 					'exponetial', 'tanh', 'softmax', 'sigmoid']#, 'normalize']
 	Graph_Pool_List = ['max']
+	CV_List = ['811', '622']
 
 	# Set params of rows and cols.
-#	row_grid = ParameterGrid({'edit_cost': Edit_Cost_List[0:],
-#						 'distance': Dis_List[0:]})
+# 	from sklearn.model_selection import ParameterGrid
+# 	row_grid = ParameterGrid({'graph_pool': Graph_Pool_List[0:],
+# 						 'cv': CV_List[0:]})
 	# show by edit costs then by distances.
-	row_grid_list = Graph_Pool_List[0:]
-# 	for i in Edit_Cost_List[0:]:
-# 		for j in Dis_List[0:]:
-# 		 row_grid_list.append({'edit_cost': i, 'distance': j})
-	col_grid_list = Model_List[0:1]
-	fig_name_list = Metric_List[0:]
+# 	row_grid_list = Graph_Pool_List[0:]
+	row_grid_list = []
+	for i in CV_List[0:]:
+		for j in Graph_Pool_List[0:]:
+			row_grid_list.append({'cv': i, 'graph_pool': j})
+	col_grid_list = Model_List[0:]
+# 	fig_name_list = Metric_List[0:]
+	fig_name_list = Descriptor_List[0:]
+
+	ds_name = DS_Name_List[0]
 
 	for fig_name in fig_name_list:
 		print('---------------------- %s ---------------------' % fig_name)
@@ -450,15 +477,15 @@ if __name__ == '__main__':
 		params = {}
 		for row, col_name in enumerate(col_grid_list):
 			for col, row_name in enumerate(row_grid_list):
-				print('---------------------- %s, %s ---------------------' % (col_name, row_name))
+				print('\n------------ %s, %s -----------' % (col_name, row_name))
 
 				ax = fig.add_subplot(gs[row, col])
 				y_label = (get_ylabel(col_name) if col == 0 else '')
 
 				title = get_title(row_name) if row == 0 else ''
-				p, c = plot_a_task(ax, col_name, row_name, fig_name, title, y_label)
-				results[(col_name, row_name)] = p
-				params[(col_name, row_name)] = c
+				p, c = plot_a_task(ax, col_name, row_name, fig_name, 'MAE', title, y_label)
+				results[(col_name, tuple(row_name))] = p
+				params[(col_name, tuple(row_name))] = c
 				if col == 0 and row == 0:
 					handles, labels = ax.get_legend_handles_labels()
 
@@ -466,13 +493,14 @@ if __name__ == '__main__':
 		size = fig.get_size_inches()
 		nrow_labels = int(len(labels) / 3)
 # 		fig.subplots_adjust(bottom=0.56 / size[1])
-		fig.subplots_adjust(bottom=(0.075 * nrow_labels + 0.11))
+		fig.subplots_adjust(bottom=(0.075 * nrow_labels / len(col_grid_list) + 0.11))
 # 		labels[0] = 'poly200_exp'
 		fig.legend(handles, labels, loc='lower center', ncol=3, frameon=False) # , ncol=5, labelspacing=0.1, handletextpad=0.4, columnspacing=0.6)
-		nm_stra = ('.stratified' if stratified else '')
-		fn_prefix = 'results.' + fig_name + nm_stra + '.811'
+		nm_stra = ('.use_edge_chirality' if use_edge_chirality else '')
+		nm_stra += ('.stratified' if stratified else '')
+		fn_prefix = 'results.' + ds_name + '.' + fig_name + nm_stra
 		plt.savefig(fn_prefix + '.eps', format='eps', dpi=300, transparent=False, bbox_inches='tight')
-		plt.savefig(fn_prefix + '.pdf', format='pdf', dpi=300, transparent=False, bbox_inches='tight')
+		plt.savefig(fn_prefix + '.pdf', format='pdf', dpi=300, transparent=True, bbox_inches='tight')
 		plt.savefig(fn_prefix + '.png', format='png', dpi=300, transparent=False, bbox_inches='tight')
 		plt.show()
 		plt.clf()

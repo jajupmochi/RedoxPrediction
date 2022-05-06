@@ -7,6 +7,21 @@ Created on Fri Dec  3 10:15:31 2021
 """
 import numpy as np
 
+import sys
+sys.path.insert(0, '../')
+
+
+
+def get_atom_types(ds_name, **kwargs):
+	from dataset.load_dataset import load_dataset
+	dataset = load_dataset(ds_name, format_='networkx', **kwargs)
+
+	atom_types = []
+	for graph in dataset['X']:
+		for n in graph.nodes(data=True):
+			if n[1]['symbol'] not in atom_types:
+				atom_types.append(n[1]['symbol'])
+	print('Atom types: ', atom_types)
 
 def get_rmse_thermophysical():
 	"""Get rmse between experimental and computed Tg of the thermophysical dataset.
@@ -54,4 +69,11 @@ def get_rmse_thermophysical():
 
 
 if __name__ == '__main__':
-	rmse, perc = get_rmse_thermophysical()
+# 	###
+# 	rmse, perc = get_rmse_thermophysical()
+
+	###
+# 	ds_name = 'polyacrylates200'
+	ds_name = 'sugarmono'
+	get_atom_types(ds_name)
+

@@ -145,6 +145,7 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 			  use_partial_charge: bool = False,
 			  use_distance_stats: bool = False,
 			  use_xyz: bool = False,
+			  return_int: bool = False,
 			  feature_scaling: str = 'auto'):
 		"""
 		Parameters
@@ -165,6 +166,7 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 		self.use_chirality = use_chirality
 		self.use_distance_stats = use_distance_stats
 		self.use_xyz = use_xyz
+		self.return_int = return_int
 		self.feature_scaling = feature_scaling
 		self.feature_scaler = None
 
@@ -188,6 +190,11 @@ class DCMolGraphFeaturizer(MolecularFeaturizer):
 		features = super(DCMolGraphFeaturizer, self).featurize(datapoints,
 														 log_every_n=log_every_n,
 														 **kwargs)
+
+		if self.return_int: # Format one-hot features to int.
+			for feat in features:
+				feat.node_features = feat.node_features.astype(int)
+				feat.edge_features = feat.edge_features.astype(int)
 
 		if self.use_distance_stats or self.use_xyz:
 			# Scale real value features.

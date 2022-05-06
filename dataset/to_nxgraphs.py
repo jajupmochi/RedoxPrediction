@@ -77,6 +77,25 @@ def smiles_to_nxgraphs(smiles):
 	return graphs
 
 
+def draw_molecule_from_smiles(smiles, fig_name='fig.pdf'):
+	import matplotlib.pyplot as plt
+	import networkx as nx
+	from dataset.format_dataset import smiles2nxgraph_rdkit
+	graph = smiles2nxgraph_rdkit(smiles, add_hs=False)
+	nlabels = nx.get_node_attributes(graph, 'symbol')
+	elabels = nx.get_edge_attributes(graph, 'bond_type_double')
+
+	pos = nx.spring_layout(graph)
+	nx.draw(graph, pos)
+	nx.draw_networkx_labels(graph, pos, labels=nlabels)
+	nx.draw_networkx_edge_labels(graph, pos, edge_labels=elabels)
+	plt.savefig(fig_name)
+	plt.show()
+
+# 	nx.draw(graph, labels=nlabels, edge_labels=elabels)
+# 	plt.savefig(fig_name)
+# 	plt.show()
+
 if __name__ == '__main__':
 	import pickle
 
@@ -85,7 +104,7 @@ if __name__ == '__main__':
 		smiles, y, families = get_data(ds_name, descriptor='smiles')
 		graphs = smiles_to_nxgraphs(smiles)
 
-		pickle.dump((graphs,y, families), open(ds_name + '.pkl', 'wb'))
+		pickle.dump((graphs, y, families), open(ds_name + '.pkl', 'wb'))
 
 		### read.
 		dataset = pickle.load(open(ds_name + '.pkl', 'rb'))

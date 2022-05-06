@@ -367,9 +367,14 @@ if __name__ == '__main__':
 	stratified = False
 
 	# Get task grid.
-	Model_List = ['GCN', 'GAT']
+	Model_List = ['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel'][2:]
 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][0:1]
 	Metric_List = ['RMSE', 'MAE', 'R2'][1:2]
+	# network structural hyperparameters.
+	Model_List = ['GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
+	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
+					'exponetial', 'tanh', 'softmax', 'sigmoid']#, 'normalize']
+	Graph_Pool_List = ['max', 'none']
 
 	# Set params of rows and cols.
 #	row_grid = ParameterGrid({'edit_cost': Edit_Cost_List[0:],

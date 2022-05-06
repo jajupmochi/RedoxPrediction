@@ -45,30 +45,82 @@ def to_rdkit_mols(data, descriptor='smiles+xyz_obabel',
 	return data
 
 
-def to_nxgraphs(data, ds_name, verbose=True, **kwargs):
+def to_nxgraphs(data, ds_name,
+				descriptor='none',
+				add_hs=False,
+				verbose=True,
+				**kwargs):
+
 	data_tmp = to_smiles(data, ds_name, **kwargs)
 
-	# Convert smiles to nxgraphs.
-	ds_size = len(data_tmp['X'])
-	X, idx_true = [], []
-	for i in range(ds_size):
-		try:
-			g = smiles2nxgraph_rdkit(data_tmp['X'][i])
-		except AttributeError:
-			pass
-		else:
-			X.append(g)
-			idx_true.append(i)
 
-	if verbose and (ds_size != len(idx_true)):
-		print('%d graph(s) are removed due to unrecognized smiles.' %
-			(ds_size - len(idx_true)))
+	### Convert smiles to nxgraphs.
+	## if descriptor is a predefined string:
+	if isinstance(descriptor, str):
+		add_edge_feats = kwargs.get('add_edge_feats', True)
+		ds_size = len(data_tmp['X'])
+		X, idx_true = [], []
+		for i in range(ds_size):
+			try:
+				g = smiles2nxgraph_rdkit(data_tmp['X'][i],
+							 add_edge_feats=add_edge_feats,
+							 add_hs=add_hs)
+			except AttributeError:
+				pass
+			else:
+				X.append(g)
+				idx_true.append(i)
 
-	# Save nxgraphs to data.
-	data = {'X': X}
-	for k in data_tmp.keys():
-		if k != 'X' and len(data_tmp['X']) == len(data_tmp[k]):
-			data[k] = [data_tmp[k][i] for i in idx_true]
+		if verbose and (ds_size != len(idx_true)):
+			print('%d graph(s) are removed due to unrecognized smiles.' %
+				(ds_size - len(idx_true)))
+
+		# Save nxgraphs to data.
+		data = {'X': X}
+		for k in data_tmp.keys():
+			if k != 'X' and len(data_tmp['X']) == len(data_tmp[k]):
+				data[k] = [data_tmp[k][i] for i in idx_true]
+
+
+	## if descriptor is a provided featurizer:
+	else:
+		# Remove smiles that can not be handled by RDKit.
+		# @todo: this maybe a better way.
+		from rdkit import Chem
+		ds_size = len(data_tmp['X'])
+		X, idx_true = [], []
+		for i in range(ds_size):
+			mol = Chem.MolFromSmiles(data_tmp['X'][i])
+			if mol is not None:
+				X.append(mol)
+				idx_true.append(i)
+
+		if verbose and (ds_size != len(idx_true)):
+			print('%d graph(s) are removed due to unrecognized smiles.' %
+				(ds_size - len(idx_true)))
+
+		# Save valid SMILES:
+		data = {'X': X}
+		for k in data_tmp.keys():
+			if k != 'X' and len(data_tmp['X']) == len(data_tmp[k]):
+				data[k] = [data_tmp[k][i] for i in idx_true]
+
+		# Featurize:
+		graphs = descriptor.featurize(data['X'])
+
+		# to nx graphs:
+		import networkx as nx
+		for i_g, g in enumerate(graphs):
+			g_new = nx.Graph(idx=str(i_g))
+			for n, feat in enumerate(g.node_features):
+				g_new.add_node(n, **{str(i) : v for i, v in enumerate(feat)})
+
+			for i_e in range(0, g.edge_index.shape[1], 2):
+				n1, n2 = g.edge_index[0, i_e], g.edge_index[1, i_e]
+				g_new.add_edge(n1, n2, **{str(i) : v for i, v in enumerate(g.edge_features[i_e])})
+
+			data['X'][i_g] = g_new
+
 
 	return data
 
@@ -80,8 +132,7 @@ def to_smiles(data, ds_name, **kwargs):
 		return thermophysical_to_smiles(data, t_type=t_type, rm_replicate=rm_replicate)
 
 	elif ds_name == 'polyacrylates200':
-		with_names = kwargs.get('with_names', False)
-		return polyacrylates200_to_smiles(data, with_names=with_names)
+		return data
 
 	elif ds_name.lower() == 'sugarmono':
 		return data
@@ -121,22 +172,10 @@ def thermophysical_to_smiles(data, t_type='cal', rm_replicate=True):
 	return dataset
 
 
-def polyacrylates200_to_smiles(data, with_names=False):
-
-	dataset = {}
-
-	dataset['X'] = [i.replace(' ', '') for i in data.iloc[:, 3].to_list()]
-	dataset['targets'] = [float(i) for i in data.iloc[:, 2].to_list()]
-	if with_names:
-		dataset['names'] = [i.strip() for i in data.iloc[:, 1].to_list()]
-
-	return dataset
-
-
 #%%
 
 
-def smiles2nxgraph_rdkit(smiles_string):
+def smiles2nxgraph_rdkit(smiles_string, add_edge_feats=True, add_hs=False):
 	"""Converts SMILES string to NetworkX graph object by RDKit library.
 
 	Parameters
@@ -150,11 +189,13 @@ def smiles2nxgraph_rdkit(smiles_string):
 	"""
 	from rdkit import Chem
 	mol = Chem.MolFromSmiles(smiles_string)
-	mol = mol_to_nx(mol)
+	if add_hs:
+		mol = Chem.AddHs(mol)
+	mol = mol_to_nx(mol, add_edge_feats=add_edge_feats)
 	return mol
 
 
-def mol_to_nx(mol):
+def mol_to_nx(mol, add_edge_feats=True):
 	"""Converts RDKit mol to NetworkX graph object.
 
 	Parameters
@@ -184,9 +225,17 @@ def mol_to_nx(mol):
 # 				   num_explicit_hs=atom.GetNumExplicitHs(),
 # 				   is_aromatic=atom.GetIsAromatic()
 				   )
-	for bond in mol.GetBonds():
-		G.add_edge(bond.GetBeginAtomIdx(),
-				   bond.GetEndAtomIdx(),
-   				   bond_type_double=str(bond.GetBondTypeAsDouble()))
-# 				   bond_type=bond.GetBondType())
+	if add_edge_feats:
+		for bond in mol.GetBonds():
+			G.add_edge(bond.GetBeginAtomIdx(),
+					   bond.GetEndAtomIdx(),
+	   				   bond_type_double=str(bond.GetBondTypeAsDouble()))
+	# 				   bond_type=bond.GetBondType())
+	else:
+		for bond in mol.GetBonds():
+			G.add_edge(bond.GetBeginAtomIdx(),
+					   bond.GetEndAtomIdx(),
+	   				   bond_type_double='0')
+	# 				   bond_type=bond.GetBondType())
+
 	return G

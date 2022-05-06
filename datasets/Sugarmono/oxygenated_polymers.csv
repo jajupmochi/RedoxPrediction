@@ -1,0 +1,51 @@
+Entry,Monomer 1, ,Monomer 2, ,Polymer,Tg,Tm,Reference
+ ,ChemDraw,SMILES,ChemDraw,SMILES,type, (°C), (TBC), 
+1,,O1CC1,,C(=O)=O,polycarbonate,10,,https://pubs.rsc.org/en/content/articlelanding/2011/cc/c0cc02207a 
+2,,CC1OC1,,C(=O)=O,polycarbonate,42,,https://pubs.rsc.org/en/content/articlelanding/2011/cc/c0cc02207a 
+3,,CCC1OC1,,C(=O)=O,polycarbonate,9,,https://pubs.rsc.org/en/content/articlelanding/2011/cc/c0cc02207a 
+4,,[C@H]12O[C@H]1CCCC2,,C(=O)=O,polycarbonate,118,,https://pubs.rsc.org/en/content/articlelanding/2011/cc/c0cc02207a 
+5,,[C@H]12O[C@H]1C3=C(C=CC=C3)C2,,C(=O)=O,polycarbonate,134,,https://pubs.acs.org/doi/10.1021/ja208711c 
+6,,CC12OC1C[C@H](C(C)=C)CC2,,C(=O)=O,polycarbonate,111,,https://pubs.rsc.org/en/content/articlelanding/2011/cc/c0cc02207a#cit154 
+7,,C1(C2=CC=CC=C2)OC1,,C(=O)=O,polycarbonate,80,,https://pubs.acs.org/doi/10.1021/ja208711c 
+8,,ClCC1OC1,,C(=O)=O,polycarbonate,31,,https://pubs.acs.org/doi/10.1021/ja208711c 
+9,,C[C@]12O[C@H]1C[C@@H](C(C)=C)CC2,,C(=O)=O,polycarbonate,122,,https://pubs.acs.org/doi/10.1021/acs.macromol.5b00157 
+10,,O=C1OCCCO1,,,polycarbonate,-25,,https://pubs.rsc.org/en/content/articlelanding/2017/py/c7py00236j 
+11,,O=C1OC[C@@H]2[C@@H](C[C@@H](OC)O2)O1,,,polycarbonate,58,,https://pubs.rsc.org/en/content/articlelanding/2017/py/c7py00236j 
+12,,O=C1OC[C@@H]2[C@@H]([C@@H](OC(C)(C)O3)[C@@H]3O2)O1,,,polycarbonate,125,,https://pubs.rsc.org/en/content/articlelanding/2021/py/d1py00784j 
+13,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,C(=O)=O,polycarbonate,121,,https://pubs.rsc.org/en/content/articlelanding/2021/py/d1py00784j
+14,,O=C1OC[C@@H]2[C@@H](C[C@H](N(C=C3C)C(N(C)C3=O)=O)O2)O1,,,polycarbonate,156,,https://pubs.rsc.org/en/content/articlelanding/2021/py/d1py00784j
+15,,O=C1OC[C@@H]2[C@H]([C@H](OC(C)(C)O3)[C@H]3[C@@H](OC)O2)O1,,,polycarbonate,152,,https://pubs.acs.org/doi/10.1021/acs.macromol.6b01492 
+16,,O=C1OC[C@@H]2[C@H](C=C[C@@H](OC(C)C)O2)O1,,,polycarbonate,69,,https://pubs.acs.org/doi/10.1021/acsmacrolett.7b00362 
+17,,O=C1OC[C@@H]2[C@H]([C@H](OC)[C@@H](OC)[C@@H](OC)O2)O1,,,polycarbonate,122,,https://pubs.acs.org/doi/10.1021/ja402319m 
+18,,CO[C@@H]1[C@@H]2[C@H](OC(O2)=O)[C@@H]3OC(C4=CC=CC=C4)OC[C@H]3O1,,,polycarbonate,233,,https://pubs.acs.org/doi/10.1021/acs.macromol.7b01785 
+19,,O[C@@H]([C@@H](OC(O1)=O)[C@H]1[C@@H](OC)O2)[C@H]2CO,,,polycarbonate,158,,https://pubs.acs.org/doi/10.1021/acs.macromol.7b01785
+20,,CO[C@@H](O1)[C@@H]2[C@H](OC(O2)=O)[C@@H]([C@H]1COC(C)=O)OC(C)=O,,,polycarbonate,156,,https://pubs.acs.org/doi/10.1021/acs.macromol.7b01785
+21,,O=C1OC[C@@H]2[C@H]([C@H](OC(OCC)=O)[C@@H](OC(OCC)=O)[C@@H](OC)O2)O1,,,polycarbonate,120,,https://pubs.acs.org/doi/pdf/10.1021/jacs.8b10675 
+22,,O=C1OC[C@@H]2[C@H]([C@H](OC(OCCCC)=O)[C@@H](OC(OCCCC)=O)[C@@H](OC)O2)O1,,,polycarbonate,68,,https://pubs.acs.org/doi/pdf/10.1021/jacs.8b10675 
+23,,O=C1OC[C@@H]2[C@H]([C@H](OC(OCCCCCC)=O)[C@@H](OC(OCCCCCC)=O)[C@@H](OC)O2)O1,,,polycarbonate,46,,https://pubs.acs.org/doi/pdf/10.1021/jacs.8b10675 
+24,,O=C1OC[C@@H]2[C@H]([C@H](OC(OCC(C)C)=O)[C@@H](OC(OCC(C)C)=O)[C@@H](OC)O2)O1,,,polycarbonate,85,,https://pubs.acs.org/doi/pdf/10.1021/jacs.8b10675
+25,,O=C1OC[C@@H]2[C@H]([C@H](OC(OCC(C)(C)C)=O)[C@@H](OC(OCC(C)(C)C)=O)[C@@H](OC)O2)O1,,,polycarbonate,125,,https://pubs.acs.org/doi/pdf/10.1021/jacs.8b10675
+26,,O=C1OC[C@@H]2[C@H]([C@H](OC(OCC(CCCC)CC)=O)[C@@H](OC(OCC(CCCC)CC)=O)[C@@H](OC)O2)O1,,,polycarbonate,38,,https://pubs.acs.org/doi/pdf/10.1021/jacs.8b10675
+27,,O=C1OCC=CCO1,,,polycarbonate,-24,115,https://pubs.acs.org/doi/full/10.1021/jacs.9b06259 
+28,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,,polyether,131,271,https://onlinelibrary.wiley.com/doi/full/10.1002/anie.202013562 
+29,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,CC1(C)O[C@H]2[C@H]3[C@H](CO3)O[C@H]2O1,polyether,128,,https://onlinelibrary.wiley.com/doi/full/10.1002/anie.202013562 
+30,,CC1(C)O[C@@H]2[C@@H](OCC=C)[C@@H](COCC=C)O[C@@H]2O1,,,polyether,14,,https://pubs.acs.org/doi/pdf/10.1021/acsapm.1c01095 
+31,,CC1(C)O[C@@H]2[C@@H](OCCCC=C)[C@@H](COCCCC=C)O[C@@H]2O1,,,polyether,0,,https://pubs.acs.org/doi/pdf/10.1021/acsapm.1c01095 
+32,,CC1(C)O[C@@H]2[C@@H](OCCCCCCCCCC=C)[C@@H](COCCCCCCCCCC=C)O[C@@H]2O1,,,polyether,-32,,https://pubs.acs.org/doi/pdf/10.1021/acsapm.1c01095 
+33,,CC1(C)O[C@@H]2[C@@H](OC(C=C)=O)[C@@H](COC(C=C)=O)O[C@@H]2O1,,,Polyester,45,,https://pubs.acs.org/doi/pdf/10.1021/acsapm.1c01095
+34,,CC1(C)O[C@@H]2[C@@H](OC(CCC=C)=O)[C@@H](COC(CCC=C)=O)O[C@@H]2O1,,,Polyester,36,,https://pubs.acs.org/doi/pdf/10.1021/acsapm.1c01095
+35,,CC1(C)O[C@@H]2[C@@H](OC(CCCCCCCCC=C)=O)[C@@H](COC(CCCCCCCCC=C)=O)O[C@@H]2O1,,,Polyester,-14,,https://pubs.acs.org/doi/pdf/10.1021/acsapm.1c01095
+36,,O[C@@H]1[C@@H](OC(CCCCCCCCC=C)=O)[C@@H](COC(CCCCCCCCC=C)=O)O[C@@H]1O,,,Polyester,-,48,https://pubs.rsc.org/en/content/articlelanding/2020/py/c9py01809c 
+37,,C=CCCCCCCCCC(OC[C@@H]1[C@H]([C@H](OC(C)(C)O2)[C@H]2[C@@H](OC)O1)OC(CCCCCCCCC=C)=O)=O,,,Polyester,-19,,https://pubs.rsc.org/en/content/articlelanding/2020/py/c9py01809c 
+38,,C=CCCCCCCCCC(OC[C@@H]1[C@H]([C@H](O)[C@H](O)[C@@H](OC)O1)OC(CCCCCCCCC=C)=O)=O,,,Polyester,-10,49,https://pubs.rsc.org/en/content/articlelanding/2020/py/c9py01809c
+39,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C1C(C=CC=C2)=C2C(O1)=O,Polyester,145,,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+40,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C1C(C=C(C)C=C2)=C2C(O1)=O,Polyester,138,,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+41,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C(O1)CCCC1=O,Polyester,60,81,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+42,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C(O1)COCC1=O,Polyester,80,,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+43,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C(O1)[C@@]2([H])[C@@]([C@H]3C=C[C@@H]2CC3)([H])C1=O,Polyester,,,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+44,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C(O1)[C@@]2([H])[C@@]([C@H]3C=C[C@@H]2C3)([H])C1=O,Polyester,,,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+45,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,O=C1OC(C(C=CC=C2)=C2C3=C1C=CC=C3)=O,Polyester,,,https://pubs.acs.org/doi/full/10.1021/acs.macromol.1c00365
+46,,CC1(C)O[C@@H]2[C@@H]3[C@@H](CO3)O[C@@H]2O1,,C(=S)=S,Poly(thiono-alt-trithiocarboante),114,,https://pubs.rsc.org/en/content/articlelanding/2021/py/d1py00753j#cit27 
+47,,S=C1SC[C@@H]2[C@@H]([C@@H](OC(C)(C)O3)[C@@H]3O2)O1,,,Poly(thiono-alt-trithiocarboante),114,,https://pubs.rsc.org/en/content/articlelanding/2021/py/d1py00753j#cit27 
+48,,S=C1SC[C@@H]2[C@H](C=CCO2)O1,,,Poly(thiono-alt-trithiocarboante),65,,Unpublished data
+49,,S=C1SC[C@@H]2[C@H](CCCO2)O1,,,Poly(thiono-alt-trithiocarboante),78,105,Unpublished data

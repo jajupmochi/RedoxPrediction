@@ -177,35 +177,31 @@ def get_params(results):
 
 
 def print_curves(ax, p_all, title, y_label='RMSE', export_filename=None,
-				 show_interval=True, renderer='seaborn', smooth=None):
+				 show_interval=False, renderer='seaborn', smooth=None):
 
-	### Arrange datapoints for drawing.
-	epochs, y_err, y_int = [], {}, {}
-	for epoch, res in p_all.items():
-		epochs.append(epoch)
+	### Compute average scores.
+	scores_ave = []
+	for epoch in range(0, len(p_all[0])):
+		ave = np.mean([i[epoch] for i in p_all])
+		scores_ave.append(ave)
 
-		for i, xp in enumerate(res.keys()):
-			if xp in y_err:
-				y_err[xp].append(res[xp]['mean'][1])
-				y_int[xp].append(res[xp]['interval'][1])
-			else:
-				y_err[xp] = [res[xp]['mean'][1]]
-				y_int[xp] = [res[xp]['interval'][1]]
 
 	### Use Seaborn style.
 	if renderer == 'seaborn':
 		import seaborn as sns
-		colors = sns.color_palette('husl')[2:]
+		colors = sns.color_palette('husl')[0:]
 # 		sns.axes_style('darkgrid')
 		sns.set_theme()
 
-	### Smooth the data by average values.
-	if smooth is not None:
-		def fun_smooth(x):
-			x_smt = np.empty((len(x),))
-			for i in range(0, len(x)):
-				x_smt[i] = np.mean(x[i - int(smooth / 2):i + int(smooth / 2) + 1])
-			return x_smt
+
+# 	### Smooth the data by average values.
+# 	if smooth is not None:
+# 		def fun_smooth(x):
+# 			x_smt = np.empty((len(x),))
+# 			for i in range(0, len(x)):
+# 				x_smt[i] = np.mean(x[i - int(smooth / 2):i + int(smooth / 2) + 1])
+# 			return x_smt
+
 
 	### Plot figures.
 	# if show confidence interval.
@@ -247,16 +243,25 @@ def print_curves(ax, p_all, title, y_label='RMSE', export_filename=None,
 					 size=6)
 	# if not show confidence interval.
 	else:
-		for xp, y in y_err.items():
-			plt.plot(epochs, y, '.-')
-			# Draw text.
-			max_y = np.max(y)
-			for index, value in enumerate(epochs):
-				if value % 50 == 0:
-		 			plt.text(value - epochs[-1] / 50, (y[index] + max_y / 50 if y[index] > 0 else 0),
-		 			'{:.1f}'.format(y[index]),
-					 color='Green', #palette(i),
-					 size=6)
+		# Plot each trial.
+		for idx, scores in enumerate(p_all):
+			epochs = range(0, len(scores))
+			ax.plot(epochs, scores, '-', c=colors[idx], label=('trial ' + str(idx)))
+
+		# Plot the average score.
+		ax.plot(epochs, scores_ave, '-', c=colors[idx + 1], label='average score')
+
+# 		for xp, y in y_err.items():
+
+# 			plt.plot(epochs, y, '.-')
+# 			# Draw text.
+# 			max_y = np.max(y)
+# 			for index, value in enumerate(epochs):
+# 				if value % 50 == 0:
+# 		 			plt.text(value - epochs[-1] / 50, (y[index] + max_y / 50 if y[index] > 0 else 0),
+# 		 			'{:.1f}'.format(y[index]),
+# 					 color='Green', #palette(i),
+# 					 size=6)
 
 	### Set general layout.
 # 	ax.set_xticks(r)
@@ -266,8 +271,9 @@ def print_curves(ax, p_all, title, y_label='RMSE', export_filename=None,
 	ax.set_ylabel(y_label)
 	#	ax.legend()
 	ax.set_title(title)
-	# 	y_upper = 40 # 50 # @todo: to change back
-	# 	ax.set_ylim([0, y_upper])
+	y_lower = 15
+	y_upper = 60 # 50 # @todo: to change back
+	ax.set_ylim([y_lower, y_upper])
 
 
 	if (export_filename is not None):
@@ -333,39 +339,41 @@ def organize_results_by_xps(results, xps):
 	return results_by_xp
 
 
-def plot_a_task(ax, model_name, feature_scaling, metric_name, title, y_label):
+def plot_a_task(ax, model_name, graph_pool, metric_name, title, y_label):
 	p_all = {}
-	for nb_epoch in range(5, 761, 5):
 
-		DS_Name_List = ['poly200', 'thermo_exp', 'thermo_cal'][0:1]
+	DS_Name_List = ['poly200', 'thermo_exp', 'thermo_cal'][0:1]
+	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][0:1]
+	feature_scaling = Feature_Scaling_List[0]
 
-		# Load data.
-		root_dir = '../outputs/gnn/'
-	# 	str_stra = ('.stratified' if stratified else '')
-		results = {}
-		for ds_name in DS_Name_List:
+	# Load data.
+	root_dir = '../outputs/gnn/'
+# 	str_stra = ('.stratified' if stratified else '')
+	results = []
+	for ds_name in DS_Name_List:
+		for trial in range(1, 6):
 			task = {'ds_name': ds_name, 'feature_scaling': feature_scaling,
 			  'metric': metric_name, 'model': model_name}
-			fn = root_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.' + str(nb_epoch) + '.shuffle.5folds.no_seed.pkl'
+			fn = root_dir + 'results.' + '.'.join([v for k, v in task.items()]) + '.shuffle.5folds.no_seed/all_scores.trial' + str(trial) + '.pkl'
 			if os.path.isfile(fn):
 				with open(fn, 'rb') as file:
 					result = pickle.load(file)
-					results[ds_name] = result
-# 			else:
-# 				results[ds_name] = {'results': [{'perf_app': np.nan, 'perf_test': np.nan}]}
+					results.append(result[score_key])
+	# 			else:
+	# 				results[ds_name] = {'results': [{'perf_app': np.nan, 'perf_test': np.nan}]}
 
-		if results == {}:
-			return None, None
+	if results == []:
+		return None, None
 
-		# Compute data.
-	# 	xps = ["random", "expert", "fitted"]
-		results_by_xp = organize_results_by_xps(results, DS_Name_List)
-		p = compute_displayable_results(results_by_xp)
-	#		 print_bars(p,'KNN with CV and y_distance = {0}'.format(results['y_distance']),export_filename=export_filename)
-		p_all[nb_epoch] = p
+	# Compute data.
+# 	xps = ["random", "expert", "fitted"]
+# 	results_by_xp = organize_results_by_xps(results, DS_Name_List)
+# 	p = compute_displayable_results(results_by_xp)
+#		 print_bars(p,'KNN with CV and y_distance = {0}'.format(results['y_distance']),export_filename=export_filename)
+	p_all = results
 
 	print_curves(ax, p_all, title, y_label=y_label, export_filename=None)
-	c = None # get_params(results)
+	p, c = None, None # get_params(results)
 	return p, c
 
 
@@ -383,7 +391,7 @@ def set_figure(nb_rows, nb_cols, y_label):
 	#ax2 = plt.subplot(222)
 	#ax3 = plt.subplot(223)
 	#ax4 = plt.subplot(224)
-	fig = plt.figure(figsize=(8 * nb_cols, 2.12 * nb_rows + 0.8))
+	fig = plt.figure(figsize=(8 * nb_cols, 2.12 * nb_rows + 2))
 	ax = fig.add_subplot(111)    # The big subplot for common labels
 
 	# Turn off axis lines and ticks of the big subplot
@@ -425,17 +433,18 @@ if __name__ == '__main__':
 	import pickle
 
 	stratified = False
+	score_key = 'valid_scores'
 
 	# Get task grid.
-	Model_List = ['GCN', 'GAT']
-	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none'][0:1]
+	Model_List = ['GraphConvModel', 'GCNModel', 'GATModel']
 	Metric_List = ['RMSE', 'MAE', 'R2'][1:2]
+	Graph_Pool_List = ['max', 'none'][0:1]
 
 	# Set params of rows and cols.
 #	row_grid = ParameterGrid({'edit_cost': Edit_Cost_List[0:],
 #						 'distance': Dis_List[0:]})
 	# show by edit costs then by distances.
-	row_grid_list = Feature_Scaling_List[0:]
+	row_grid_list = Graph_Pool_List[0:]
 # 	for i in Edit_Cost_List[0:]:
 # 		for j in Dis_List[0:]:
 # 		 row_grid_list.append({'edit_cost': i, 'distance': j})
@@ -471,11 +480,12 @@ if __name__ == '__main__':
 
 		# Show graphic
 		size = fig.get_size_inches()
-		fig.subplots_adjust(bottom=0.56 / size[1])
+		fig.subplots_adjust(bottom=0.99 / size[1])
+		fig.suptitle(score_key)
 # 		labels[0] = 'poly200_exp'
-# 		fig.legend(handles, labels, loc='lower center', ncol=3, frameon=False) # , ncol=5, labelspacing=0.1, handletextpad=0.4, columnspacing=0.6)
+		fig.legend(handles, labels, loc='lower center', ncol=4, frameon=False) # , ncol=5, labelspacing=0.1, handletextpad=0.4, columnspacing=0.6)
 		nm_stra = ('.stratified' if stratified else '')
-		fn_prefix = 'accu_vs_epochs.' + fig_name + nm_stra
+		fn_prefix = 'accu_vs_epochs.' + fig_name + '.' + score_key + nm_stra
 		plt.savefig(fn_prefix + '.eps', format='eps', dpi=300, transparent=False, bbox_inches='tight')
 		plt.savefig(fn_prefix + '.pdf', format='pdf', dpi=300, transparent=False, bbox_inches='tight')
 		plt.savefig(fn_prefix + '.png', format='png', dpi=300, transparent=False, bbox_inches='tight')
