@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+figures/miccio/
+figures/mpnn_attention/
+figures/treelet_kernel_krr/
+outputs/

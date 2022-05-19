@@ -7,3 +7,4 @@ Created on Wed May  5 15:40:19 2021
 """
 
 from .molecule_featurizers.dc_mol_graph_conv_featurizer import DCMolGraphFeaturizer
+from .molecule_featurizers.mol_gnn_featurizer import MolGNNFeaturizer

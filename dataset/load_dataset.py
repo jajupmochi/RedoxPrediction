@@ -45,7 +45,13 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 		data = load_thermophysical(**kwargs_data)
 
 	# Format data.
-	if format_.lower() == 'smiles':
+	if format_ is None: # Return the output format of the featurizer.
+		from dataset.format_dataset import to_featurizer_format
+		data = to_featurizer_format(data, ds_name=ds_name.lower(),
+							  descriptor=descriptor,
+							  **kwargs)
+
+	elif format_.lower() == 'smiles':
 		from dataset.format_dataset import to_smiles
 		data = to_smiles(data, ds_name.lower(), **kwargs)
 

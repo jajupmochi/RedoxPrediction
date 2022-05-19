@@ -125,6 +125,43 @@ def to_nxgraphs(data, ds_name,
 	return data
 
 
+def to_featurizer_format(data, ds_name,
+				descriptor='none',
+				add_hs=False,
+				verbose=True,
+				**kwargs):
+
+	data_tmp = to_smiles(data, ds_name, **kwargs)
+
+	# Remove smiles that can not be handled by RDKit.
+	# @todo: this maybe a better way.
+	from rdkit import Chem
+	ds_size = len(data_tmp['X'])
+	idx_true = []
+	for i in range(ds_size):
+		mol = Chem.MolFromSmiles(data_tmp['X'][i])
+		if mol is not None:
+# 			X.append(mol)
+			idx_true.append(i)
+
+	if verbose and (ds_size != len(idx_true)):
+		print('%d graph(s) are removed due to unrecognized smiles.' %
+			(ds_size - len(idx_true)))
+
+	# Save valid SMILES:
+	data = {}
+	for k in data_tmp.keys():
+		if len(data_tmp['X']) == len(data_tmp[k]):
+			data[k] = [data_tmp[k][i] for i in idx_true]
+
+	# Featurize:
+	graphs = descriptor.featurize(data['X'])
+	data['X'] = graphs
+
+
+	return data
+
+
 def to_smiles(data, ds_name, **kwargs):
 	if ds_name == 'thermophysical':
 		t_type = kwargs.get('t_type', 'cal')
