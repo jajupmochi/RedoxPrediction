@@ -131,3 +131,4 @@ figures/miccio/
 figures/mpnn_attention/
 figures/treelet_kernel_krr/
 outputs/
+!outputs/mpnn_tranformer/*.md

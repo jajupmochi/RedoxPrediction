@@ -117,8 +117,7 @@ class AtomFeaturizer(Featurizer):
 		"""
 		if return_dim:
 			return len(allowable_set) + (1 if include_unknown_set else 0)
-		return one_hot_encode(
-						str(atom.GetHybridization()), allowable_set, include_unknown_set)
+		return one_hot_encode(str(atom.GetHybridization()), allowable_set, include_unknown_set)
 # 		return atom.GetHybridization().name.lower()
 
 
@@ -192,6 +191,30 @@ class AtomFeaturizer(Featurizer):
 		if return_dim:
 			return len(allowable_set) + (1 if include_unknown_set else 0)
 		return one_hot_encode(atom.GetTotalDegree(), allowable_set, include_unknown_set)
+
+
+	def n_valence(self, atom, allowable_set=None, include_unknown_set=True, return_dim=False):
+		"""Get an one-hot feature of the total valence (explicit + implicit) of the atom.
+
+		Parameters
+		---------
+		atom: rdkit.Chem.rdchem.Atom
+				RDKit atom object
+		allowable_set: List[int]
+				The degree to consider. The default set is `[0, 1, ..., 5, 6]`
+		include_unknown_set: bool, default True
+				If true, the index of all types not in `allowable_set` is `len(allowable_set)`.
+
+		Returns
+		-------
+		List[float]
+				A one-hot vector of the degree which an atom has.
+				If `include_unknown_set` is False, the length is `len(allowable_set)`.
+				If `include_unknown_set` is True, the length is `len(allowable_set) + 1`.
+		"""
+		if return_dim:
+			return len(allowable_set) + (1 if include_unknown_set else 0)
+		return one_hot_encode(atom.GetTotalValence(), allowable_set, include_unknown_set)
 
 
 	def total_num_Hs(self, atom, allowable_set=None, include_unknown_set=True, return_dim=False):
@@ -626,7 +649,10 @@ class MolGNNFeaturizer(object):
 					raise ImportError("This class requires RDKit to be installed.")
 
 		# construct atom (node) feature
-		h_bond_infos = construct_hydrogen_bonding_info(molecule)
+		if 'acceptor_donor' in self.atom_featurizer.allowable_sets:
+			h_bond_infos = construct_hydrogen_bonding_info(molecule)
+		else:
+			h_bond_infos = None
 
 
 		for atom in molecule.GetAtoms():

@@ -4,6 +4,9 @@
 Created on Mon May 16 17:16:02 2022
 
 @author: ljia
+
+This script is built to:
+	- test if the cross validation codes are correct using the Keras MPNN example data (given the implementations of featurizers and models are correct, see `test_mpnn_transformer_keras_eg_modified.py`).
 """
 import os
 import sys
@@ -27,11 +30,11 @@ from models.utils import split_data
 
 
 # tf.config.run_functions_eagerly(True) # @todo: this is for debug only.
-# np.random.seed(42) # @todo: these are for debug only.
-# tf.random.set_seed(42)
+np.random.seed(42) # @todo: these are for debug only.
+tf.random.set_seed(42)
 
 
-path_kw = '/mpnn_tranformer/std_y/mae/'
+path_kw = '/mpnn_tranformer/keras_eg_data/' # IMPORTANT!: can not use std_y for the Keras example data.
 # path_kw = '/mpnn_tranformer/std_y/mse/'
 # path_kw = '/mpnn_tranformer/std_y/mape/'
 
@@ -227,23 +230,23 @@ def plot_epoch_curves(history, figure_name):
 
 from dataset.feat import MolGNNFeaturizer
 af_allowable_sets = {
-	'atom_type': ['C', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I'],
-# 	'atom_type': ["B", "Br", "C", "Ca", "Cl", "F", "H", "I", "N", "Na", "O", "P", "S"],
-	'formal_charge': None, # [-2, -1, 0, 1, 2],
-	'hybridization': ['SP', 'SP2', 'SP3'],
-# 	'hybridization': ['S', 'SP', 'SP2', 'SP3'],
-	'acceptor_donor': ['Donor', 'Acceptor'],
-	'aromatic': [True, False],
-	'degree': [0, 1, 2, 3, 4, 5],
- 	'n_valence': [0, 1, 2, 3, 4, 5, 6],
+# 	'atom_type': ['C', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I'],
+	'atom_type': ["B", "Br", "C", "Ca", "Cl", "F", "H", "I", "N", "Na", "O", "P", "S"],
+# 	'formal_charge': None, # [-2, -1, 0, 1, 2],
+# 	'hybridization': ['SP', 'SP2', 'SP3'],
+	'hybridization': ['S', 'SP', 'SP2', 'SP3'],
+# 	'acceptor_donor': ['Donor', 'Acceptor'],
+# 	'aromatic': [True, False],
+# 	'degree': [0, 1, 2, 3, 4, 5],
+	'n_valence': [0, 1, 2, 3, 4, 5, 6],
 	'total_num_Hs': [0, 1, 2, 3, 4],
-	'chirality': ['R', 'S'],
+# 	'chirality': ['R', 'S'],
 	}
 bf_allowable_sets = {
 	'bond_type': ['SINGLE', 'DOUBLE', 'TRIPLE', 'AROMATIC'],
-	'same_ring': [True, False],
+# 	'same_ring': [True, False],
 	'conjugated': [True, False],
-	'stereo': ['STEREONONE', 'STEREOANY', 'STEREOZ', 'STEREOE'],
+# 	'stereo': ['STEREONONE', 'STEREOANY', 'STEREOZ', 'STEREOE'],
 	}
 featurizer = MolGNNFeaturizer(use_edges=True,
 						   use_partial_charge=False,
@@ -277,10 +280,10 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	# Hperams: tune them one by one rather than grid search.
 # 	from sklearn.model_selection import ParameterGrid
 	params_grid = {
-		'learning_rate': [0.001, 1e-4, 1e-5], # influential, [0.001]
-		'redurce_lr_factor': [0.5, 1, 0.2, 0.1], # influential, [0.5]
+		'learning_rate': [5e-4, 0.001, 1e-4, 1e-5], # influential, [0.001]
+		'redurce_lr_factor': [1, 0.5, 0.2, 0.1], # influential, [0.5]
 		'message_units': [32, 64, 128], # influential, [32]
-		'message_steps': [1, 2, 3, 4], # a little influential, [1]
+		'message_steps': [4, 1, 2, 3], # a little influential, [1]
 		'num_attention_heads': [8, 4, 16], # a liitle influential, [8]
 		'batch_size': [8, 4, 16], # [8]
 		'dense_units': [512, 128, 1024], # no much influence, [512]
@@ -310,18 +313,21 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 			nb_epoch = 5000 # @todo: change it back
 
 			# Choose loss function.
-			if '/mae/' in path_kw:
-				loss = tf.keras.metrics.mean_absolute_error # tf.keras.losses.MeanAbsoluteError() # tf.keras.metrics.MeanAbsoluteError()
-		# 	r2_score = tfa.metrics.RSquare
-			elif '/mse/' in path_kw:
-				loss = tf.keras.metrics.mean_squared_error
-			elif '/mape/' in path_kw:
-				loss = tf.keras.metrics.mean_absolute_percentage_error
+# 			if '/mae/' in path_kw:
+# 				loss = tf.keras.metrics.mean_absolute_error # tf.keras.losses.MeanAbsoluteError() # tf.keras.metrics.MeanAbsoluteError()
+# 		# 	r2_score = tfa.metrics.RSquare
+# 			elif '/mse/' in path_kw:
+# 				loss = tf.keras.metrics.mean_squared_error
+# 			elif '/mape/' in path_kw:
+# 				loss = tf.keras.metrics.mean_absolute_percentage_error
+			loss = tf.keras.losses.BinaryCrossentropy()
 
 			model.compile(optimizer=Adam(learning_rate=params['learning_rate']),
 					loss=loss,
 					# metrics=['mae'])
-					metrics=['mae', R_squared])
+# 					metrics=['mae', R_squared])
+					metrics=[keras.metrics.AUC(name='AUC')
+			  ])
 	# 				metrics=[keras.losses.MeanAbsoluteError(name='mae'), R_squared])
 		# 			   metrics=['mae', loss, R_squared])
 		# 	model.run_eagerly = True # @todo: this is for debug only.
@@ -367,7 +373,7 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	 			batch_size=batch_size,
 				epochs=nb_epoch,
 	 			shuffle=True,
-				verbose=0)
+				verbose=1)
 
 			# Record result if better.
 			y_pred_valid = tf.squeeze(model.predict(valid_dataset, batch_size=batch_size), axis=1).numpy()
@@ -617,8 +623,15 @@ if __name__ == '__main__':
 
 #	test_losses()
 
-	### Load dataset.
-	for ds_name in ['poly200']: # ['poly200+sugarmono']: ['poly200']
-		X, y, families = get_data(ds_name, descriptor='smiles', format_='smiles')
+	csv_path = keras.utils.get_file(
+		"BBBP.csv", "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/BBBP.csv"
+	)
 
-		cross_validate(X, y, families)
+	import pandas as pd
+	df = pd.read_csv(csv_path, usecols=[1, 2, 3])
+	df.iloc[96:104]
+	X = df.smiles.to_list()
+	y = df.p_np.to_list()
+	families = ['hahaha'] * len(y)
+
+	cross_validate(X, y, families)

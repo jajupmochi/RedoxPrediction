@@ -4,6 +4,8 @@
 Created on Mon May  9 10:26:39 2022
 
 @author: ljia
+
+This script tests the original code of the keras MPNN example on poly200_exp to see roughly if it works.
 """
 import sys
 import os
