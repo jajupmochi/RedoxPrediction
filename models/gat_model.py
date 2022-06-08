@@ -38,14 +38,54 @@ warnings.filterwarnings('ignore')
 # =============================================================================
 
 
+def prepare_batch(x_batch, y_batch):
+	"""Merges (sub)graphs of batch into a single global (disconnected) graph
+	"""
+
+	node_features, edge_features, pair_indices = x_batch
+
+	# Obtain number of atoms and bonds for each graph (molecule)
+	num_nodes = node_features.row_lengths()
+	num_edges = pair_indices.row_lengths() # edge_features may be empty.
+
+	# Obtain partition indices (molecule_indicator), which will be used to
+	# gather (sub)graphs from global graph in model later on
+	molecule_indices = tf.range(len(num_nodes))
+# 	molecule_indicator = tf.repeat(molecule_indices, num_nodes)
+
+	# Merge (sub)graphs into a global (disconnected) graph. Adding 'increment' to
+	# 'pair_indices' (and merging ragged tensors) actualizes the global graph
+	gather_indices = tf.repeat(molecule_indices[:-1], num_edges[1:])
+	increment = tf.cumsum(num_nodes[:-1])
+	increment = tf.pad(tf.gather(increment, gather_indices), [(num_edges[0], 0)])
+	pair_indices = pair_indices.merge_dims(outer_axis=0, inner_axis=1).to_tensor()
+	pair_indices = pair_indices + increment[:, tf.newaxis]
+	pair_indices = tf.transpose(pair_indices) # Transpose so to facilicate creating DGL graph.
+	pair_indices = (pair_indices[0, :], pair_indices[1, :])
+	node_features = node_features.merge_dims(outer_axis=0, inner_axis=1).to_tensor()
+# 	edge_features = edge_features.merge_dims(outer_axis=0, inner_axis=1).to_tensor()
+	edge_features = edge_features.to_tensor()
+
+	return (node_features, edge_features, pair_indices, num_nodes, num_edges), y_batch
+
+
 def GATDataset(X, y, batch_size=32, shuffle=False):
 # 	return prepare_batch(X, y)
 	dataset = tf.data.Dataset.from_tensor_slices((X, (y)))
 	if shuffle:
 		dataset = dataset.shuffle(1024)
-	return dataset.batch(batch_size).prefetch(-1)
+	return dataset.batch(batch_size).map(prepare_batch, -1).prefetch(-1)
 #	 return dataset.batch(batch_size).map(
 # 		(lambda x: tf.py_function(prepare_batch, [x], [tf.int64])), -1)
+
+# def GATDataset(X, y, batch_size=32, shuffle=False):
+# # 	return prepare_batch(X, y)
+# 	dataset = tf.data.Dataset.from_tensor_slices((X, (y)))
+# 	if shuffle:
+# 		dataset = dataset.shuffle(1024)
+# 	return dataset.batch(batch_size).prefetch(-1)
+# #	 return dataset.batch(batch_size).map(
+# # 		(lambda x: tf.py_function(prepare_batch, [x], [tf.int64])), -1)
 
 
 # def prepare_batch(x_batch, y_batch):
@@ -89,50 +129,6 @@ def GATDataset(X, y, batch_size=32, shuffle=False):
 # =============================================================================
 # Message passing model
 # =============================================================================
-
-
-# class EdgeNetwork(layers.Layer):
-# 	def __init__(self, **kwargs):
-# 		super().__init__(**kwargs)
-
-
-# 	def build(self, input_shape):
-# 		self.atom_dim = input_shape[0][-1]
-# 		self.bond_dim = input_shape[1][-1]
-# 		self.kernel = self.add_weight(
-# 			shape=(self.bond_dim, self.atom_dim * self.atom_dim),
-# 			trainable=True,
-# 			initializer="glorot_uniform",
-# 			name="kernel",
-# 		)
-# 		self.bias = self.add_weight(
-# 			shape=(self.atom_dim * self.atom_dim), trainable=True, initializer="zeros", name="bias",
-# 		)
-# 		self.built = True
-
-
-# 	def call(self, inputs):
-# 		atom_features, bond_features, pair_indices = inputs
-
-# 		# Apply linear transformation to bond features
-# 		bond_features = tf.matmul(bond_features, self.kernel) + self.bias
-
-# 		# Reshape for neighborhood aggregation later
-# 		bond_features = tf.reshape(bond_features, (-1, self.atom_dim, self.atom_dim))
-
-# 		# Obtain atom features of neighbors
-# 		atom_features_neighbors = tf.gather(atom_features, pair_indices[:, 1])
-# 		atom_features_neighbors = tf.expand_dims(atom_features_neighbors, axis=-1)
-
-# 		# Apply neighborhood aggregation
-# 		transformed_features = tf.matmul(bond_features, atom_features_neighbors)
-# 		transformed_features = tf.squeeze(transformed_features, axis=-1)
-# 		aggregated_features = tf.math.unsorted_segment_sum(
-# 			transformed_features,
-# 			pair_indices[:, 0],
-# 			num_segments=tf.shape(atom_features)[0],
-# 		)
-# 		return aggregated_features
 
 
 class MessagePassing(layers.Layer):
@@ -290,53 +286,9 @@ class MessagePassing(layers.Layer):
 # =============================================================================
 
 
-# class MPNNTransformerModel(tf.keras.Model):
-# 	def __init__(self,
-#  			  atom_dim,
-#  			  bond_dim,
-#  			  batch_size: int = 32,
-#  			  message_units: int = 64,
-#  			  message_steps: int = 4,
-#  			  num_attention_heads: int = 8,
-#  			  dense_units: int = 512,
-# mode: str = 'regression',
-#  			  ):
-# 		super(MPNNTransformerModel, self).__init__()
-
-# 		atom_features = layers.Input((atom_dim), dtype='float32', name='atom_features')
-# 		bond_features = layers.Input((bond_dim), dtype='float32', name='bond_features')
-# 		pair_indices = layers.Input((2), dtype='int32', name='pair_indices')
-# 		molecule_indicator = layers.Input((), dtype='int32', name='molecule_indicator')
-
-# 		x = MessagePassing(message_units, message_steps)(
-#  			[atom_features, bond_features, pair_indices]
-# 		)
-
-# 		x = TransformerEncoderReadout(
-#  	        num_attention_heads,
-#  			message_units,
-#  			dense_units,
-#  			batch_size
-#  	    )([x, molecule_indicator])
-
-# 		x = layers.Dense(dense_units, activation='relu')(x)
-# activation_out = ('linear' if mode == 'regression' else 'sigmoid')
-# 		x = layers.Dense(1, activation=activation_out)(x)
-
-# 		self.model = keras.Model(
-#  			inputs=[atom_features, bond_features, pair_indices, molecule_indicator],
-#  			outputs=[x],
-#  			)
-
-
-# 	def call(self, inputs):
-# 		x = self.model(inputs)
-# 		return x
-
-
 class GATModel(tf.keras.Model):
 	def __init__(self,
-			node_dim, # @todo: Check paper for all the defaults.
+			node_dim,
 			# The following are used by the GATConv layer.
 			in_feats: int = 32,
 			hidden_feats: int = 32,
@@ -386,7 +338,7 @@ class GATModel(tf.keras.Model):
 
 
 	def call(self, inputs):
-		# @todo: a more efficient way. The current implementation recomputes the DGL graph of each (sub-)graph inside every batch, which is time consuming.
+		# @todo: a more efficient way. The current implementation reconstruct the DGL graph of each (sub-)graph inside every batch, which is time consuming.
 		graphs, node_features = self.to_dgl_graph(inputs)
 		x = self.msg_passing((graphs, node_features))
 		x = self.readout(graphs, x)
@@ -402,44 +354,24 @@ class GATModel(tf.keras.Model):
 	def to_dgl_graph(self, inputs):
 		"""Construct a DGL batched graph from inputs (batch_size sub-graphs).
 		"""
+		node_features, edge_features, pair_indices, num_nodes, num_edges = inputs
+
 		# Construct DGL graphs.
-		node_features, edge_features, pair_indices = inputs
-# 		graphs = tf.map_fn(self._to_dgl_graph, inputs)
+		g = dgl.graph(pair_indices)
+		g.ndata['x'] = node_features
 
-		graphs = [self._to_dgl_graph((n_feats, edge_features[i], pair_indices[i]))
-			for i, n_feats in enumerate(node_features)]
+		# Set batch information.
+		g.set_batch_num_nodes(num_nodes)
+		g.set_batch_num_edges(num_edges)
 
-		# Batch DGL graphs.
-		bgraphs = dgl.batch(graphs)
-		node_features = bgraphs.ndata['x']
-		# 	edge_features = bgraphs.edata['x']
+		# 	edge_features = edge_features
 
-		return bgraphs, node_features
+		return g, node_features
 
-
-	def _to_dgl_graph(self, inputs):
-		"""Construct a DGL graph from inputs (of one sub-graph).
-		"""
-		node_features, edge_features, pair_indices = inputs
-
-		srcs, dsts = [], []
-		for i in range(pair_indices.shape[0]):
-			srcs.append(pair_indices[i][0])
-			dsts.append(pair_indices[i][1])
-		srcs = tf.transpose(srcs)
-		dsts = tf.transpose(dsts)
-# 		srcs = tf.transpose([i[0] for i in pair_indices])
-# 		dsts = tf.transpose([i[1] for i in pair_indices])
-# 		srcs, dsts = tf.transpose(pair_indices.to_tensor())
-		g = dgl.graph((srcs, dsts))
-		g.ndata['x'] = node_features.to_tensor()
-	# 	g.edata['x'] = edge_features.to_tensor()
-
-		return g
 
 
 # def GATModel(
-# 		node_dim, # @todo: Check paper for all the defaults.
+# 		node_dim,
 # 		# The following are used by the GATConv layer.
 # 		in_feats: int = 32,
 # 		hidden_feats: int = 32,

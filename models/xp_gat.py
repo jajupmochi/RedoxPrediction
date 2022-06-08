@@ -278,18 +278,18 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	# Hperams: tune them one by one rather than grid search.
 # 	from sklearn.model_selection import ParameterGrid
 	params_grid = { # @todo
-		'in_feats': [32], # [32, 64, 128, 256], # influential?, [32]
-		'message_steps': [1], # [1, 2, 3, 4],
-		'hidden_feats': [32], # [32, 64, 128, 256], # a little influential, [1]
-		'num_attention_heads': [8], # [8, 4, 16], # a liitle influential, [16]
-		'predictor_hidden_feats': [128], # [512, 128, 256, 1024], # a little influence, [512]
-		'batch_size': [8], # [4, 8, 16], # a liitle influential, [8]
-		'learning_rate': [5e-4], # [5e-4, 0.001, 1e-4], # [5e-4, 0.001, 1e-4] influential?, [5e-4]
-		'feat_drop': [0], # [0, 0.2, 0.5],
-		'attn_drop': [0], # [0, 0.2, 0.5],
+		'in_feats': [32, 64, 128, 256], # influential?, [32]
+		'message_steps': [1, 2, 3, 4],
+		'hidden_feats': [8, 32, 64, 128, 256], # a little influential, [1]
+		'num_attention_heads': [4, 8, 16], # a liitle influential, [16]
+		'predictor_hidden_feats': [128, 256, 512, 1024], # a little influence, [512]
+		'batch_size': [4, 8, 16], # a liitle influential, [8]
+		'learning_rate': [5e-4, 0.001, 1e-4], # [5e-4, 0.001, 1e-4] influential?, [5e-4]
+		'feat_drop': [0, 0.3, 0.6],
+		'attn_drop': [0, 0.3, 0.6],
 		'negative_slope': [0.2],
-		'redurce_lr_factor': [1], # [0.5, 1, 0.2, 0.1], # a liile influential, [0.5]
-		'residual': [False], # [False, True],
+		'redurce_lr_factor': [0.5, 1, 0.2, 0.1], # a liile influential, [0.5]
+		'residual': [False, True],
 		'agg_activation': [None],
 		'attn_agg_mode': ['concat'], # ['concat', 'mean'],
 		'bias': [True],
@@ -347,7 +347,8 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 			model.compile(optimizer=Adam(learning_rate=params['learning_rate']),
 					loss=loss,
 					# metrics=['mae'])
-					metrics=['mae', R_squared])
+					metrics=['mae', R_squared],
+					run_eagerly=True) # @todo: change as needed.
 	# 				metrics=[keras.losses.MeanAbsoluteError(name='mae'), R_squared])
 		# 			   metrics=['mae', loss, R_squared])
 		# 	model.run_eagerly = True # @todo: this is for debug only.
@@ -387,7 +388,7 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	 									# train_dataset=train_dataset,
 	 									# valid_dataset=valid_dataset),
  	 				 EarlyStopping,
- 	 				 TensorBoard,
+ 	 				 # TensorBoard,
 	 	# 				NBatchLogger(train_dataset=train_dataset,
 	 	#  				 valid_dataset=valid_dataset,batch_size=batch_size),
 					 ] +
@@ -397,7 +398,7 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	 			batch_size=batch_size,
 				epochs=nb_epoch,
 	 			shuffle=True,
-				verbose=1)
+				verbose=0)
 
 			# Record result if better.
 			y_pred_valid = tf.squeeze(model.predict(valid_dataset, batch_size=batch_size), axis=1).numpy()
@@ -462,10 +463,10 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 
 
 def cross_validate(X, targets, families=None,
-				   n_splits=5, # @todo
+				   n_splits=30, # @todo
 				   stratified=True, # @todo
 				   output_file='../outputs/' + path_kw + '/results.pkl',
-				   load_exist_results=False, # @todo
+				   load_exist_results=True, # @todo
 				   **kwargs):
 	"""Run expriment.
 	"""
@@ -569,7 +570,8 @@ def cross_validate(X, targets, families=None,
 		setup_results['best_params'] = bparams
 		# Save model.
 		fn_model = '../outputs/' + path_kw + '/model.t' + str(i - 1) + '.h5'
-		model.save(fn_model, save_format='tf')
+# 		model.save(fn_model, save_format='h5') # 'tf'
+# 		model.save_weights(fn_model, save_format='h5')
 		setup_results['model'] = fn_model
 
 
