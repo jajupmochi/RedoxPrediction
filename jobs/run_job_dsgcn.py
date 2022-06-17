@@ -127,7 +127,7 @@ if __name__ == '__main__':
 # 		print()
 # 		print(task)
 	job_script = get_job_script(
-		{'model': 'gcn', 'ds_name': 'poly200'}, device='cpu')  # @todo: to change it as needed.
+		{'model': 'dsgcn', 'ds_name': 'poly200r'}, device='cpu')  # @todo: to change it as needed.
 	command = 'sbatch <<EOF\n' + job_script + '\nEOF'
 
 # 		print(command)

@@ -617,12 +617,27 @@ def compute_final_perf(results):
 #%%
 
 
+def parse_args():
+	import argparse
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument('-D', "--ds_name", type=str, help='the name of dataset')
+
+	args = parser.parse_args()
+
+	return args
+
+
 if __name__ == '__main__':
 
 #	test_losses()
 
+	args = parse_args()
+	DS_Name_List = (['poly200r'] if args.ds_name is None else [args.ds_name]) # ['poly200+sugarmono']:
+
 	### Load dataset.
-	for ds_name in ['poly200']: # ['poly200+sugarmono']: ['poly200']
+	for ds_name in DS_Name_List:
+		path_kw = '/' + ds_name + path_kw
 		X, y, families = get_data(ds_name, descriptor='smiles', format_='smiles')
 
 		cross_validate(X, y, families)

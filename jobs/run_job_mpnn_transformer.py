@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 30 16:11:41 2021
+Created on Fri Jun 17 19:26:16 2022
 
 @author: ljia
 """
@@ -127,7 +127,7 @@ if __name__ == '__main__':
 # 		print()
 # 		print(task)
 	job_script = get_job_script(
-		{'model': 'gat', 'ds_name': 'poly200r'}, device='cpu')  # @todo: to change it as needed.
+		{'model': 'mpnn_transformer', 'ds_name': 'poly200r'}, device='cpu')  # @todo: to change it as needed.
 	command = 'sbatch <<EOF\n' + job_script + '\nEOF'
 
 # 		print(command)

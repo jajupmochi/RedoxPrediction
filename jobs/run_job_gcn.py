@@ -20,6 +20,7 @@ def get_job_script(args, device='cpu'):
 # 	str_stra = ('.stratified' if stratified == 'True' else '')
 	id_str = '.'.join([v for k, v in args.items()])
 	model = args['model']
+	ds_name = args['ds_name']
 
 	if device == 'gpu':
 		script = get_job_script_gpu(args, id_str)
@@ -31,7 +32,7 @@ def get_job_script(args, device='cpu'):
 # 	script += r"""
 # python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" --stratified """ + stratified
 	script += r"""
-python3 xp_""" + model + r""".py"""
+python3 xp_""" + model + r""".py """ + ds_name
 	script = script.strip()
 	script = re.sub('\n\t+', '\n', script)
 	script = re.sub('\n +', '\n', script)
@@ -121,57 +122,15 @@ if __name__ == '__main__':
 	os.makedirs('outputs/', exist_ok=True)
 	os.makedirs('errors/', exist_ok=True)
 
-# 	from sklearn.model_selection import ParameterGrid
-
-# 	stratified = 'True'
-
-# 	# Get task grid.
-# 	DS_Name_List = ['poly200+sugarmono', 'sugarmono', 'poly200', 'thermo_exp', 'thermo_cal']
-# 	Descriptor_List = ['smiles+dis_stats_obabel', 'smiles+xyz_obabel', 'smiles']
-# 	Feature_Scaling_List = ['standard_y', 'minmax_y', 'none']
-# 	Metric_List = ['MAE', 'RMSE', 'R2']
-# 	# network structural hyperparameters.
-# 	Model_List = ['GCNModelExt', 'GATModelExt', 'GraphConvModelExt', 'GraphConvModel', 'GCNModel', 'GATModel']
-# 	Activation_Fn_List = ['relu', 'elu', 'leaky_relu', 'selu', 'gelu', 'linear',
-# # 					'exponetial',
-# 					'tanh', 'softmax', 'sigmoid']#, 'normalize']
-# 	Graph_Pool_List = ['max', 'none']
-# 	# CV hyperparameters.
-# 	CV_List = ['811', '622']
-# 	task_grid = ParameterGrid({
-# 							'ds_name': DS_Name_List[2:3], # @todo: to change back.
-# 							'descriptor': Descriptor_List[2:3],
-# 							'feature_scaling': Feature_Scaling_List[0:1],
-# 							'metric': Metric_List[0:1],
-# 							# network structural hyperparameters.
-# 							'model': Model_List[0:2],
-# 							'activation_fn': Activation_Fn_List[0:],
-# 							'graph_pool': Graph_Pool_List[0:1],
-# 							'cv': CV_List[0:],
-# # 							'level': Level_List[0:],
-# # 							'stratified': Stratified_List[0:],
-# # 							'edit_cost': Edit_Cost_List[0:],
-# # 							'distance': Dis_List[0:],
-# # 							'target': Target_List
-# 							})
-
 # 	# Run.
 # 	for task in list(task_grid):
 # 		print()
 # 		print(task)
-	job_script = get_job_script({'model': 'gcn'}, device='cpu')  # @todo: to change it as needed.
+	job_script = get_job_script(
+		{'model': 'gcn', 'ds_name': 'poly200r'}, device='cpu')  # @todo: to change it as needed.
 	command = 'sbatch <<EOF\n' + job_script + '\nEOF'
 
 # 		print(command)
 	output = os.system(command)
 # 		os.popen(command)
 # 		output = stream.readlines()
-
-
-# 		import subprocess
-# 		try:
-# 			subprocess.run([command], check=True)
-# 		except subprocess.CalledProcessError:
-# 			print('Error happened when using "sbatch". Use command line instead.')
-# 			job_script = get_job_script(task, device=None)
-# 			subprocess.run([job_script], check=True)

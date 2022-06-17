@@ -27,7 +27,7 @@ from dataset.load_dataset import get_data
 from models.utils import split_data
 
 
-# tf.config.run_functions_eagerly(True) # @todo: this is for debug only.
+tf.config.run_functions_eagerly(True) # @todo: this is for debug only.
 # np.random.seed(42) # @todo: these are for debug only.
 # tf.random.set_seed(42)
 
@@ -36,21 +36,6 @@ path_kw = '/gcn/std_y/mae/'
 
 
 #%% Model
-
-# def are(y_true, y_pred):
-#  	"""Average relative error.
-#  	"""
-# # 	print('I am are()!')
-# #  	loss = y_true - y_pred
-# #  	loss = tf.math.divide(loss, y_true)
-# #  	loss = tf.math.abs(loss)
-# #  	loss = 100 * tf.keras.backend.mean(loss)
-# #  	return loss
-
-#  	loss = y_true - y_pred
-#  	loss = tf.math.divide(loss, y_true)
-#  	loss = 100 * tf.keras.backend.mean(loss)
-#  	return loss
 
 
 ### Losses.
@@ -381,7 +366,7 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	 									# train_dataset=train_dataset,
 	 									# valid_dataset=valid_dataset),
  	 				 EarlyStopping,
- 	 				 TensorBoard,
+ 	 				 # TensorBoard,
 	 	# 				NBatchLogger(train_dataset=train_dataset,
 	 	#  				 valid_dataset=valid_dataset,batch_size=batch_size),
 					 ] +
@@ -639,12 +624,27 @@ def compute_final_perf(results):
 #%%
 
 
+def parse_args():
+	import argparse
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument('-D', "--ds_name", type=str, help='the name of dataset')
+
+	args = parser.parse_args()
+
+	return args
+
+
 if __name__ == '__main__':
 
 #	test_losses()
 
+	args = parse_args()
+	DS_Name_List = (['poly200r'] if args.ds_name is None else [args.ds_name]) # ['poly200+sugarmono']:
+
 	### Load dataset.
-	for ds_name in ['poly200']: # ['poly200+sugarmono']: ['poly200']
+	for ds_name in DS_Name_List:
+		path_kw = '/' + ds_name + path_kw
 		X, y, families = get_data(ds_name, descriptor='smiles', format_='smiles')
 
 		cross_validate(X, y, families)

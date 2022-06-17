@@ -317,7 +317,7 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 				predictor_weight_decay=params['predictor_weight_decay'],
 				predictor_activation=params['predictor_activation'],
 				mode='regression',
-					)
+				)
 
 			nb_epoch = 5000 # @todo: change it back
 
@@ -347,7 +347,7 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 				monitor='val_loss',
 				patience=50, # 100, # @todo
 				verbose=1,
-				restore_best_weights=True) # @todo
+				restore_best_weights=True)
 			if params['redurce_lr_factor'] < 1.0:
 				ReduceLROnPlateau =	tf.keras.callbacks.ReduceLROnPlateau(
 					monitor='val_loss',
