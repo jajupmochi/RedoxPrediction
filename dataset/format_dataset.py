@@ -168,11 +168,10 @@ def to_smiles(data, ds_name, **kwargs):
 		rm_replicate = kwargs.get('rm_replicate', True)
 		return thermophysical_to_smiles(data, t_type=t_type, rm_replicate=rm_replicate)
 
-	elif ds_name == 'polyacrylates200':
+	elif ds_name in ['polyacrylates200', 'poly200r', 'sugarmono', 'benchmarktao96']:
 		return data
 
-	elif ds_name.lower() == 'sugarmono':
-		return data
+	return data
 
 
 def thermophysical_to_smiles(data, t_type='cal', rm_replicate=True):

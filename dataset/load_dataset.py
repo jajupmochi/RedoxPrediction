@@ -35,6 +35,18 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 				 & set(inspect.signature(load_polyacrylates200).parameters)}
 		data = load_polyacrylates200(**kwargs_data)
 
+	elif ds_name.lower() == 'poly200r':
+
+		kwargs_data = {key: kwargs[key] for key in kwargs.keys()
+				 & set(inspect.signature(load_polyacrylates200).parameters)}
+		data = load_poly200r(**kwargs_data)
+
+	elif ds_name.lower() == 'benchmarktao96':
+
+		kwargs_data = {key: kwargs[key] for key in kwargs.keys()
+				 & set(inspect.signature(load_polyacrylates200).parameters)}
+		data = load_benchmarktao96(**kwargs_data)
+
 	elif ds_name.lower() == 'sugarmono':
 		kwargs_data = {key: kwargs[key] for key in kwargs.keys()
 				 & set(inspect.signature(load_sugarmono).parameters)}
@@ -109,6 +121,46 @@ def load_polyacrylates200(path='../datasets/Polyacrylates200/',
 		dataset['targets'] = [t - 273.15 for t in dataset['targets']]
 	if with_names:
 		dataset['names'] = [i.strip() for i in df.iloc[:, 1].to_list()]
+
+	return dataset
+
+
+def load_poly200r(path='../datasets/Poly200R/',
+				  temp_unit='K',
+				  with_names=False):
+	### Load raw data from file.
+	fname = os.path.join(path, 'poly200r.csv')
+	df = pd.read_csv(fname) # Note the first row is automatically removed as header.
+
+	### Retrieve dataset from the raw data.
+	dataset = {}
+	dataset['X'] = [i.strip() for i in df.iloc[:, 2].to_list()]
+	dataset['targets'] = [float(i) for i in df.iloc[:, 4].to_list()]
+	if temp_unit == 'C':
+		dataset['targets'] = [t - 273.15 for t in dataset['targets']]
+	dataset['familes'] = [i.strip() for i in df.iloc[:, 6].to_list()]
+	if with_names:
+		dataset['names'] = [i.strip() for i in df.iloc[:, 1].to_list()]
+
+	return dataset
+
+
+def load_benchmarktao96(path='../datasets/BenchmarkTao96/',
+						temp_unit='K',
+						with_md_tg=False):
+	### Load raw data from file.
+	fname = os.path.join(path, 'benchmark_tao_96.csv')
+	df = pd.read_csv(fname) # Note the first row is automatically removed as header.
+
+	### Retrieve dataset from the raw data.
+	dataset = {}
+	dataset['X'] = [i.strip() for i in df.iloc[:, 0].to_list()]
+	dataset['targets'] = [float(i) for i in df.iloc[:, 1].to_list()]
+	if temp_unit == 'C':
+		dataset['targets'] = [t - 273.15 for t in dataset['targets']]
+	dataset['familes'] = ['noidea'] * len(dataset['X'])
+	if with_md_tg:
+		dataset['md_tg'] = [float(i) for i in df.iloc[:, 2].to_list()]
 
 	return dataset
 
@@ -188,6 +240,16 @@ def get_data(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 			return (smiles, y, families)
 
 
+	def get_poly200r(descriptor, format_):
+		data = load_dataset('poly200r', descriptor=descriptor, format_=format_, **kwargs)
+		return tuple(data.values())
+
+
+	def get_benchmarktao96(descriptor, format_):
+		data = load_dataset('benchmarktao96', descriptor=descriptor, format_=format_, **kwargs)
+		return tuple(data.values())
+
+
 	def get_sugarmono(descriptor, format_):
 		data = load_dataset('sugarmono', descriptor=descriptor, format_=format_, **kwargs)
 		smiles = data['X']
@@ -207,6 +269,14 @@ def get_data(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 
 	if ds_name.lower() == 'poly200':
 		data = get_poly200(descriptor, format_)
+		return data
+
+	elif ds_name.lower() == 'poly200r':
+		data = get_poly200r(descriptor, format_)
+		return data
+
+	elif ds_name.lower() == 'benchmarktao96':
+		data = get_benchmarktao96(descriptor, format_)
 		return data
 
 	elif ds_name.lower() == 'thermo_exp':
