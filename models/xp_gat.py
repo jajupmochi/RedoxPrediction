@@ -278,9 +278,9 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	# Hperams: tune them one by one rather than grid search.
 # 	from sklearn.model_selection import ParameterGrid
 	params_grid = { # @todo
-		'in_feats': [32, 64, 128, 256], # influential?, [32]
-		'message_steps': [1, 2, 3, 4],
+# 		'in_feats': [32, 64, 128, 256], # influential?, [32]
 		'hidden_feats': [8, 32, 64, 128, 256], # a little influential, [1]
+		'message_steps': [1, 2, 3, 4],
 		'num_attention_heads': [4, 8, 16], # a liitle influential, [16]
 		'predictor_hidden_feats': [128, 256, 512, 1024], # a little influence, [512]
 		'batch_size': [4, 8, 16], # a liitle influential, [8]
@@ -310,9 +310,8 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 
 			# Initialize model.
 			model = GATModel(
-				X_train[0][0][0].shape[0],
 				# The following are used by the GATConv layer.
-				in_feats=params['in_feats'],
+				in_feats=X_train[0][0][0].shape[0],
 				hidden_feats=params['hidden_feats'],
 				message_steps=params['message_steps'],
 				num_attention_heads=params['num_attention_heads'],
@@ -326,10 +325,10 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 				attn_agg_mode=params['attn_agg_mode'],
 				# The following are used for readout.
 				readout=params['readout'],
+				batch_size=batch_size, # for transformer readout.
 				# The following are used for the final prediction.
 				predictor_hidden_feats=params['predictor_hidden_feats'],
 				predictor_activation=params['predictor_activation'],
-				batch_size=batch_size, # for transformer readout.
 				mode='regression',
 				)
 

@@ -251,6 +251,7 @@ class TransformerEncoderReadout(layers.Layer):
 #  			  message_steps: int = 4,
 #  			  num_attention_heads: int = 8,
 #  			  dense_units: int = 512,
+# mode: str = 'regression',
 #  			  ):
 # 		super(MPNNTransformerModel, self).__init__()
 
@@ -271,7 +272,8 @@ class TransformerEncoderReadout(layers.Layer):
 #  	    )([x, molecule_indicator])
 
 # 		x = layers.Dense(dense_units, activation='relu')(x)
-# 		x = layers.Dense(1, activation='sigmoid')(x)
+# activation_out = ('linear' if mode == 'regression' else 'sigmoid')
+# 		x = layers.Dense(1, activation=activation_out)(x)
 
 # 		self.model = keras.Model(
 #  			inputs=[atom_features, bond_features, pair_indices, molecule_indicator],
@@ -285,37 +287,39 @@ class TransformerEncoderReadout(layers.Layer):
 
 
 def MPNNTransformerModel(
- 	  atom_dim,
- 	  bond_dim,
- 	  batch_size: int = 32,
- 	  message_units: int = 64,
- 	  message_steps: int = 4,
- 	  num_attention_heads: int = 8,
- 	  dense_units: int = 512,
- 	  ):
+		atom_dim,
+		bond_dim,
+		batch_size: int = 32,
+		message_units: int = 64,
+		message_steps: int = 4,
+		num_attention_heads: int = 8,
+		dense_units: int = 512,
+		mode: str = 'regression',
+		):
 
- 	atom_features = layers.Input((atom_dim), dtype='float32', name='atom_features')
- 	bond_features = layers.Input((bond_dim), dtype='float32', name='bond_features')
- 	pair_indices = layers.Input((2), dtype='int32', name='pair_indices')
- 	molecule_indicator = layers.Input((), dtype='int32', name='molecule_indicator')
+	atom_features = layers.Input((atom_dim), dtype='float32', name='atom_features')
+	bond_features = layers.Input((bond_dim), dtype='float32', name='bond_features')
+	pair_indices = layers.Input((2), dtype='int32', name='pair_indices')
+	molecule_indicator = layers.Input((), dtype='int32', name='molecule_indicator')
 
- 	x = MessagePassing(message_units, message_steps)(
+	x = MessagePassing(message_units, message_steps)(
 		[atom_features, bond_features, pair_indices]
- 	)
+	)
 
- 	x = TransformerEncoderReadout(
+	x = TransformerEncoderReadout(
         num_attention_heads,
 		message_units,
 		dense_units,
 		batch_size
     )([x, molecule_indicator])
 
- 	x = layers.Dense(dense_units, activation='relu')(x)
- 	x = layers.Dense(1, activation='sigmoid')(x)
+	x = layers.Dense(dense_units, activation='relu')(x)
+	activation_out = ('linear' if mode == 'regression' else 'sigmoid')
+	x = layers.Dense(1, activation=activation_out)(x)
 
- 	model = keras.Model(
+	model = keras.Model(
 		inputs=[atom_features, bond_features, pair_indices, molecule_indicator],
 		outputs=[x],
 		)
 
- 	return model
+	return model

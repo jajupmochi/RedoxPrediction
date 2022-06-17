@@ -78,52 +78,6 @@ def GATDataset(X, y, batch_size=32, shuffle=False):
 #	 return dataset.batch(batch_size).map(
 # 		(lambda x: tf.py_function(prepare_batch, [x], [tf.int64])), -1)
 
-# def GATDataset(X, y, batch_size=32, shuffle=False):
-# # 	return prepare_batch(X, y)
-# 	dataset = tf.data.Dataset.from_tensor_slices((X, (y)))
-# 	if shuffle:
-# 		dataset = dataset.shuffle(1024)
-# 	return dataset.batch(batch_size).prefetch(-1)
-# #	 return dataset.batch(batch_size).map(
-# # 		(lambda x: tf.py_function(prepare_batch, [x], [tf.int64])), -1)
-
-
-# def prepare_batch(x_batch, y_batch):
-# 	"""Merges (sub)graphs of batch into a single global (disconnected) graph.
-# 	"""
-
-# # 	atom_features, bond_features, pair_indices = x_batch
-
-# # 	# Construct DGL graphs.
-# # 	graphs = []
-# # 	for i, a_feats in enumerate(atom_features):
-# # 		graphs.append(to_dgl_graph((a_feats, bond_features[i], pair_indices[i])))
-
-# 	# Batch DGL graphs.
-# 	bgraphs = batch.batch(x_batch)
-# 	atom_features = bgraphs.ndata['x']
-# # 	bond_features = bgraphs.edata['x']
-
-# # 	return (bgraphs, atom_features, bond_features), y_batch
-# 	return (bgraphs, atom_features), y_batch
-
-
-# def GATDataset(X, y, batch_size=32, shuffle=False):
-# 	# Construct DGL graphs.
-# 	atom_features, bond_features, pair_indices = X
-# 	graphs = [to_dgl_graph((a_feats, bond_features[i], pair_indices[i]))
-# 		   for i, a_feats in enumerate(atom_features)]
-
-# 	for i_graph in range(0, len(graphs), batch_size):
-# 		yield prepare_batch(
-# 			graphs[i_graph:i_graph+batch_size], y[i_graph:i_graph+batch_size])
-
-# # 	hahaha = []
-# # 	for i_graph in range(0, len(graphs), batch_size):
-# # 		hahaha.append(prepare_batch(
-# # 			graphs[i_graph:i_graph+batch_size], y[i_graph:i_graph+batch_size]))
-# # 	return hahaha
-
 
 #%%
 # =============================================================================
@@ -288,7 +242,6 @@ class MessagePassing(layers.Layer):
 
 class GATModel(tf.keras.Model):
 	def __init__(self,
-			node_dim,
 			# The following are used by the GATConv layer.
 			in_feats: int = 32,
 			hidden_feats: int = 32,
@@ -304,10 +257,10 @@ class GATModel(tf.keras.Model):
 			attn_agg_mode: str = 'concat',
 			# The following are used for readout.
 			readout: str = 'mean',
+			batch_size: int = 32, # for transformer readout
 			# The following are used for the final prediction.
 			predictor_hidden_feats: int = 512,
 			predictor_activation: str = 'relu',
-			batch_size: int = 32, # for transformer readout
 			mode: str = 'regression',
 			):
 		super(GATModel, self).__init__()
@@ -371,7 +324,6 @@ class GATModel(tf.keras.Model):
 
 
 # def GATModel(
-# 		node_dim,
 # 		# The following are used by the GATConv layer.
 # 		in_feats: int = 32,
 # 		hidden_feats: int = 32,
@@ -387,15 +339,15 @@ class GATModel(tf.keras.Model):
 # 		attn_agg_mode: str = 'concat',
 # 		# The following are used for readout.
 # 		readout: str = 'mean',
+# 		batch_size: int = 32, # for transformer readout
 # 		# The following are used for the final prediction.
 # 		predictor_hidden_feats: int = 512,
 # 		predictor_activation: str = 'relu',
-# 		batch_size: int = 32, # for transformer readout
 # 		mode: str = 'regression',
 # 		):
 
 # 	graphs = layers.Input((1), dtype=dgl.graph, name='dgl_graphs')
-# 	node_features = layers.Input((node_dim), dtype='float32', name='node_features')
+# 	node_features = layers.Input((in_feats), dtype='float32', name='node_features')
 # # 	pair_indices = layers.Input((2), dtype='int32', name='pair_indices')
 # # 	molecule_indicator = layers.Input((), dtype='int32', name='molecule_indicator')
 

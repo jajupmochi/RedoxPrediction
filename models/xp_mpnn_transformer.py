@@ -235,7 +235,7 @@ af_allowable_sets = {
 	'acceptor_donor': ['Donor', 'Acceptor'],
 	'aromatic': [True, False],
 	'degree': [0, 1, 2, 3, 4, 5],
- 	'n_valence': [0, 1, 2, 3, 4, 5, 6],
+ 	# 'n_valence': [0, 1, 2, 3, 4, 5, 6],
 	'total_num_Hs': [0, 1, 2, 3, 4],
 	'chirality': ['R', 'S'],
 	}
@@ -276,21 +276,22 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	# Train and predict.
 	# Hperams: tune them one by one rather than grid search.
 # 	from sklearn.model_selection import ParameterGrid
-	params_grid = {
-		'learning_rate': [0.001, 1e-4, 1e-5], # influential, [0.001]
-		'redurce_lr_factor': [0.5, 1, 0.2, 0.1], # influential, [0.5]
-		'message_units': [32, 64, 128], # influential, [32]
+	params_grid = { # @todo
+		'message_units': [32, 64, 128, 256], # influential?, [32]
 		'message_steps': [1, 2, 3, 4], # a little influential, [1]
-		'num_attention_heads': [8, 4, 16], # a liitle influential, [8]
-		'batch_size': [8, 4, 16], # [8]
-		'dense_units': [512, 128, 1024], # no much influence, [512]
+		'num_attention_heads': [8, 4, 16], # a liitle influential, [16]
+		'dense_units': [512, 128, 256, 1024], # a little influence, [512]
+		'batch_size': [4, 8, 16], # a liitle influential, [8]
+		'learning_rate': [5e-4, 0.001, 1e-4], # [5e-4, 0.001, 1e-4] influential?, [5e-4]
+		'redurce_lr_factor': [0.5, 1, 0.2, 0.1], # a liile influential, [0.5]
 		}
 
 	MAE_min = np.inf
 	MAE_all = []
 	cur_params = {k: v[0] for k, v in params_grid.items()}
-	for param_name in get_iters(cur_params, desc='Hyperparam tuning'): # for each hyper-parameter:
-		for param_val in params_grid[param_name]:
+	for idx_params, param_name in get_iters(enumerate(cur_params), desc='Hyperparam tuning', length=len(cur_params)): # for each hyper-parameter:
+		start_idx = (0 if idx_params == 0 else 1) # Avoid redundant computations.
+		for param_val in params_grid[param_name][start_idx:]:
 			cur_params[param_name] = param_val
 			params = cur_params.copy() # (Depp) Copy so that the stored best values will not be overrided.
 
@@ -331,18 +332,21 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 							 show_dtype=True, show_shapes=True)
 
 			# callbacks
-			EarlyStopping =	tf.keras.callbacks.EarlyStopping(monitor='val_loss',
-														patience=100, # 100,
-														verbose=1,
-														restore_best_weights=True) # @todo
-			ReduceLROnPlateau =	tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-	    											   factor=0.5,
-													   patience=50,
-													   verbose=1,
-													   mode='auto',
-													   min_delta=0.01,
-													   cooldown=0,
-													   min_lr=0)
+			EarlyStopping =	tf.keras.callbacks.EarlyStopping(
+				monitor='val_loss',
+				patience=50, # 100, # @todo
+				verbose=1,
+				restore_best_weights=True) # @todo
+			if params['redurce_lr_factor'] < 1.0:
+				ReduceLROnPlateau =	tf.keras.callbacks.ReduceLROnPlateau(
+					monitor='val_loss',
+					factor=params['redurce_lr_factor'],
+					patience=20,
+					verbose=1,
+					mode='auto',
+					min_delta=0.01,
+					cooldown=0,
+					min_lr=0)
 			TensorBoard = tf.keras.callbacks.TensorBoard(
 				log_dir='../outputs/' + path_kw + '/tb_logs.t' + str(trial_index))
 
@@ -357,11 +361,11 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 	 									# train_dataset=train_dataset,
 	 									# valid_dataset=valid_dataset),
 	 				 EarlyStopping,
-	 				 ReduceLROnPlateau,
- 	 				 TensorBoard,
+ 	 				 # TensorBoard,
 	 	# 				NBatchLogger(train_dataset=train_dataset,
 	 	#  				 valid_dataset=valid_dataset,batch_size=batch_size),
-					 ],
+					 ] +
+				 ([ReduceLROnPlateau] if params['redurce_lr_factor'] < 1.0 else []),
 	 	# 				model_checkpoint,
 	 	# 				CSVLogger(log_path[i], append=True)],
 	 			batch_size=batch_size,
@@ -432,10 +436,10 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 
 
 def cross_validate(X, targets, families=None,
-				   n_splits=30,
+				   n_splits=30, # @todo
 				   stratified=True, # @todo
 				   output_file='../outputs/' + path_kw + '/results.pkl',
-				   load_exist_results=False, # @todo
+				   load_exist_results=True, # @todo
 				   **kwargs):
 	"""Run expriment.
 	"""
@@ -450,7 +454,7 @@ def cross_validate(X, targets, families=None,
 	from sklearn.model_selection import ShuffleSplit, StratifiedShuffleSplit, train_test_split
 
 #	if mode == 'classif':
-#		stratified = True # @todo: to change it as needed.
+#		stratified = True
 #	else:
 #		stratified = kwargs.get('stratified', True)
 
@@ -538,7 +542,7 @@ def cross_validate(X, targets, families=None,
 		setup_results['perf_test'] = perf_test
 		setup_results['best_params'] = bparams
 		# Save model.
-		fn_model = '../outputs/' + path_kw + '/model.h5.t' + str(i - 1)
+		fn_model = '../outputs/' + path_kw + '/model.t' + str(i - 1) + '.h5'
 		model.save(fn_model, save_format='h5')
 		setup_results['model'] = fn_model
 
