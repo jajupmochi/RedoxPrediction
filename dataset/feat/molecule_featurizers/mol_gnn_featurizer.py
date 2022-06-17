@@ -497,15 +497,16 @@ class MolGNNFeaturizer(object):
 				}
 		self.atom_featurizer = AtomFeaturizer(allowable_sets=af_allowable_sets)
 
-		if bf_allowable_sets is None:
-			bf_allowable_sets = {
-				'bond_type': ['SINGLE', 'DOUBLE', 'TRIPLE', 'AROMATIC'],
-				'same_ring': [True, False],
-				'conjugated': [True, False],
-				'stereo': ['STEREONONE', 'STEREOANY', 'STEREOZ', 'STEREOE'],
-				}
-		self.bond_featurizer = BondFeaturizer(allowable_sets=bf_allowable_sets,
-										add_self_loop=add_self_loop)
+		if self.use_edges:
+			if bf_allowable_sets is None:
+				bf_allowable_sets = {
+					'bond_type': ['SINGLE', 'DOUBLE', 'TRIPLE', 'AROMATIC'],
+					'same_ring': [True, False],
+					'conjugated': [True, False],
+					'stereo': ['STEREONONE', 'STEREOANY', 'STEREOZ', 'STEREOE'],
+					}
+			self.bond_featurizer = BondFeaturizer(allowable_sets=bf_allowable_sets,
+											add_self_loop=add_self_loop)
 
 
 # 		self.use_distance_stats = use_distance_stats
