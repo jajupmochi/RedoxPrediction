@@ -178,9 +178,14 @@ def get_data(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 		if format_ == 'smiles':
 			smiles = [s for i, s in enumerate(smiles) if i not in [6]]
 			y = [y for i, y in enumerate(y) if i not in [6]]
+			if 'names' in data:
+				names = [y for i, y in enumerate(data['names']) if i not in [6]]
 		y = np.reshape(y, (len(y), 1))
 		families = [ds_name] * len(smiles)
-		return smiles, y, families
+		if 'names' in data:
+			return (smiles, y, families, names)
+		else:
+			return (smiles, y, families)
 
 
 	def get_sugarmono(descriptor, format_):
@@ -201,7 +206,8 @@ def get_data(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 		format_ = 'rdkit'
 
 	if ds_name.lower() == 'poly200':
-		smiles, y, families = get_poly200(descriptor, format_)
+		data = get_poly200(descriptor, format_)
+		return data
 
 	elif ds_name.lower() == 'thermo_exp':
 		data = load_dataset('thermophysical', descriptor=descriptor, format_=format_, t_type='exp', **kwargs)
