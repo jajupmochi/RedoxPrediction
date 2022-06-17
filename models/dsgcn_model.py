@@ -17,7 +17,7 @@ import numpy as np
 import warnings
 
 from models.utils import Identity
-from models.readout import GlobalAverageMaxPooling1D
+from models.readout import GlobalAverageMaxPooling1D, GlobalAveragePooling1D, GlobalMaxPooling1D
 
 # tf.get_logger().setLevel(logging.ERROR)
 warnings.filterwarnings('ignore')
@@ -164,23 +164,23 @@ class DepSepGraphConv(layers.Layer):
 				self.res_fc = Identity()
 		else:
 			self.res_fc = None
-		self.vars = {} # trainable weights
+# 		self.weights_ = [] # trainable weights
 
 
 	def build(self, input_shape):
 		self.nb_supports = input_shape[1][0]
 
 		# Initialize weight for each filter.
-		i = 0
-		self.vars['weights_' + str(i)] = self.add_weight(
-			shape=(self.in_feats, self.out_feats),
-			trainable=True,
-			initializer='glorot_uniform',
-			regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
-			name='weights_' + str(i),
-		)
-
 		if self.nb_supports > 1 and self.is_depthwise:
+			i = 0
+			self.weights_.append(self.add_weight(
+				shape=(self.in_feats, self.out_feats),
+				trainable=True,
+				initializer='glorot_uniform',
+				regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
+				name='weights_' + str(i),
+			))
+
 			if self.firstDSWS:
 				self.vars['sdweight_' + str(i)] = ones([input_dim],name='sdweight_' + str(i))
                     #self.vars['sdweight_' + str(i)] = glorot([input_dim,1],name='sdweight_' + str(i))
@@ -192,22 +192,30 @@ class DepSepGraphConv(layers.Layer):
                     #self.vars['sdweight_' + str(i)]=tf.squeeze(self.vars['sdweight_' + str(i)])
 
 		if not self.is_depthwise:
-			for i in range(1, self.nb_supports): # for each filter.
-				self.vars['weights_' + str(i)] = self.add_weight(
-					shape=(self.in_feats, self.out_feats),
-					trainable=True,
-					initializer='glorot_uniform',
-					regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
-					name='weights_' + str(i),
-				)
+			self.supp_weights = self.add_weight(
+				shape=(self.nb_supports, self.in_feats, self.out_feats),
+				trainable=True,
+				initializer='glorot_uniform',
+				regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
+				name='supp_weights',
+			)
+# 			for i in range(1, self.nb_supports): # for each filter.
+# 				self.weights_.append(self.add_weight(
+# 					shape=(self.in_feats, self.out_feats),
+# 					trainable=True,
+# 					initializer='glorot_uniform',
+# 					regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
+# 					name='weights_' + str(i),
+# 				))
+# 		self.weights_ = tf.stack(self.weights_)
 
 		# bias
 		if self.bias:
-			self.vars['bias'] = self.add_weight(
+			self.bias_fn = self.add_weight(
 				shape=(self.out_feats), trainable=True, initializer='zeros', name='bias',
 			)
 		else:
-			self.vars['bias'] = None
+			self.bias_fn = None
 
 		self.built = True
 
@@ -238,18 +246,43 @@ class DepSepGraphConv(layers.Layer):
 			output=tf.tensordot(output,self.vars['weights_' + str(0)],[2, 0])
 
 		else:
-			feat_supports = list()
-			for i in tf.range(0, tf.shape(supports)[0]):
-				feat_supp = self.kernel_drop(supports[i])
-				feat_supp = tf.matmul(feat_supp, node_features)
-				feat_supp = tf.matmul(feat_supp, self.vars['weights_' + str(i)])
-				feat_supports.append(feat_supp)
-# 			feat_supports = tf.map_fn(self.compute_support, support, i), elems)
-			rst = tf.math.add_n(feat_supports)
+# 			i = tf.constant(0)
+# 			while_condition = lambda x: tf.less(x, tf.shape(supports)[0])
+# 			def while_body(i):
+# 				feat_supp = self.kernel_drop(supports[i])
+# 				feat_supp = tf.matmul(feat_supp, node_features)
+# 				feat_supp = tf.matmul(feat_supp, self.vars['weights_' + str(i)])
+# 				feat_supports.append(feat_supp)
+# 				return
+# 			tf.while_loop(while_condition, while_body, [i])
+
+# 			feat_supports = list()
+# 			for i in tf.range(0, tf.shape(supports)[0]):
+# 				feat_supp = self.kernel_drop(supports[i])
+# 				feat_supp = tf.matmul(feat_supp, node_features)
+# 				feat_supp = tf.matmul(feat_supp, self.vars['weights_' + str(i)])
+# 				feat_supports.append(feat_supp)
+# 			feat_supports = tf.map_fn(
+# 				lambda x: self.compute_support(node_features, supports, x),
+# # 				lambda x: self.kernel_drop(supports[x]),
+# 				tf.range(0, tf.shape(supports)[0]),
+# 				fn_output_signature=tf.float32,
+# 				)
+			feat_supports = self.kernel_drop(supports)
+			feat_supports = tf.matmul(feat_supports, node_features)
+			feat_supports = tf.matmul(feat_supports, self.supp_weights)
+			rst = tf.math.reduce_sum(feat_supports, axis=0)
+# 			feat_supports = tf.map_fn(
+# 				lambda x: self.compute_support(node_features, x[0], x[1]),
+# # 				lambda x: self.kernel_drop(supports[x]),
+# 				(supports, self.supp_weights),
+# 				fn_output_signature=(tf.float32, tf.float32),
+# 				)
+# 			rst = tf.math.add_n(feat_supports)
 
 		# bias
-		if self.vars['bias'] is not None:
-			 rst = rst + self.vars['bias']
+		if self.bias_fn is not None:
+			 rst = rst + self.bias_fn
 
  		# residual
 		if self.res_fc is not None:
@@ -263,10 +296,10 @@ class DepSepGraphConv(layers.Layer):
 		return rst
 
 
-# 	def compute_support(self, node_features, support, i):
+# 	def compute_support(self, node_features, support, weights):
 # 		feat_supp = self.kernel_drop(support)
 # 		feat_supp = tf.matmul(feat_supp, node_features)
-# 		feat_supp = tf.matmul(feat_supp, self.vars['weights_' + str(i)])
+# 		feat_supp = tf.matmul(feat_supp, weights)
 # 		return feat_supp
 
 
@@ -353,25 +386,20 @@ class GraphPartition(layers.Layer):
 		)
 
 		# Remove empty subgraphs (usually for last batch in dataset)
-		node_features_partitioned = [i for i in node_features_partitioned if tf.shape(i)[0] != 0]
+		num_nodes = [tf.shape(f)[0] for f in node_features_partitioned]
+		masks = tf.cast(num_nodes, tf.bool)
+		node_features_partitioned = tf.ragged.boolean_mask(
+			tf.ragged.stack(node_features_partitioned), masks)
+
+# 		gather_indices = tf.where(~tf.math.equal(num_nodes, 0))
+# 		gather_indices = tf.squeeze(gather_indices, axis=-1)
+# 		masks = tf.
+
+# 		masks = tf.map_fn(
+# 			lambda i: (1 if tf.cond(tf.math.equal(tf.shape(i)[0], 0), lambda: 0, lambda: 1) else 0),
+# 			node_features_partitioned)
 
 		return node_features_partitioned
-
-# 		# Pad and stack subgraphs
-# 		num_nodes = [tf.shape(f)[0] for f in node_features_partitioned]
-# 		max_num_nodes = tf.reduce_max(num_nodes)
-# 		node_features_stacked = tf.stack(
-# 			[
-# 				tf.pad(f, [(0, max_num_nodes - n), (0, 0)])
-# 				for f, n in zip(node_features_partitioned, num_nodes)
-# 			],
-# 			axis=0,
-# 		)
-
-# 		# Remove empty subgraphs (usually for last batch in dataset)
-# 		gather_indices = tf.where(tf.reduce_sum(node_features_stacked, (1, 2)) != 0)
-# 		gather_indices = tf.squeeze(gather_indices, axis=-1)
-# 		return tf.gather(node_features_stacked, gather_indices, axis=0)
 
 
 # class TransformerEncoderReadout(layers.Layer):
@@ -420,7 +448,7 @@ class GraphPartition(layers.Layer):
 class DSGCNModel(tf.keras.Model):
 	def __init__(self,
 			# The following are used by the DSGCN layer.
-	  		in_feats: int = 32,
+			in_feats: int = 32,
 			hidden_feats: int = 32,
 			message_steps: int = 1,
 			is_depthwise: bool = False,
@@ -463,9 +491,9 @@ class DSGCNModel(tf.keras.Model):
 		# Readout
 		self.graph_partition = GraphPartition(batch_size)
 		if readout == 'mean':
-			self.readout = layers.GlobalAveragePooling1D()
+			self.readout = GlobalAveragePooling1D()
 		elif readout == 'max':
-			self.readout = layers.GlobalMaxPooling1D()
+			self.readout = GlobalMaxPooling1D()
 		elif readout == 'meanmax':
 			self.readout = GlobalAverageMaxPooling1D()
 
