@@ -120,8 +120,6 @@ def DSGCNDataset(X, y, batch_size=32, shuffle=False):
 	if shuffle:
 		dataset = dataset.shuffle(1024)
 	return dataset.batch(batch_size).map(prepare_batch, -1).prefetch(-1)
-#	 return dataset.batch(batch_size).map(
-# 		(lambda x: tf.py_function(prepare_batch, [x], [tf.int64])), -1)
 
 
 #%%
@@ -164,7 +162,6 @@ class DepSepGraphConv(layers.Layer):
 				self.res_fc = Identity()
 		else:
 			self.res_fc = None
-# 		self.weights_ = [] # trainable weights
 
 
 	def build(self, input_shape):
@@ -199,15 +196,6 @@ class DepSepGraphConv(layers.Layer):
 				regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
 				name='supp_weights',
 			)
-# 			for i in range(1, self.nb_supports): # for each filter.
-# 				self.weights_.append(self.add_weight(
-# 					shape=(self.in_feats, self.out_feats),
-# 					trainable=True,
-# 					initializer='glorot_uniform',
-# 					regularizer=(tf.keras.regularizers.L2(self.weight_decay) if self.weight_decay > 0. else None),
-# 					name='weights_' + str(i),
-# 				))
-# 		self.weights_ = tf.stack(self.weights_)
 
 		# bias
 		if self.bias:
@@ -246,39 +234,10 @@ class DepSepGraphConv(layers.Layer):
 			output=tf.tensordot(output,self.vars['weights_' + str(0)],[2, 0])
 
 		else:
-# 			i = tf.constant(0)
-# 			while_condition = lambda x: tf.less(x, tf.shape(supports)[0])
-# 			def while_body(i):
-# 				feat_supp = self.kernel_drop(supports[i])
-# 				feat_supp = tf.matmul(feat_supp, node_features)
-# 				feat_supp = tf.matmul(feat_supp, self.vars['weights_' + str(i)])
-# 				feat_supports.append(feat_supp)
-# 				return
-# 			tf.while_loop(while_condition, while_body, [i])
-
-# 			feat_supports = list()
-# 			for i in tf.range(0, tf.shape(supports)[0]):
-# 				feat_supp = self.kernel_drop(supports[i])
-# 				feat_supp = tf.matmul(feat_supp, node_features)
-# 				feat_supp = tf.matmul(feat_supp, self.vars['weights_' + str(i)])
-# 				feat_supports.append(feat_supp)
-# 			feat_supports = tf.map_fn(
-# 				lambda x: self.compute_support(node_features, supports, x),
-# # 				lambda x: self.kernel_drop(supports[x]),
-# 				tf.range(0, tf.shape(supports)[0]),
-# 				fn_output_signature=tf.float32,
-# 				)
 			feat_supports = self.kernel_drop(supports)
 			feat_supports = tf.matmul(feat_supports, node_features)
 			feat_supports = tf.matmul(feat_supports, self.supp_weights)
 			rst = tf.math.reduce_sum(feat_supports, axis=0)
-# 			feat_supports = tf.map_fn(
-# 				lambda x: self.compute_support(node_features, x[0], x[1]),
-# # 				lambda x: self.kernel_drop(supports[x]),
-# 				(supports, self.supp_weights),
-# 				fn_output_signature=(tf.float32, tf.float32),
-# 				)
-# 			rst = tf.math.add_n(feat_supports)
 
 		# bias
 		if self.bias_fn is not None:
@@ -294,13 +253,6 @@ class DepSepGraphConv(layers.Layer):
 			rst = self.activation(rst)
 
 		return rst
-
-
-# 	def compute_support(self, node_features, support, weights):
-# 		feat_supp = self.kernel_drop(support)
-# 		feat_supp = tf.matmul(feat_supp, node_features)
-# 		feat_supp = tf.matmul(feat_supp, weights)
-# 		return feat_supp
 
 
 class MessagePassing(layers.Layer):
@@ -386,18 +338,15 @@ class GraphPartition(layers.Layer):
 		)
 
 		# Remove empty subgraphs (usually for last batch in dataset)
-		num_nodes = [tf.shape(f)[0] for f in node_features_partitioned]
-		masks = tf.cast(num_nodes, tf.bool)
-		node_features_partitioned = tf.ragged.boolean_mask(
-			tf.ragged.stack(node_features_partitioned), masks)
+		# @todo
+# 		# 1. This implementation returns a ragged tensor, which works in both eager and autograph mode. However, the readout used afterwards (such as GlobalAverageMaxPooling1D()) is not fully adapted, so in autograph mode it was extremely slow, I did seem any epoch information in minutes. A possible solution is to replace any Pythonic statement (such as list comprehension) with tf functions. Moreover, it is a bit slower to run in eager mode.
+# 		num_nodes = [tf.shape(f)[0] for f in node_features_partitioned]
+# 		masks = tf.cast(num_nodes, tf.bool)
+# 		node_features_partitioned = tf.ragged.boolean_mask(
+# 			tf.ragged.stack(node_features_partitioned), masks)
 
-# 		gather_indices = tf.where(~tf.math.equal(num_nodes, 0))
-# 		gather_indices = tf.squeeze(gather_indices, axis=-1)
-# 		masks = tf.
-
-# 		masks = tf.map_fn(
-# 			lambda i: (1 if tf.cond(tf.math.equal(tf.shape(i)[0], 0), lambda: 0, lambda: 1) else 0),
-# 			node_features_partitioned)
+		# 2. This implementation only works in the eager mode, but it is faster than the 1st implementaion (almost 2X). I use this for now for the project's sake, but it should be improved.
+		node_features_partitioned = [i for i in node_features_partitioned if tf.shape(i)[0] != 0]
 
 		return node_features_partitioned
 
