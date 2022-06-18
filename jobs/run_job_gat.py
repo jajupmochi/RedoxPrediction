@@ -32,7 +32,7 @@ def get_job_script(args, device='cpu'):
 # 	script += r"""
 # python3 run_xps.py """ + ' '.join([r"""--""" + k + r""" """ + v for k, v in args.items()]) + r""" --stratified """ + stratified
 	script += r"""
-python3 xp_""" + model + r""".py """ + ds_name
+python3 xp_""" + model + r""".py --ds_name """ + ds_name
 	script = script.strip()
 	script = re.sub('\n\t+', '\n', script)
 	script = re.sub('\n +', '\n', script)
@@ -100,7 +100,7 @@ def get_job_script_cpu(args, id_str):
 #
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=28
+#SBATCH --cpus-per-task=1 # @todo: to change it
 #SBATCH --time=48:00:00 # @todo: to change it back
 #SBATCH --mem-per-cpu=4000
 

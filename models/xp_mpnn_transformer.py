@@ -327,9 +327,9 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 		# 			   metrics=['mae', loss, R_squared])
 		# 	model.run_eagerly = True # @todo: this is for debug only.
 
-			keras.utils.plot_model(model,
-							 path_kw.strip('/').split('/')[0] + '_model.png',
-							 show_dtype=True, show_shapes=True)
+# 			keras.utils.plot_model(model,
+# 							 path_kw.strip('/').split('/')[0] + '_model.png',
+# 							 show_dtype=True, show_shapes=True)
 
 			# callbacks
 			EarlyStopping =	tf.keras.callbacks.EarlyStopping(
@@ -438,11 +438,16 @@ def evaluate_model(X_train, y_train, X_valid, y_valid, X_test, y_test,
 def cross_validate(X, targets, families=None,
 				   n_splits=30, # @todo
 				   stratified=True, # @todo
-				   output_file='../outputs/' + path_kw + '/results.pkl',
+				   output_file=None,
 				   load_exist_results=True, # @todo
 				   **kwargs):
 	"""Run expriment.
 	"""
+	# output_file can not be set in the argument directly, as it contains
+	# `path_kw`, which is modified in the `__main__`.
+	if output_file is None:
+		output_file='../outputs/' + path_kw + '/results.pkl'
+
 	### Load existing results if possible.
 	if load_exist_results and output_file is not None and os.path.isfile(output_file) and os.path.getsize(output_file) > 0:
 		with open(output_file, 'rb') as file:
