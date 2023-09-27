@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
 	name='redox_prediction',
 	version='1.0.0',
-	packages=[''],
+	packages=['redox_prediction'],
 	url='https://github.com/jajupmochi/RedoxPrediction',
 	license='',
 	author='linlin',
