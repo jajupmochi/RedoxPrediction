@@ -193,7 +193,7 @@ if __name__ == "__main__":
 		# GNNs:
 		'nn:mpnn', 'nn:gcn', 'nn:gat', 'nn:dgcnn', 'nn:gin', 'nn:graphsage',
 		'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer',
-	] if args.model is None else args.model
+	] if args.model is None else [args.model]
 	Descriptor_List = [
 		'unlabeled', 'atom_bond_types', 'mpnn', '1hot', '1hot-dis',
 		'af1hot+3d-dis', '1hot+3d-dis',
