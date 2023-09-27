@@ -23,7 +23,18 @@ def get_get_data(ds_name, descriptor):
 	}
 	ds_dir_feat = '../datasets/Redox/'
 
-	if descriptor == 'atom_bond_types':
+	if descriptor == 'unlabeled':
+		graphs, y, _ = get_data(
+			ds_name, descriptor='smiles', format_='networkx', **ds_kwargs
+		)
+		# Remove labels:
+		for G in graphs:
+			for node in G.nodes():
+				G.nodes[node].clear()
+			for edge in G.edges():
+				G.edges[edge].clear()
+
+	elif descriptor == 'atom_bond_types':
 		graphs, y, _ = get_data(
 			ds_name, descriptor='smiles', format_='networkx', **ds_kwargs
 		)

@@ -294,7 +294,7 @@ if __name__ == '__main__':
 	params_grid = {
 		'dataset': Dataset_List[0:2],
 		'model': Model_List[24:25],
-		'descriptor': Descriptor_List[3:4],
+		'descriptor': Descriptor_List[0:2],
 		'x_scaling': X_Scaling_List[0:1],
 		'y_scaling': Y_Scaling_List[2:3],
 	}

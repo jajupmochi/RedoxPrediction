@@ -220,7 +220,7 @@ if __name__ == "__main__":
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
 				'model': Model_List[24:25],
-				'descriptor': Descriptor_List[3:4],  # 'atom_bond_types'
+				'descriptor': Descriptor_List[0:1],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],
 			}
