@@ -19,3 +19,22 @@ python3 -m pip install --no-cache-dir --user torch-scatter torch-sparse torch-cl
 python3 -m pip install --no-cache-dir --user dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
 python3 -m pip install --no-cache-dir --user dgllife
 
+
+# tensorflow~=2.11.0
+numpy~=1.24.2
+scikit-learn~=1.2.1
+xgboost
+#~=1.7.4
+# keras~=2.11.0
+torch
+#~=1.10.0+cu113
+deepchem
+#~=2.7.1
+networkx~=3.0
+pandas~=1.5.3
+matplotlib~=3.7.0
+rdkit~=2022.9.5
+# ipython~=8.11.0
+scipy~=1.8.1
+tqdm
+#~=4.64.1
