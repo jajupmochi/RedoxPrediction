@@ -250,7 +250,7 @@ def resu_to_serializable(
 		The converted results.
 	"""
 	import torch
-	import gklearn
+	from gklearn.kernels import GraphKernel
 	from redox_prediction.models.nn.utils import nn_to_dict
 	from redox_prediction.models.embed.kernel import estimator_to_dict
 
@@ -267,7 +267,7 @@ def resu_to_serializable(
 			)
 
 		# Convert the `gklearn.models.graph_kernel.GraphKernel` to a dict:
-		elif issubclass(type(resu[key]), gklearn.kernels.GraphKernel):
+		elif issubclass(type(resu[key]), GraphKernel):
 			resu_serializable[key] = kernel_to_dict(resu[key])
 
 		# Convert the numpy.ndarray to a list:
@@ -286,7 +286,7 @@ def resu_to_serializable(
 		# Convert a tuple to a dict only if it is a list of estimators
 		# (when using kernels/geds + predictors):
 		elif isinstance(resu[key], tuple) and len(resu[key]) > 0 and issubclass(
-				type(resu[key][0]), gklearn.kernels.GraphKernel
+				type(resu[key][0]), GraphKernel
 		):
 			resu_serializable[key] = {}
 			for idx, val in enumerate(resu[key]):
@@ -308,18 +308,31 @@ def resu_to_serializable(
 		elif hasattr(resu[key], '__call__'):
 			resu_serializable[key] = resu[key].__module__ + '.' + resu[key].__name__
 
+		# Convert the type `float32` to `float`:
+		elif type(resu[key]) == np.float32:
+			resu_serializable[key] = float(resu[key])
+
+		# Convert the type `int64` to `int`:
+		elif type(resu[key]) == np.int64:
+			resu_serializable[key] = int(resu[key])
+
 		else:
 			resu_serializable[key] = resu[key]
 
-		# try:
-		# 	import json
-		# 	json.dumps(resu_serializable[key])
-		# except TypeError:
-		# 	print('resu_serializable[key]: ', resu_serializable[key])
-		# 	print('resu[key]: ', resu[key])
-		# 	print('key: ', key)
-		# 	print('type(resu[key]): ', type(resu[key]))
-		# 	print('type(resu_serializable[key]): ', type(resu_serializable[key]))
-		# 	raise ValueError('resu_serializable[key] is not json serializable.')
+		# todo
+		try:
+			import json
+			json.dumps(resu_serializable[key])
+		except TypeError:
+			print()
+			print('The following key is ignored because it is not json serializable:')
+			# print('resu_serializable[key]: ', resu_serializable[key])
+			# print('resu[key]: ', resu[key])
+			print('key: ', key)
+			print('type(resu[key]): ', type(resu[key]))
+			print('type(resu_serializable[key]): ', type(resu_serializable[key]))
+			# raise ValueError('resu_serializable[key] is not json serializable.')
+			# Delete the key:
+			del resu_serializable[key]
 
 	return resu_serializable
