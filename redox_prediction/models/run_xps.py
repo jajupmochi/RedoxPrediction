@@ -84,7 +84,10 @@ def parse_args():
 
 	parser.add_argument(
 		'--descriptor', type=str,
-		choices=['unlabeled', 'atom_bond_types', 'mpnn', '1hot', '1hot-dis'],
+		choices=[
+			'unlabeled', 'atom_bond_types', '1hot', 'af1hot+3d-dis',
+			'1hot+3d-dis', 'mpnn', '1hot-dis'
+		],
 		help='the descriptor used for each graph as an input of ML models'
 	)
 
@@ -220,8 +223,8 @@ if __name__ == "__main__":
 		task_grid = ParameterGrid(
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[25:26],
-				'descriptor': Descriptor_List[3:4],  # 'atom_bond_types'
+				'model': Model_List[26:27],
+				'descriptor': Descriptor_List[2:3],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],
 			}
