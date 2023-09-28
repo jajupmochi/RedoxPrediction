@@ -31,7 +31,7 @@ def print_latex_results(results, mode, rm_valid=False):
 		final_perf[key] = str_latex
 	# time cost:
 	print()
-	for key in ['perf_train', 'perf_valid', 'history_test']:
+	for key in ['history_train', 'history_valid', 'history_test']:
 		final_perf[key] = {}
 		print(key + ':')
 		for key2 in [
