@@ -446,7 +446,8 @@ def fit_model_gnn(
 	if early_stopping:
 		early_stopping_mode = kwargs.get('early_stopping_mode', 'min')
 		early_stopping_min_delta = kwargs.get('early_stopping_min_delta', 0.0)
-		early_stopping_patience = kwargs.get('early_stopping_patience', max_epochs // 2)
+		early_stopping_patience = kwargs.get('early_stopping_patience', 500)  # debug
+			# max_epochs // 2)
 
 		early_stopping_metric = get_early_stopping_metric(
 			kwargs.get('early_stopping_metric', 'loss'),
