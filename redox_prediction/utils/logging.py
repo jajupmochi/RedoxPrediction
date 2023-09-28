@@ -311,10 +311,18 @@ def resu_to_serializable(
 		# Convert the type `float32` to `float`:
 		elif type(resu[key]) == np.float32:
 			resu_serializable[key] = float(resu[key])
+		elif isinstance(resu[key], list) and len(resu[key]) > 0 and type(
+				resu[key][0]
+		) == np.float32:
+			resu_serializable[key] = [float(val) for val in resu[key]]
 
 		# Convert the type `int64` to `int`:
 		elif type(resu[key]) == np.int64:
 			resu_serializable[key] = int(resu[key])
+		elif isinstance(resu[key], list) and len(resu[key]) > 0 and type(
+				resu[key][0]
+		) == np.int64:
+			resu_serializable[key] = [int(val) for val in resu[key]]
 
 		else:
 			resu_serializable[key] = resu[key]
