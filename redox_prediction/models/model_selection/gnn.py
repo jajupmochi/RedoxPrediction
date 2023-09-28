@@ -461,6 +461,31 @@ def evaluate_gnn(
 		from redox_prediction.models.nn.gat import GAT
 		estimator = GAT
 
+	elif kwargs.get('model') == 'nn:gin':
+		# Get parameter grid:
+		param_grid = {
+			'lr': [10 ** -3, 10 ** -4],
+			'hidden_feats': [32, 64],
+			'message_steps': [2, 3, 4],
+			'train_eps': [True],
+			'agg_activation': ['relu'],
+			'aggregation': ['sum'],  # 'mean
+			'readout': ['concat'],
+			'predictor_hidden_feats': [128, 512, 1024],
+			'predictor_n_hidden_layers': [1],
+			'predictor_activation': ['relu'],
+			'predictor_drop': [0.5, 0.],
+			'predictor_clf_activation': ['log_softmax'],
+			'batch_size': [32, 64],
+		}
+		max_epochs = 5000
+
+		from redox_prediction.models.nn.gin import GIN
+		estimator = GIN
+
+	else:
+		raise ValueError('Unknown model: {}.'.format(kwargs.get('model')))
+
 	return model_selection_for_gnn(
 		G_train, y_train, G_valid, y_valid, G_test, y_test,
 		estimator,
