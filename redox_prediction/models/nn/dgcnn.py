@@ -114,6 +114,7 @@ class DGCNN(nn.Module):
 			message_steps,
 			predictor_hidden_feats,
 			predictor_clf_activation,
+			mode: str = 'regression',
 			**kwargs
 	):
 		super(DGCNN, self).__init__()
@@ -121,6 +122,7 @@ class DGCNN(nn.Module):
 		self.k = k
 		self.hidden_feats = hidden_feats
 		self.message_steps = message_steps
+		self.mode = mode
 
 		self.convs = []
 		for layer in range(self.message_steps):
@@ -147,6 +149,12 @@ class DGCNN(nn.Module):
 		self.input_dense_dim = (dense_dim - 5 + 1) * 32
 
 		self.predictor_hidden_feats = predictor_hidden_feats
+		if mode == 'classification':
+			dim_target = dim_target
+		elif mode == 'regression':
+			dim_target = 1
+		else:
+			raise ValueError('Unknown mode: {}.'.format(mode))
 		self.dense_layer = nn.Sequential(
 			nn.Linear(self.input_dense_dim, self.predictor_hidden_feats),
 			nn.ReLU(),
@@ -154,7 +162,8 @@ class DGCNN(nn.Module):
 			nn.Linear(self.predictor_hidden_feats, dim_target)
 		)
 
-		self.predictor_clf_activation = get_activation(predictor_clf_activation)
+		if mode == 'classification':
+			self.predictor_clf_activation = get_activation(predictor_clf_activation)
 
 
 	def forward(self, data, output='prediction'):
@@ -186,10 +195,12 @@ class DGCNN(nn.Module):
 		# apply dense layer
 		out_dense = self.dense_layer(conv1d_res)
 
-		# apply activation:
-		log_probs = self.predictor_clf_activation(out_dense)
-
-		return log_probs
+		if self.mode == 'classification':
+			# apply activation:
+			log_probs = self.predictor_clf_activation(out_dense)
+			return log_probs
+		else:
+			return out_dense
 
 
 def get_sort_pooling_k(

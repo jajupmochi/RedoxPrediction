@@ -420,19 +420,19 @@ def evaluate_gnn(
 				0.6, 0.9]
 		])))
 		param_grid = {
-			'lr': [10 ** -4, 10 ** -5],
+			'lr': [10 ** -3, 10 ** -4],
 			'hidden_feats': [32, 64],
 			'message_steps': [2, 3, 4],
 			'k': ks,  # [10, 20],
 			'agg_activation': ['tanh'],
 			'readout': ['sort_pooling'],
-			'predictor_hidden_feats': [128],
+			'predictor_hidden_feats': [128, 512, 1024],
 			'predictor_n_hidden_layers': [1],
 			'predictor_activation': ['relu'],
 			'predictor_dropout': [0.5],
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
-			'dim_target': [len(set(np.concatenate((y_app, y_test))))],
+			'dim_target': [len(set(np.concatenate((y_train, y_valid, y_test))))],
 		}
 		max_epochs = 5000
 
