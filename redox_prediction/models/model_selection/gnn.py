@@ -434,7 +434,7 @@ def evaluate_gnn(
 			'batch_size': [32, 64],
 			'dim_target': [len(set(np.concatenate((y_app, y_test))))],
 		}
-		max_epochs = 1000
+		max_epochs = 5000
 
 		from redox_prediction.models.nn.dgcnn import DGCNN
 		estimator = DGCNN
@@ -442,7 +442,7 @@ def evaluate_gnn(
 	elif kwargs.get('model') == 'nn:gat':
 		# Get parameter grid:
 		param_grid = {
-			'lr': [10 ** -4, 10 ** -5],
+			'lr': [10 ** -3, 10 ** -4],
 			'hidden_feats': [32, 64],  # [128],  # [64, 128],
 			'n_heads': [4, 8],  # [4, 8],
 			'concat_heads': [True],  # [True, False],
@@ -450,13 +450,13 @@ def evaluate_gnn(
 			'attention_drop': [0, 0.5],  # [0., 0.5],
 			'agg_activation': ['relu'],
 			'readout': ['mean'],
-			'predictor_hidden_feats': [64, 128],  # [128],  # [64, 128],
+			'predictor_hidden_feats': [128, 512],  # [128],  # [64, 128],
 			'predictor_n_hidden_layers': [1],
 			'predictor_activation': ['relu'],
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 1000
+		max_epochs = 5000
 
 		from redox_prediction.models.nn.gat import GAT
 		estimator = GAT
