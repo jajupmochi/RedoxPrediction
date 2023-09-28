@@ -48,8 +48,9 @@ Model_List = [
 	'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer',
 ]
 Descriptor_List = [
-	'unlabeled', 'atom_bond_types', 'mpnn', '1hot', '1hot-dis',
+	'unlabeled', 'atom_bond_types', '1hot',
 	'af1hot+3d-dis', '1hot+3d-dis',
+	'mpnn', '1hot-dis'
 ]
 X_Scaling_List = [
 	'none', 'minmax', 'std'

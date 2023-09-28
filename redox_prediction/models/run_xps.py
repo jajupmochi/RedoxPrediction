@@ -195,8 +195,9 @@ if __name__ == "__main__":
 		'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer',
 	] if args.model is None else [args.model]
 	Descriptor_List = [
-		'unlabeled', 'atom_bond_types', 'mpnn', '1hot', '1hot-dis',
+		'unlabeled', 'atom_bond_types', '1hot',
 		'af1hot+3d-dis', '1hot+3d-dis',
+		'mpnn', '1hot-dis'
 	] if args.descriptor is None else [args.descriptor]
 	X_Scaling_List = [
 		'none', 'minmax', 'std'
@@ -219,8 +220,8 @@ if __name__ == "__main__":
 		task_grid = ParameterGrid(
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[24:25],
-				'descriptor': Descriptor_List[0:1],  # 'atom_bond_types'
+				'model': Model_List[25:26],
+				'descriptor': Descriptor_List[3:4],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],
 			}
