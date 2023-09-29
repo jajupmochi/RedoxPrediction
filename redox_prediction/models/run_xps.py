@@ -9,8 +9,13 @@ run_xp
 
 import sys
 
+import numpy as np
 
-def run_xp(ds_name, output_file, model_type, read_resu_from_file, **tasks):
+
+def run_xp(
+		ds_name, output_file, model_type, read_resu_from_file,
+		parallel, **tasks
+):
 	from gklearn.dataset import Dataset
 	from gklearn.experiments import DATASET_ROOT
 	from learning import xp_main
@@ -53,6 +58,7 @@ def run_xp(ds_name, output_file, model_type, read_resu_from_file, **tasks):
 		ds_name=ds_name,
 		output_file=output_file,
 		read_resu_from_file=read_resu_from_file,
+		parallel=parallel,
 		**{
 			**tasks,
 			'output_dir': output_file[:-4] + '/'  # remove .pkl
@@ -127,6 +133,11 @@ def parse_args():
 		     'the refitted model; 2: yes, and also the model before refitting.'
 	)
 
+	parser.add_argument(
+		'--parallel', type=str, choices=['true', 'false'],
+		help='Whether to run the experiments in parallel.'
+	)
+
 	# parser.add_argument(
 	# 	'output_file', help='path to file which will contains the results'
 	# )
@@ -153,6 +164,7 @@ if __name__ == "__main__":
 	read_resu_from_file = (
 		1 if args.read_resu_from_file is None else args.read_resu_from_file
 	)
+	parallel = (False if args.parallel is None else args.parallel == 'true')
 
 	# Network settings.
 	epochs_per_eval = 10 if args.epochs_per_eval is None else args.epochs_per_eval
@@ -223,7 +235,7 @@ if __name__ == "__main__":
 		task_grid = ParameterGrid(
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[33:34],
+				'model': Model_List[23:24],
 				'descriptor': Descriptor_List[2:3],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],
@@ -232,26 +244,33 @@ if __name__ == "__main__":
 
 	# Run.
 	from redox_prediction.utils.utils import remove_useless_keys
+	from redox_prediction.utils.logging import PrintLogger
 
 	for task in list(task_grid):
 
 		task = remove_useless_keys(task)
-
-		print()
-		print(task)
-
-		model_type = model_type_from_dataset(task['dataset'])
 
 		ab_path = os.path.dirname(os.path.abspath(__file__))
 		output_result = ab_path + '/../outputs/results.' + '.'.join(
 			list(task.values())
 		) + '.pkl'
 
+		# Redirect stdout to file:
+		logging_file = os.path.join(output_result[:-4], 'output.txt')
+		os.makedirs(os.path.dirname(logging_file), exist_ok=True)
+		sys.stdout = PrintLogger(logging_file)
+
+		print()
+		print(task)
+
+		model_type = model_type_from_dataset(task['dataset'])
+
 		if not os.path.isfile(output_result) or force_run:
 			resu, _ = run_xp(
 				task['dataset'], output_result, model_type,
 				epochs_per_eval=epochs_per_eval,
 				read_resu_from_file=read_resu_from_file,
+				parallel=parallel,
 				# if_tune_n_epochs=if_tune_n_epochs,
 				**{k: v for k, v in task.items() if k != 'dataset'}
 			)
@@ -264,7 +283,9 @@ if __name__ == "__main__":
 		final_perf = print_latex_results(
 			resu['results'][-1], model_type, rm_valid=True
 		)
-
+		final_perf['total_run_time'] = np.sum(
+			[res['split_total_run_time'] for res in resu['results'][:-1]]
+		)
 		# Save to json:
 		resu = {**{'final_perf': final_perf}, **resu}
 		from redox_prediction.utils.logging import resu_to_serializable

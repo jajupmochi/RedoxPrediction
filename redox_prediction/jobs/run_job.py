@@ -223,8 +223,8 @@ def get_job_script_cpu(id_str):
 #
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=1 # @todo: to change it
-#SBATCH --time=90:00:00 # @todo: to change it back
+#SBATCH --cpus-per-task=11 # @debug: to change it
+#SBATCH --time=90:00:00 # @debug: to change it back
 # Do not use values without a unit. In CRIANN, the default unit is MB; while in UBELIX, it is GB.
 #SBATCH --mem-per-cpu=40G  # This value can not exceed 4GB on CRIANN.
 
@@ -283,6 +283,7 @@ if __name__ == '__main__':
 	settings = {
 		'force_run': 'true',
 		'read_resu_from_file': 1,
+		'parallel': 'True',
 	}
 
 	# network settings:
