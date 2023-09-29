@@ -28,7 +28,7 @@ class MessagePassing(nn.Module):
 			feat_drop: float = 0.,
 			kernel_drop: float = 0.,
 			# 			residual: bool = False,
-			agg_activation: str = None,
+			agg_activation: str = 'relu',
 			**kwargs
 	):
 		super().__init__(**kwargs)
@@ -119,7 +119,7 @@ class GCN(torch.nn.Module):
 			kernel_drop: float = 0.,
 			# 			residual: bool = False,
 			# The followings are used for aggragation of the outputs:
-			agg_activation: str = None,
+			agg_activation: str = 'relu',
 			# The followings are used for readout:
 			readout: str = 'mean',
 			mode: str = 'regression',
