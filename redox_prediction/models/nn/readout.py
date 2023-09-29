@@ -8,7 +8,7 @@ readout
 """
 
 
-def get_readout(key):
+def get_readout(key, *args, **kwargs):
     """
     Return the readout function.
     """
@@ -30,7 +30,7 @@ def get_readout(key):
         )
     elif key == 'set2set':
         from torch_geometric.nn.aggr import Set2Set
-        return Set2Set()
+        return Set2Set(*args, **kwargs)
     elif key == 'transformer':
         raise NotImplementedError(
             'TransformerAggregation is not implemented in PyG.'

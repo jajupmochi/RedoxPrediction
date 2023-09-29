@@ -1,13 +1,15 @@
 """
-unimp.py
+mpnn.py
 
 
 @Author: linlin
 @Date: 24.09.29
+@References
+	- https://github.com/tencent-alchemy/Alchemy/blob/master/pyg/mpnn.py
 """
 import torch
 from torch import nn
-from torch_geometric.nn import TransformerConv
+from torch_geometric.nn import NNConv
 
 from .activation import get_activation
 from .readout import get_readout
@@ -18,10 +20,10 @@ class MessagePassing(nn.Module):
 	def __init__(
 			self,
 			in_feats: int,
+			edge_dim: int = None,
 			hidden_feats: int = 32,
+			edge_hidden_feats: int = 32,
 			message_steps: int = 1,
-			n_heads: int = 4,
-			concat_heads: bool = True,
 			feat_drop: float = 0.,
 			kernel_drop: float = 0.,
 			# 			residual: bool = False,
@@ -44,14 +46,18 @@ class MessagePassing(nn.Module):
 			else:
 				fp = feat_drop
 			if fp > 0.:
-				self.add_module('dropout_{}'.format(i), nn.Dropout(p=fp))
+				self.add_module('feat_drop_{}'.format(i), nn.Dropout(p=fp))
 
 			# Convolutional layer:
-			conv = TransformerConv(
+			edge_network = nn.Sequential(
+				nn.Linear(edge_dim, edge_hidden_feats),
+				nn.ReLU(),
+				nn.Linear(edge_hidden_feats, n_h_feats * n_h_feats)
+			)
+			conv = NNConv(
 				in_feats,
 				n_h_feats,
-				heads=n_heads,
-				concat=concat_heads,  # default is True
+				edge_network,
 				**kwargs
 			)
 			self.add_module('conv_{}'.format(i), conv)
@@ -64,7 +70,10 @@ class MessagePassing(nn.Module):
 			)
 			if activ_func is not None:
 				activ_func = get_activation(activ_func)
-				self.add_module('activ_func_{}'.format(i), activ_func)
+				self.add_module('agg_activ_{}'.format(i), activ_func)
+
+			# Update function:
+			self.add_module('update_{}'.format(i), nn.GRU(in_feats, n_h_feats))
 
 			# Kernel dropout:
 			if isinstance(kernel_drop, list):
@@ -72,19 +81,20 @@ class MessagePassing(nn.Module):
 			else:
 				kp = kernel_drop
 			if kp > 0.:
-				self.add_module('dropout_{}'.format(i), nn.Dropout(p=kp))
+				self.add_module('kernel_drop_{}'.format(i), nn.Dropout(p=kp))
 
 			# Update in_feats:
-			if concat_heads:
-				in_feats = n_h_feats * n_heads
-			else:
-				in_feats = n_h_feats
+			in_feats = n_h_feats
 
 
 	def forward(self, x, edge_index, edge_attr=None):
+		h = x.unsqueeze(0)
 		for module in self._modules:
 			if module.startswith('conv_'):
 				x = self._modules[module](x, edge_index, edge_attr=edge_attr)
+			elif module.startswith('update_'):
+				x, h = self._modules[module](x.unsqueeze(0), h)
+				x = x.squeeze(0)
 			else:
 				x = self._modules[module](x)
 		return x
@@ -106,15 +116,15 @@ class MessagePassing(nn.Module):
 # 	)
 
 
-class UniMP(torch.nn.Module):
+class MPNN(torch.nn.Module):
 	def __init__(
 			self,
 			# The followings are used by the Conv layer:
 			in_feats,
+			edge_dim: int = None,
 			hidden_feats: int = 32,
+			edge_hidden_feats: int = 32,
 			message_steps: int = 1,
-			n_heads: int = 4,
-			concat_heads: bool = True,
 			normalize: bool = True,
 			# weight: bool = True,
 			feat_drop: float = 0.,
@@ -123,7 +133,8 @@ class UniMP(torch.nn.Module):
 			# The followings are used for aggragation of the outputs:
 			agg_activation: str = None,
 			# The followings are used for readout:
-			readout: str = 'mean',
+			readout: str = 'set2set',
+			processing_steps: int = 6,
 			mode: str = 'regression',
 			# The following are PyTorch settings:
 			**kwargs  # batch_size: int = 32,  # for transformer readout
@@ -138,11 +149,9 @@ class UniMP(torch.nn.Module):
 		**kwargs
 			Other parameters.
 			Parameters for convolution:
-				edge_dim: int = None,
-				beta: bool = False,
-				dropout: float = 0.,
-				bias: bool = True,
+				aggr: str = 'add',
 				root_weight: bool = True,
+				bias: bool = True,
 			Parameters for MLP:
 				predictor_hidden_feats: int = 512,
 				predictor_n_hidden_layers: int = 1,
@@ -159,10 +168,10 @@ class UniMP(torch.nn.Module):
 		# Message passing
 		self.msg_passing = MessagePassing(
 			in_feats,
+			edge_dim=edge_dim,
 			hidden_feats=hidden_feats,
+			edge_hidden_feats=edge_hidden_feats,
 			message_steps=message_steps,
-			n_heads=n_heads,
-			concat_heads=concat_heads,
 			normalize=normalize,
 			feat_drop=feat_drop,
 			kernel_drop=kernel_drop,
@@ -172,7 +181,9 @@ class UniMP(torch.nn.Module):
 		)
 
 		# Readout
-		self.readout = get_readout(readout)
+		self.readout = get_readout(
+			readout, hidden_feats, processing_steps
+		)
 
 		# Predict.
 		n_h_feats = (
@@ -186,10 +197,8 @@ class UniMP(torch.nn.Module):
 			self.predict = nn.Sequential(*self.predict)
 		# Graph level prediction:
 		else:
-			if concat_heads:
-				n_h_feats *= n_heads
 			self.predict = MLP(
-				n_h_feats,
+				2 * n_h_feats,
 				out_feats=1,
 				# 			residual=predictor_residual,
 				mode=mode,
@@ -202,11 +211,11 @@ class UniMP(torch.nn.Module):
 
 
 	def forward(self, data, output='prediction'):
-		x, edge_index, edge_attr, ptr = data.x, data.edge_index, data.edge_attr, data.ptr
+		x, edge_index, edge_attr, batch = data.x, data.edge_index, data.edge_attr, data.batch
 
 		x = self.msg_passing(x, edge_index, edge_attr=edge_attr)
 		if self.readout is not None:
-			x = self.readout(x, ptr=ptr)
+			x = self.readout(x, index=batch)
 		x = self.predict(x, output=output)
 
 		return x
@@ -242,7 +251,7 @@ if __name__ == '__main__':
 
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 	print(device)
-	model = UniMP(
+	model = MPNN(
 		in_feats=dataset.num_node_features,
 		hidden_feats=[16, dataset.num_classes],
 		message_steps=2,

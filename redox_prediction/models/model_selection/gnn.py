@@ -52,7 +52,6 @@ def fit_model(
 		# @TODO #(True if model_type == 'classif' else False),
 		n_classes=kwargs.get('n_classes'),
 		mode=('regression' if model_type == 'reg' else 'classification'),
-		device=device,
 		**params
 	).to(device)
 	print(model)
@@ -394,13 +393,36 @@ def evaluate_gnn(
 	# clf_activation = (
 	# 	'sigmoid' if kwargs.get('n_classes') == 2 else 'log_softmax')
 
-	if kwargs.get('model') == 'nn:gcn':
+	if kwargs.get('model') == 'nn:mpnn':
+		# Get parameter grid:
+		param_grid = {
+			'lr': [10 ** -3, 10 ** -4],
+			'hidden_feats': [32, 64],
+			'edge_hidden_feats': [32, 64],
+			'message_steps': [2, 3, 4],
+			'aggr': ['add'],
+			'root_weight': [True],
+			# 'agg_activation': ['relu'],
+			'readout': ['set2set'],
+			'predictor_hidden_feats': [128, 512, 1024],  # [32, 64, 128],
+			'predictor_n_hidden_layers': [1],
+			'predictor_activation': ['relu'],
+			'predictor_clf_activation': ['log_softmax'],
+			'processing_steps': [3, 6, 9],
+			'batch_size': [32, 64],
+		}
+		max_epochs = 2000
+
+		from redox_prediction.models.nn.mpnn import MPNN
+		estimator = MPNN
+
+	elif kwargs.get('model') == 'nn:gcn':
 		# Get parameter grid:
 		param_grid = {
 			'lr': [10 ** -3, 10 ** -4],
 			'hidden_feats': [32, 64],
 			'message_steps': [2, 3, 4],
-			# 'agg_activation': ['relu'],
+			'agg_activation': ['relu'],
 			'readout': ['mean'],
 			'predictor_hidden_feats': [128, 512, 1024],  # [32, 64, 128],
 			'predictor_n_hidden_layers': [1],
@@ -470,7 +492,7 @@ def evaluate_gnn(
 			'hidden_feats': [32, 64],
 			'message_steps': [2, 3, 4],
 			'train_eps': [True],
-			'agg_activation': ['relu'],
+			# 'agg_activation': ['relu'],
 			'aggregation': ['sum'],  # 'mean
 			'readout': ['concat'],
 			'predictor_hidden_feats': [128, 512, 1024],
