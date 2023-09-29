@@ -137,7 +137,7 @@ class GAT(torch.nn.Module):
 			attention_drop: float = 0.,
 			# 			residual: bool = False,
 			# The followings are used for aggragation of the outputs:
-			agg_activation: str = 'relu',
+			agg_activation: str = None,
 			# The followings are used for readout:
 			readout: str = 'mean',
 			mode: str = 'regression',
