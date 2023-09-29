@@ -256,7 +256,7 @@ if __name__ == "__main__":
 		) + '.pkl'
 
 		# Redirect stdout to file:
-		logging_file = os.path.join(output_result[:-4], 'output.txt')
+		logging_file = os.path.join(output_result[:-4], 'output.log')
 		os.makedirs(os.path.dirname(logging_file), exist_ok=True)
 		sys.stdout = PrintLogger(logging_file)
 
