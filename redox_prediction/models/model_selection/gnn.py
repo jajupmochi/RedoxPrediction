@@ -493,8 +493,8 @@ def evaluate_gnn(
 			'message_steps': [2, 3, 4],
 			'n_heads': [4, 8],
 			'concat_heads': [True],
-			'beta': [False, True],
-			'dropout': [0., 0.5],
+			'beta': [False],  # True
+			'dropout': [0.],  # 0.5
 			# 'agg_activation': ['relu'],
 			'readout': ['mean'],
 			'predictor_hidden_feats': [128, 512, 1024],  # [32, 64, 128],
