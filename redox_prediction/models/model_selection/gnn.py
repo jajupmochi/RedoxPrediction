@@ -39,9 +39,11 @@ def fit_model(
 		**kwargs
 ):
 	# Initialize the model:
+	edge_dim = train_loader.dataset.num_edge_features
+	edge_dim = (None if edge_dim == 0 else edge_dim)
 	model = estimator(
 		in_feats=train_loader.dataset.num_node_features,
-		edge_dim=train_loader.dataset.num_edge_features,
+		edge_dim=edge_dim,
 		normalize=True,
 		bias=True,
 		feat_drop=0.,
@@ -398,7 +400,7 @@ def evaluate_gnn(
 			'lr': [10 ** -3, 10 ** -4],
 			'hidden_feats': [32, 64],
 			'message_steps': [2, 3, 4],
-			'agg_activation': ['relu'],
+			# 'agg_activation': ['relu'],
 			'readout': ['mean'],
 			'predictor_hidden_feats': [128, 512, 1024],  # [32, 64, 128],
 			'predictor_n_hidden_layers': [1],
@@ -406,7 +408,7 @@ def evaluate_gnn(
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 5000  # debug
+		max_epochs = 2000  # debug
 
 		from redox_prediction.models.nn.gcn import GCN
 		estimator = GCN
@@ -434,7 +436,7 @@ def evaluate_gnn(
 			'batch_size': [32, 64],
 			'dim_target': [len(set(np.concatenate((y_train, y_valid, y_test))))],
 		}
-		max_epochs = 5000
+		max_epochs = 2000
 
 		from redox_prediction.models.nn.dgcnn import DGCNN
 		estimator = DGCNN
@@ -448,7 +450,7 @@ def evaluate_gnn(
 			'concat_heads': [True],  # [True, False],
 			'message_steps': [2, 3, 4],  # [5],  # [2, 3, 4],
 			'attention_drop': [0, 0.5],  # [0., 0.5],
-			'agg_activation': ['relu'],
+			# 'agg_activation': ['relu'],
 			'readout': ['mean'],
 			'predictor_hidden_feats': [128, 512],  # [128],  # [64, 128],
 			'predictor_n_hidden_layers': [1],
@@ -456,7 +458,7 @@ def evaluate_gnn(
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 5000
+		max_epochs = 2000
 
 		from redox_prediction.models.nn.gat import GAT
 		estimator = GAT
@@ -478,7 +480,7 @@ def evaluate_gnn(
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 5000
+		max_epochs = 2000
 
 		from redox_prediction.models.nn.gin import GIN
 		estimator = GIN
@@ -501,7 +503,7 @@ def evaluate_gnn(
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 5000
+		max_epochs = 2000
 
 		from redox_prediction.models.nn.unimp import UniMP
 		estimator = UniMP
