@@ -6,6 +6,7 @@ logging
 @Author: linlin
 @Date: 03.08.23
 """
+import sys
 import functools
 import time
 
@@ -233,6 +234,24 @@ class Logger(object):
 				shutil.rmtree(log_dir)
 
 
+class PrintLogger:
+	def __init__(self, filename):
+		self.terminal = sys.stdout
+		self.logfile = open(filename, "a")
+
+
+	def write(self, message):
+		self.terminal.write(message)
+		self.logfile.write(message)
+
+
+	def flush(self):
+		pass
+
+	# def close(self):
+	# 	self.logfile.close()
+
+
 def resu_to_serializable(
 		resu: dict,
 ):
@@ -306,7 +325,8 @@ def resu_to_serializable(
 		# This can happen in `params_best` in the results of each trial for
 		# models such as `ShortestPath`.
 		elif hasattr(resu[key], '__call__'):
-			resu_serializable[key] = resu[key].__module__ + '.' + resu[key].__name__
+			resu_serializable[key] = resu[key].__module__ + '.' + resu[
+				key].__name__
 
 		# Convert the type `float32` to `float`:
 		elif type(resu[key]) == np.float32:
@@ -333,12 +353,16 @@ def resu_to_serializable(
 			json.dumps(resu_serializable[key])
 		except TypeError:
 			print()
-			print('The following key is ignored because it is not json serializable:')
+			print(
+				'The following key is ignored because it is not json serializable:'
+			)
 			# print('resu_serializable[key]: ', resu_serializable[key])
 			# print('resu[key]: ', resu[key])
 			print('key: ', key)
 			print('type(resu[key]): ', type(resu[key]))
-			print('type(resu_serializable[key]): ', type(resu_serializable[key]))
+			print(
+				'type(resu_serializable[key]): ', type(resu_serializable[key])
+			)
 			# raise ValueError('resu_serializable[key] is not json serializable.')
 			# Delete the key:
 			del resu_serializable[key]
