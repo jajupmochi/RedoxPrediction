@@ -33,6 +33,13 @@ class MessagePassing(nn.Module):
 		super().__init__()
 		self.message_steps = message_steps
 
+		self.add_module(
+			'embed_0', nn.Sequential(
+				nn.Linear(in_feats, hidden_feats),
+				nn.ReLU()
+			)
+		)
+
 		for i in range(message_steps):
 			n_h_feats = (
 				hidden_feats[i] if isinstance(
@@ -55,7 +62,7 @@ class MessagePassing(nn.Module):
 				nn.Linear(edge_hidden_feats, n_h_feats * n_h_feats)
 			)
 			conv = NNConv(
-				in_feats,
+				n_h_feats,
 				n_h_feats,
 				edge_network,
 				**kwargs
@@ -73,7 +80,7 @@ class MessagePassing(nn.Module):
 				self.add_module('agg_activ_{}'.format(i), activ_func)
 
 			# Update function:
-			self.add_module('update_{}'.format(i), nn.GRU(in_feats, n_h_feats))
+			self.add_module('update_{}'.format(i), nn.GRU(n_h_feats, n_h_feats))
 
 			# Kernel dropout:
 			if isinstance(kernel_drop, list):
@@ -83,18 +90,20 @@ class MessagePassing(nn.Module):
 			if kp > 0.:
 				self.add_module('kernel_drop_{}'.format(i), nn.Dropout(p=kp))
 
-			# Update in_feats:
-			in_feats = n_h_feats
+			# # Update in_feats:
+			# in_feats = n_h_feats
 
 
 	def forward(self, x, edge_index, edge_attr=None):
-		h = x.unsqueeze(0)
 		for module in self._modules:
 			if module.startswith('conv_'):
 				x = self._modules[module](x, edge_index, edge_attr=edge_attr)
 			elif module.startswith('update_'):
 				x, h = self._modules[module](x.unsqueeze(0), h)
 				x = x.squeeze(0)
+			elif module == 'embed_0':
+				x = self._modules[module](x)
+				h = x.unsqueeze(0)
 			else:
 				x = self._modules[module](x)
 		return x
