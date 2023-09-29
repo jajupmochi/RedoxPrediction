@@ -195,7 +195,7 @@ if __name__ == "__main__":
 		'gk:path', 'gk:treelet', 'gk:wlsubtree',  # 20-22
 		# GNNs:
 		'nn:mpnn', 'nn:gcn', 'nn:gat', 'nn:dgcnn', 'nn:gin', 'nn:graphsage',
-		'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer',
+		'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer', 'nn:unimp',
 	] if args.model is None else [args.model]
 	Descriptor_List = [
 		'unlabeled', 'atom_bond_types', '1hot',
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 		task_grid = ParameterGrid(
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[26:27],
+				'model': Model_List[33:34],
 				'descriptor': Descriptor_List[2:3],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],

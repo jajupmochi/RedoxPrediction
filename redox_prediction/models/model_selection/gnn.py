@@ -483,6 +483,29 @@ def evaluate_gnn(
 		from redox_prediction.models.nn.gin import GIN
 		estimator = GIN
 
+	elif kwargs.get('model') == 'nn:unimp':
+		# Get parameter grid:
+		param_grid = {
+			'lr': [10 ** -3, 10 ** -4],
+			'hidden_feats': [32, 64],
+			'message_steps': [2, 3, 4],
+			'n_heads': [4, 8],
+			'concat_heads': [True],
+			'beta': [False, True],
+			'dropout': [0., 0.5],
+			# 'agg_activation': ['relu'],
+			'readout': ['mean'],
+			'predictor_hidden_feats': [128, 512, 1024],  # [32, 64, 128],
+			'predictor_n_hidden_layers': [1],
+			'predictor_activation': ['relu'],
+			'predictor_clf_activation': ['log_softmax'],
+			'batch_size': [32, 64],
+		}
+		max_epochs = 5000
+
+		from redox_prediction.models.nn.unimp import UniMP
+		estimator = UniMP
+
 	else:
 		raise ValueError('Unknown model: {}.'.format(kwargs.get('model')))
 

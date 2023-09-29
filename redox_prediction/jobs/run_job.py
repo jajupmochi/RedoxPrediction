@@ -45,7 +45,7 @@ Model_List = [
 	'gk:path', 'gk:treelet', 'gk:wlsubtree',  # 20-22
 	# GNNs:
 	'nn:mpnn', 'nn:gcn', 'nn:gat', 'nn:dgcnn', 'nn:gin', 'nn:graphsage',
-	'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer',
+	'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer', 'nn:unimp',
 ]
 Descriptor_List = [
 	'unlabeled', 'atom_bond_types', '1hot',
