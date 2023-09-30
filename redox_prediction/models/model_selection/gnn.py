@@ -411,7 +411,7 @@ def evaluate_gnn(
 			'processing_steps': [3, 6, 9],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 2000
+		max_epochs = 2000  # debug
 
 		from redox_prediction.models.nn.mpnn import MPNN
 		estimator = MPNN
@@ -430,7 +430,7 @@ def evaluate_gnn(
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 2000  # debug
+		max_epochs = 2000
 
 		from redox_prediction.models.nn.gcn import GCN
 		estimator = GCN

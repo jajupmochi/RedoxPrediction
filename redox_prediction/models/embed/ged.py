@@ -73,6 +73,10 @@ def get_fitted_edit_costs(ds_name, method):
 	if method == 'BIPARTITE':
 		if ds_name == 'MUTAG':
 			return np.array([2.4, 3.5, 5.8, 2.5, 1.7, 4.1])
+		elif ds_name == 'brem_togn_dGred':
+			return np.array([1.7, 2.3, 4.0, 2.9, 2.5, 5.4])
+		elif ds_name == 'brem_togn_dGox':
+			return np.array([1.5, 2.0, 3.5, 2.7, 2.5, 5.2])
 		else:
 			raise ValueError('Unknown dataset name: {}.'.format(ds_name))
 	else:

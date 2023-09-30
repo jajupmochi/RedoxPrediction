@@ -37,7 +37,7 @@ def get_params_grid_task(
             raise ValueError('"model_type" must be either "reg" or "classif".')
     # if the precomputed matrix is a distance matrix:
     elif metric == 'distance':
-        return {'n_neighbors': [3, 5, 7, 9, 11]}
+        return {'n_neighbors': np.linspace(1, 10, num=10, dtype=int)}
     else:
         raise ValueError('"metric" must be either "dot-product" or "distance".')
 

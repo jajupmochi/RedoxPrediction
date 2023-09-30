@@ -13,10 +13,11 @@ from typing import List
 import networkx
 
 from redox_prediction.utils.logging import AverageMeter
+from redox_prediction.utils.graph import reorder_graphs_by_index
 
 
 def fit_model_ged(
-		G_app: List[networkx.Graph],
+		graphs: List[networkx.Graph],
 		ged_options: dict = None,
 		parallel: bool = None,
 		n_jobs: int = None,
@@ -24,15 +25,15 @@ def fit_model_ged(
 		copy_graphs: bool = True,
 		read_resu_from_file: int = 1,
 		output_dir: str = None,
-		split_idx: str = None,
 		params_idx: str = None,
+		reorder_graphs: bool = False,
 		verbose: int = 2,
 		**kwargs
 ):
-	if read_resu_from_file >= 2:
+	if read_resu_from_file >= 1:
 		fn_model = os.path.join(
-			output_dir, 'metric_model.split_{}.params_{}.pkl'.format(
-				split_idx, params_idx
+			output_dir, 'metric_model.params_{}.pkl'.format(
+				params_idx
 			)
 		)
 		# Load model from file if it exists:
@@ -41,10 +42,14 @@ def fit_model_ged(
 			resu = pickle.load(open(fn_model, 'rb'))
 			return resu['model'], resu['history'], resu['model'].dis_matrix
 
+	# Reorder graphs if specified:
+	if reorder_graphs:
+		graphs = reorder_graphs_by_index(graphs, idx_key='id')
+
 	# Compute metric matrix otherwise:
 	print('Computing metric matrix...')
-	nl_names = list(G_app[0].nodes[list(G_app[0].nodes)[0]].keys())
-	el_names = list(G_app[0].edges[list(G_app[0].edges)[0]].keys())
+	nl_names = list(graphs[0].nodes[list(graphs[0].nodes)[0]].keys())
+	el_names = list(graphs[0].edges[list(graphs[0].edges)[0]].keys())
 	from gklearn.ged import GEDModel
 	model = GEDModel(
 		ed_method=ged_options['method'],
@@ -52,7 +57,7 @@ def fit_model_ged(
 		init_edit_cost_constants=ged_options['edit_costs'],
 		optim_method=ged_options['optim_method'],
 		node_labels=nl_names, edge_labels=el_names,
-		parallel=parallel,
+		parallel=(None if parallel == False else parallel),
 		n_jobs=n_jobs,
 		chunksize=chunksize,
 		copy_graphs=copy_graphs,
@@ -62,8 +67,8 @@ def fit_model_ged(
 
 	# Train model.
 	try:
-		dis_mat_train = model.fit_transform(
-			G_app, save_dm_train=True, repeats=ged_options['repeats'],
+		matrix = model.fit_transform(
+			graphs, save_dm_train=True, repeats=ged_options['repeats'],
 		)
 	except OSError as exception:
 		if 'GLIBC_2.23' in exception.args[0]:
@@ -85,12 +90,12 @@ def fit_model_ged(
 
 	# Save history:
 	# For graph kernels it is n * (n - 1) / 2:
-	n_pairs = len(G_app) * (len(G_app) - 1) / 2
+	n_pairs = len(graphs) * (len(graphs) - 1) / 2
 	history = {'run_time': AverageMeter()}
 	history['run_time'].update(model.run_time / n_pairs, n_pairs)
 
 	# Save model and history to file:
-	if read_resu_from_file >= 2:
+	if read_resu_from_file >= 1:
 		os.makedirs(os.path.dirname(fn_model), exist_ok=True)
 		pickle.dump({'model': model, 'history': history}, open(fn_model, 'wb'))
 
@@ -98,9 +103,9 @@ def fit_model_ged(
 	print(
 		'Computed metric matrix of size {} in {:.3f} / {:.9f} seconds for parameters'
 		' # {}.'.format(
-			dis_mat_train.shape, model.run_time, model.run_time / n_pairs,
+			matrix.shape, model.run_time, model.run_time / n_pairs,
 			params_idx
 		)
 	)
 
-	return model, history, dis_mat_train
+	return model, history, matrix

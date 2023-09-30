@@ -18,8 +18,19 @@ from sklearn.model_selection import KFold, StratifiedKFold, ParameterGrid
 import multiprocessing
 import sys
 import time
+
+import copy
+from typing import List, Union
+
+import numpy as np
+
+import networkx
+
+from sklearn.model_selection import KFold, StratifiedKFold, ParameterGrid
+
 from gklearn.utils.iters import get_iters
 
+from redox_prediction.models.model_selection.utils import get_submatrix_by_index
 from redox_prediction.utils.logging import AverageMeter
 
 
@@ -30,6 +41,8 @@ def predict(
 		perf_eval: object,
 		G_test: List[networkx.Graph] = None,
 		metric_mode: str = 'pred',
+		y_scaler: object = None,
+		model_type: str = 'reg',
 		**kwargs
 ):
 	# Initialize average meters:
@@ -56,8 +69,8 @@ def predict(
 	elif metric_mode == 'matrix':
 		# Use the given metric matrix:
 		matrix_test = inputs
-		run_time = 0  # TODO: fix this.
-		history['pred_time_metric'].update(run_time / len(y_test), len(y_test))
+		run_time = kwargs['pairwise_run_time'] * matrix_test.shape[1]
+		history['pred_time_metric'].update(run_time, len(y_test))
 	else:
 		raise ValueError(
 			'"metric_mode" must be either "model", "pred" or "matrix".'
@@ -70,6 +83,13 @@ def predict(
 	)
 
 	# Compute the performance:
+	if y_scaler is not None:
+		if model_type == 'classif':
+			# Convert to int before inverse transform:
+			y_pred_test = np.ravel(y_pred_test.astype(int))
+			y_test = np.ravel(y_test.astype(int))
+		y_pred_test = y_scaler.inverse_transform(y_pred_test)
+		y_test = y_scaler.inverse_transform(y_test)
 	perf_test = perf_eval(y_pred_test, y_test)
 
 	return perf_test, y_pred_test, y_test, history
@@ -112,10 +132,9 @@ def fit_model(
 
 
 def evaluate_parameters(
-		matrix_app,
-		y_app,
+		matrix_train, y_train,
+		matrix_valid, y_valid,
 		params_task,
-		kf,
 		model_type,
 		verbose=False,
 		**kwargs
@@ -123,103 +142,126 @@ def evaluate_parameters(
 	all_history = _init_all_history()
 	perf_valid_list = []
 
-	# for each inner CV fold:
-	for idx, (train_index, valid_index) in enumerate(
-			kf.split(matrix_app, y_app)
-	):
+	# Fit the model:
+	model_task, history_task, perf_eval = fit_model(
+		matrix_train, y_train,
+		params_task,
+		metric='distance',  # for GEDs it is different.
+		model_type=model_type
+	)
 
-		# # For debugging only:  # TODO: comment this.
-		# if idx > 1:
-		# 	break
+	# Evaluate the model on the validation set:
+	perf_valid, y_pred_valid, y_true_valid, pred_history_valid = predict(
+		matrix_valid,
+		y_valid,
+		model_task,
+		perf_eval,
+		metric_mode='matrix',
+		model_type=model_type,
+		**kwargs
+	)
 
-		if verbose:
-			print('\nTrial: {}/{}'.format(idx + 1, kf.get_n_splits()))
+	perf_valid_list.append(perf_valid)
 
-		# split the dataset into train and validation sets:
-		matrix_train = matrix_app[train_index, :][:, train_index]
-		matrix_valid = matrix_app[valid_index, :][:, train_index]
-		y_train = y_app[train_index]
-		y_valid = y_app[valid_index]
-
-		# Fit the model:
-		model_task, history_task, perf_eval = fit_model(
-			matrix_train, y_train,
-			params_task,
-			metric=kwargs['loss'],
-			model_type=model_type
-		)
-
-		# Evaluate the model on the validation set:
-		perf_valid, y_pred_valid, y_true_valid, pred_history_valid = predict(
-			matrix_valid,
-			y_valid,
-			model_task,
-			perf_eval,
-			metric_mode='matrix',
-			**kwargs
-		)
-
-		perf_valid_list.append(perf_valid)
-
-		_update_history_1fold(all_history, history_task, pred_history_valid)
+	_update_history_1fold(all_history, history_task, pred_history_valid)
 
 	# Average the performance over the inner CV folds:
 	perf_valid = np.mean(perf_valid_list)
 
 	# Since this function is quite fast, I will not save the history to file.
 
-	return perf_valid, all_history, perf_eval
+	return perf_valid, all_history, perf_eval, model_task
 
 
 def model_selection_for_ged(
-		G_app, y_app, G_test, y_test,
+		G_train, y_train, G_valid, y_valid, G_test, y_test,
 		param_grid,
 		param_grid_task,
 		model_type,
-		parallel=None,
+		parallel=False,
 		n_jobs=multiprocessing.cpu_count(),
 		read_resu_from_file: int = 1,
 		verbose=True,
 		**kwargs
 ):
-	# Set cross-validation method:
+	# Scale the targets:
+	# @TODO: use minmax or log instead?
 	if model_type == 'reg':
-		kf = KFold(n_splits=5, shuffle=True, random_state=42)
+		from redox_prediction.models.model_selection.utils import get_y_scaler
+		y_scaler = get_y_scaler(y_train, kwargs.get('y_scaling'))
+		if y_scaler is not None:
+			y_train = y_scaler.transform(np.reshape(y_train, (-1, 1)))
+			y_valid = y_scaler.transform(np.reshape(y_valid, (-1, 1)))
+			y_test = y_scaler.transform(np.reshape(y_test, (-1, 1)))
 	elif model_type == 'classif':
-		kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+		# ensure that the labels are in the range [0, n_classes - 1].
+		# This is important for classification with Sigmoid and BCELoss.
+		# If the labels are not in this range, the loss might be negative.
+		from sklearn.preprocessing import LabelEncoder
+		y_scaler = LabelEncoder().fit(y_train)
+		y_train = y_scaler.transform(y_train)
+		y_valid = y_scaler.transform(y_valid)
+		y_test = y_scaler.transform(y_test)
+		# Ensure the values are floats:
+		y_train = y_train.astype(float)
+		y_valid = y_valid.astype(float)
+		y_test = y_test.astype(float)  # @TODO: is this necessary?
 	else:
 		raise ValueError('"model_type" must be either "reg" or "classif".')
+	kwargs['y_scaler'] = y_scaler
+	y_train, y_valid, y_test = np.ravel(y_train), np.ravel(y_valid), np.ravel(
+		y_test
+	)
+
+	# # Set cross-validation method:
+	# if model_type == 'reg':
+	# 	kf = KFold(n_splits=5, shuffle=True, random_state=42)
+	# elif model_type == 'classif':
+	# 	kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+	# else:
+	# 	raise ValueError('"model_type" must be either "reg" or "classif".')
 
 	# Do cross-validation:
 	param_list = list(ParameterGrid(param_grid))
 	param_list_task = list(ParameterGrid(param_grid_task))
 
 	perf_valid_best = (np.inf if model_type == 'reg' else -np.inf)
-	for idx, params in get_iters(
-			enumerate(param_list),  # @TODO: remove the [0:2]
-			desc='model selection for the GED model',
-			file=sys.stdout,
-			length=len(param_list),
-			verbose=True
-	):
-		print()
-		print(
-			'---- Parameter settings {}/{} -----:'.format(
-				idx + 1, len(param_list)
+	for idx, params in enumerate(param_list):  # debug: remove the [0:2]
+		# 		get_iters(
+		# 		enumerate(param_list),  # debug: remove the [0:2]
+		# 		desc='model selection for the GED model',
+		# 		file=sys.stdout,
+		# 		length=len(param_list),
+		# 		verbose=True
+		# )):
+		if verbose:
+			print()
+			print(
+				'---- Parameter settings {}/{} -----:'.format(
+					idx + 1, len(param_list)
+				)
 			)
-		)
-		print(params)
+			print(params)
 
-		# Get the metric matrix:
+		# Get the metric matrix for entire dataset:\
+		# We do this a prior for: 1) Reduce time complexity
+		# by computing only one matrix over multiple GNNs.
 		from redox_prediction.models.evaluation.ged import fit_model_ged
-		model, history, matrix_app = fit_model_ged(
-			G_app,
+		model, history, matrix_all = fit_model_ged(
+			G_train + G_valid + G_test,
 			ged_options=params,
 			parallel=parallel,
 			n_jobs=n_jobs,
 			read_resu_from_file=read_resu_from_file,
 			params_idx=str(idx),
+			reorder_graphs=True,
 			**kwargs
+		)
+		matrix_train = get_submatrix_by_index(
+			matrix_all, G_train, idx_key='id'
+		)
+		matrix_valid = get_submatrix_by_index(
+			matrix_all, G_train, G_valid, idx_key='id'
 		)
 
 		for idx_task, params_task in enumerate(param_list_task):
@@ -232,93 +274,122 @@ def model_selection_for_ged(
 				)
 				print(params_task)
 
-			perf_valid, all_history, perf_eval = evaluate_parameters(
-				matrix_app, y_app,
+			perf_valid, all_history, perf_eval, model_task = evaluate_parameters(
+				matrix_train, y_train,
+				matrix_valid, y_valid,
 				params_task,
-				kf,
 				model_type,
 				fit_history=history,
 				params_idx=str(idx),
 				verbose=verbose,
-				**kwargs
+				**{**kwargs, 'pairwise_run_time': history['run_time'].avg}
 			)
 
 			# Update the best parameters:
 			if check_if_valid_better(perf_valid, perf_valid_best, model_type):
+				best_model = model
+				best_model_task = model_task
 				perf_valid_best = perf_valid
 				params_best = copy.deepcopy(params)
 				params_best_task = copy.deepcopy(params_task)
-				best_model = model
 				best_history = {
-					**copy.deepcopy(all_history), 'fit_time_metric': history['run_time']
+					**copy.deepcopy(all_history),
+					'fit_time_metric': history['run_time']
 				}
 
-	# Refit the best model on the whole dataset:
-	print('\n---- Start refitting the best model on the whole valid dataset...')
+	# # Refit the best model on the whole dataset:
+	# print('\n---- Start refitting the best model on the whole valid dataset...')
 
-	# Fit the task model:
-	model_task, history_task, perf_eval = fit_model(
-		best_model.dis_matrix, y_app,
-		params_best_task,
-		metric=kwargs['loss'],
-		model_type=model_type
-	)
+	# # Fit the task model:
+	# matrix_app = get_submatrix_by_index(best_model.gram_matrix, G_app, idx_key='id')
+	# model_task, history_task, perf_eval = fit_model(
+	# 	matrix_app,
+	# 	y_app,
+	# 	params_best_task,
+	# 	metric=kwargs['loss'],
+	# 	model_type=model_type
+	# )
 
-	# Predict the app set:
-	perf_app, y_pred_app, y_true_app, pred_history_app = predict(
-		best_model,
-		y_app,
-		model_task,
+	# Predict the train set:
+	perf_train, y_pred_train, y_true_train, pred_history_train = predict(
+		get_submatrix_by_index(
+			best_model.dis_matrix, G_train, G_train, idx_key='id'
+		),
+		y_train,
+		best_model_task,
 		perf_eval,
-		metric_mode='model',
-		**kwargs
+		metric_mode='matrix',
+		model_type=model_type,
+		**{**kwargs, 'pairwise_run_time': best_history['fit_time_metric'].avg}
 	)
-	history_app = _init_all_history()
-	_update_history_1fold(history_app, None, pred_history_app)
-	history_app['fit_time_task'] = history_task['fit_time_task']
+	history_train = _init_all_history()
+	_update_history_1fold(history_train, None, pred_history_train)
+
+	# Predict the valid set:
+	perf_valid, y_pred_valid, y_true_valid, pred_history_valid = predict(
+		get_submatrix_by_index(
+			best_model.dis_matrix, G_train, G_valid, idx_key='id'
+		),
+		y_valid,
+		best_model_task,
+		perf_eval,
+		metric_mode='matrix',
+		model_type=model_type,
+		**{**kwargs, 'pairwise_run_time': best_history['fit_time_metric'].avg}
+	)
+	history_valid = _init_all_history()
+	_update_history_1fold(history_valid, None, pred_history_valid)
 
 	# Predict the test set:
 	perf_test, y_pred_test, y_true_test, pred_history_test = predict(
-		best_model,
+		get_submatrix_by_index(
+			best_model.dis_matrix, G_train, G_test, idx_key='id'
+		),
 		y_test,
-		model_task,
+		best_model_task,
 		perf_eval,
-		G_test=G_test,
-		metric_mode='pred',
-		**{**kwargs, 'repeats': params_best['repeats']}
+		metric_mode='matrix',
+		model_type=model_type,
+		**{**kwargs, 'pairwise_run_time': best_history['fit_time_metric'].avg}
 	)
 	history_test = _init_all_history()
 	_update_history_1fold(history_test, None, pred_history_test)
 
 	# Print out the best performance:
 	if verbose:
-		print('\nPerformance on the refitted model:')
-		print('Best app performance: {:.3f}'.format(perf_app))
+		print('\nPerformance on the best model:')
+		print('Best train performance: {:.3f}'.format(perf_train))
+		print('Best valid performance: {:.3f}'.format(perf_valid))
 		print('Best test performance: {:.3f}'.format(perf_test))
-		_print_time_info(best_history, history_app, history_test)
+		_print_time_info(
+			best_history, history_train, history_valid, history_test
+		)
 		print('Best params: ', params_best)
+		print('Best task params: ', params_best_task)
 
 	# Return the best model:
-	return (best_model, model_task), \
-		perf_app, perf_test, y_pred_app, y_pred_test, \
-		best_history, history_app, history_test, \
-		params_best
+	return (best_model, best_model_task), \
+		perf_train, perf_valid, perf_test, \
+		y_pred_train, y_pred_valid, y_pred_test, \
+		best_history, history_train, history_valid, history_test, \
+		(params_best, params_best_task)
 
 
 def evaluate_ged(
-		G_app, y_app, G_test, y_test,
+		G_train, y_train, G_valid, y_valid, G_test, y_test,
 		model_type='reg',
 		descriptor='atom_bond_types',
 		**kwargs
 ):
-	from redox_prediction.models.model_selection.utils import get_params_grid_task
+	from redox_prediction.models.model_selection.utils import \
+		get_params_grid_task
 	param_grid_task = get_params_grid_task(
-		kwargs['loss'], model_type
+		'distance', model_type  # not the same as graph kernels.
 	)
 
-	if kwargs.get('embedding') == 'ged:bp_random':
+	if kwargs.get('model') == 'ged:bp_random':
 		param_grid = {
-			'edit_costs': np.random.rand(6),
+			'edit_costs': [np.random.rand(6)],  # todo: this is not a real randomness
 			'edit_cost_fun': ['CONSTANT'],
 			'method': ['BIPARTITE'],
 			'optim_method': ['init'],
@@ -326,7 +397,7 @@ def evaluate_ged(
 			'return_nb_eo': [False],
 		}
 
-	elif kwargs.get('embedding') == 'ged:bp_fitted':
+	elif kwargs.get('model') == 'ged:bp_fitted':
 		from redox_prediction.models.embed.ged import get_fitted_edit_costs
 		param_grid = {
 			'edit_costs': get_fitted_edit_costs(kwargs['dataset'], 'BIPARTITE'),
@@ -339,15 +410,15 @@ def evaluate_ged(
 
 	else:
 		raise ValueError(
-			'Unknown embedding method: {}.'.format(kwargs.get('embedding'))
+			'Unknown model: {}.'.format(kwargs.get('model'))
 		)
 
 	return model_selection_for_ged(
-		G_app, y_app, G_test, y_test,
+		G_train, y_train, G_valid, y_valid, G_test, y_test,
 		param_grid,
 		param_grid_task,
 		model_type,
-		**kwargs
+		**{**kwargs, 'descriptor': descriptor}
 	)
 
 # %%
@@ -390,7 +461,8 @@ def _init_all_history():
 
 def _print_time_info(
 		best_history,
-		history_app,
+		history_train,
+		history_valid,
 		history_test
 ):
 	print('Training time:')
@@ -402,21 +474,33 @@ def _print_time_info(
 	)
 	print(
 		'  Task model:\ttotal {:.3f}\tper data {:.9f}'.format(
-			history_app['fit_time_task'].sum,
-			history_app['fit_time_task'].avg
+			best_history['fit_time_task'].sum,
+			best_history['fit_time_task'].avg
 		)
 	)
 	print('Prediction time:')
 	print(
-		'  App (metric):\ttotal {:.3f}\tper data {:.9f}'.format(
-			history_app['pred_time_metric'].sum,
-			history_app['pred_time_metric'].avg
+		'  Train (metric):\ttotal {:.3f}\tper data {:.9f}'.format(
+			history_train['pred_time_metric'].sum,
+			history_train['pred_time_metric'].avg
 		)
 	)
 	print(
-		'  App (task):\ttotal {:.3f}\tper data {:.9f}'.format(
-			history_app['pred_time_task'].sum,
-			history_app['pred_time_task'].avg
+		'  Train (task):\ttotal {:.3f}\tper data {:.9f}'.format(
+			history_train['pred_time_task'].sum,
+			history_train['pred_time_task'].avg
+		)
+	)
+	print(
+		'  Valid (metric):\ttotal {:.3f}\tper data {:.9f}'.format(
+			history_valid['pred_time_metric'].sum,
+			history_valid['pred_time_metric'].avg
+		)
+	)
+	print(
+		'  Valid (task):\ttotal {:.3f}\tper data {:.9f}'.format(
+			history_valid['pred_time_task'].sum,
+			history_valid['pred_time_task'].avg
 		)
 	)
 	print(

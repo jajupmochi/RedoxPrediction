@@ -9,6 +9,7 @@ run_xp
 
 import sys
 
+import networkx as nx
 import numpy as np
 
 
@@ -38,9 +39,11 @@ def run_xp(
 		edge_labels = ds.edge_labels
 		node_attrs = ds.node_attrs
 		edge_attrs = ds.edge_attrs
-	# Add id for each nx graph, for identification purposes in metric matrix:
 	for i, G in enumerate(Gn):
+		# Add id for each nx graph, for identification purposes in metric matrix:
 		G.graph['id'] = i
+		# Reorder nodes to prevent some bugs in some models: # todo: adjust the models
+		nx.convert_node_labels_to_integers(G, first_label=0, ordering='default')
 
 	resu = {}
 	resu['task'] = task
@@ -203,9 +206,9 @@ if __name__ == "__main__":
 		# GEDs:
 		'ged:bp_random', 'ged:bp_fitted',  # 16-17
 		'ged:IPFP_random', 'ged:IPFP_fitted',  # 18-19
-		# graph kernels:
-		'gk:path', 'gk:treelet', 'gk:wlsubtree',  # 20-22
-		# GNNs:
+		# graph kernels, 20-24:
+		'gk:sp', 'gk:structural_sp', 'gk:path', 'gk:treelet', 'gk:wlsubtree',
+		# GNNs: 25-
 		'nn:mpnn', 'nn:gcn', 'nn:gat', 'nn:dgcnn', 'nn:gin', 'nn:graphsage',
 		'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer', 'nn:unimp',
 	] if args.model is None else [args.model]
@@ -235,10 +238,10 @@ if __name__ == "__main__":
 		task_grid = ParameterGrid(
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[23:24],
+				'model': Model_List[2:3],
 				'descriptor': Descriptor_List[2:3],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
-				'y_scaling': Y_Scaling_List[2:3],
+				'y_scaling': Y_Scaling_List[0:1],
 			}
 		)
 

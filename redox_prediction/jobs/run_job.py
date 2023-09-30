@@ -41,9 +41,9 @@ Model_List = [
 	# GEDs:
 	'ged:bp_random', 'ged:bp_fitted',  # 16-17
 	'ged:IPFP_random', 'ged:IPFP_fitted',  # 18-19
-	# graph kernels:
-	'gk:path', 'gk:treelet', 'gk:wlsubtree',  # 20-22
-	# GNNs:
+	# graph kernels, 20-24:
+	'gk:sp', 'gk:structural_sp', 'gk:path', 'gk:treelet', 'gk:wlsubtree',
+	# GNNs: 25-
 	'nn:mpnn', 'nn:gcn', 'nn:gat', 'nn:dgcnn', 'nn:gin', 'nn:graphsage',
 	'nn:egnn', 'nn:schnet', 'nn:diffpool', 'nn:transformer', 'nn:unimp',
 ]
@@ -283,7 +283,7 @@ if __name__ == '__main__':
 	settings = {
 		'force_run': 'true',
 		'read_resu_from_file': 1,
-		'parallel': 'True',
+		'parallel': 'true',
 	}
 
 	# network settings:

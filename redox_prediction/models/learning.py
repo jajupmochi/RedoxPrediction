@@ -39,43 +39,40 @@ def evaluate_models(
 			read_resu_from_file=read_resu_from_file,
 			**kwargs
 		)
-	if kwargs.get('deep_model') == 'none':
-		if kwargs.get('embedding').startswith('gk:'):
-			# 1. Train the graph kernel model:
-			from redox_prediction.models.model_selection.kernel import \
-				evaluate_graph_kernel
-			return evaluate_graph_kernel(
-				G_app, y_app, G_test, y_test, model_type=model_type,
-				descriptor=descriptor, read_resu_from_file=read_resu_from_file,
-				**kwargs
-			)
-		if kwargs.get('embedding').startswith('ged:'):
-			# 2. Train the GED model:
-			from redox_prediction.models.model_selection.ged import evaluate_ged
-			return evaluate_ged(
-				G_app, y_app, G_test, y_test, model_type=model_type,
-				descriptor=descriptor, read_resu_from_file=read_resu_from_file,
-				**kwargs
-			)
-		if kwargs.get('embedding').startswith('nn:'):
-			# 3. Train the NN model:
-			from redox_prediction.models.model_selection.gnn import evaluate_gnn
-			return evaluate_gnn(
-				G_app, y_app, G_test, y_test,
-				model_type=model_type,
-				descriptor=descriptor,
-				read_resu_from_file=read_resu_from_file,
-				**kwargs
-			)
-		else:
-			raise ValueError(
-				'Unknown embedding method: {0}'.format(
-					kwargs.get('embedding')
-				)
-			)
+	# graph kernels:
+	elif kwargs.get('model').startswith('gk'):
+		from redox_prediction.models.model_selection.kernel import \
+			evaluate_graph_kernel
+		return evaluate_graph_kernel(
+			G_train, y_train, G_valid, y_valid, G_test, y_test,
+			model_type=model_type,
+			descriptor=descriptor,
+			read_resu_from_file=read_resu_from_file,
+			**kwargs
+		)
+	# GEDs:
+	elif kwargs.get('model').startswith('ged:'):
+		from redox_prediction.models.model_selection.ged import evaluate_ged
+		return evaluate_ged(
+			G_train, y_train, G_valid, y_valid, G_test, y_test,
+			model_type=model_type,
+			descriptor=descriptor,
+			read_resu_from_file=read_resu_from_file,
+			**kwargs
+		)
+	elif np.any([kwargs.get('model').startswith(key) for key in ['lr:', 'gkrr:', 'svr', 'knn']]):
+		from redox_prediction.models.model_selection.vector_model import evaluate_vector_model
+		return evaluate_vector_model(
+			G_train, y_train, G_valid, y_valid, G_test, y_test,
+			model_type=model_type,
+			descriptor=descriptor,
+			read_resu_from_file=read_resu_from_file,
+			**kwargs
+		)
 	else:
-		if kwargs.get('infer') == 'pretrain+refine':
-			pass
+		raise ValueError(
+			'Unknown model: {0}.'.format(kwargs.get('model'))
+		)
 
 
 def process_split(
