@@ -263,6 +263,7 @@ def append_split_perf(results, split_idx, results_to_save):
 
 
 def perf_util_now(results):
+	results = [res for res in results if res is not None]
 	print()
 	print(
 		'performance until now:\t'
