@@ -40,6 +40,10 @@ class MessagePassing(nn.Module):
 			)
 		)
 
+		if edge_dim is None:
+			edge_dim = 1
+
+		# Message passing:
 		for i in range(message_steps):
 			n_h_feats = (
 				hidden_feats[i] if isinstance(
@@ -221,6 +225,10 @@ class MPNN(torch.nn.Module):
 
 	def forward(self, data, output='prediction'):
 		x, edge_index, edge_attr, batch = data.x, data.edge_index, data.edge_attr, data.batch
+
+		# if edge_attr is None, then initialize it to all ones:
+		if edge_attr is None:
+			edge_attr = torch.ones(edge_index.shape[1], 1).to(x.device)
 
 		x = self.msg_passing(x, edge_index, edge_attr=edge_attr)
 		if self.readout is not None:
