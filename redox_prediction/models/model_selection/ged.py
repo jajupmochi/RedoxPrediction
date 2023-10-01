@@ -149,7 +149,7 @@ def evaluate_parameters(
 	model_task, history_task, perf_eval = fit_model(
 		matrix_train, y_train,
 		params_task,
-		metric='distance',  # for GEDs it is different.
+		metric='distance',  # for graph kernels it is different.
 		model_type=model_type
 	)
 
@@ -391,10 +391,20 @@ def evaluate_ged(
 		model_type
 	)
 
+	# Set the edit cost function according to the descriptor:
+	if descriptor in ['unlabeled', 'atom_bond_types']:
+		edit_cost_function = 'CONSTANT'
+	elif descriptor in ['1hot', 'af1hot+3d-dis']:
+		edit_cost_function = 'NON_SYMBOLIC'
+	else:
+		raise ValueError(
+			'Unknown descriptor: {}.'.format(descriptor)
+		)
+
 	if kwargs.get('model') == 'ged:bp_random':
 		param_grid = {
 			'edit_costs': [np.random.rand(6)],  # todo: this is not a real randomness
-			'edit_cost_fun': ['CONSTANT'],
+			'edit_cost_fun': [edit_cost_function],
 			'method': ['BIPARTITE'],
 			'optim_method': ['init'],
 			'repeats': [1],
@@ -405,7 +415,7 @@ def evaluate_ged(
 		from redox_prediction.models.embed.ged import get_fitted_edit_costs
 		param_grid = {
 			'edit_costs': [get_fitted_edit_costs(kwargs['ds_name'], 'BIPARTITE')],
-			'edit_cost_fun': ['CONSTANT'],
+			'edit_cost_fun': [edit_cost_function],
 			'method': ['BIPARTITE'],
 			'optim_method': ['init'],
 			'repeats': [1],

@@ -16,10 +16,11 @@ def get_estimator(
     if metric == 'dot-product':
         if model_type == 'reg':
             from sklearn.kernel_ridge import KernelRidge
-            from redox_prediction.utils.distances import rmse
+            # from redox_prediction.utils.distances import rmse
             estimator = KernelRidge(kernel='precomputed')
             # scoring = 'neg_root_mean_squared_error'
-            perf_eval = rmse
+            from sklearn.metrics import mean_absolute_error  # debug # todo: set as needed
+            perf_eval = mean_absolute_error
         elif model_type == 'classif':
             from sklearn.svm import SVC
             from redox_prediction.utils.distances import accuracy
@@ -32,10 +33,11 @@ def get_estimator(
     elif metric == 'distance':
         if model_type == 'reg':
             from sklearn.neighbors import KNeighborsRegressor
-            from redox_prediction.utils.distances import rmse
+            # from redox_prediction.utils.distances import rmse
             estimator = KNeighborsRegressor(metric='precomputed')
             # scoring = 'neg_root_mean_squared_error'
-            perf_eval = rmse
+            from sklearn.metrics import mean_absolute_error  # debug # todo: set as needed
+            perf_eval = mean_absolute_error
         elif model_type == 'classif':
             from sklearn.neighbors import KNeighborsClassifier
             from redox_prediction.utils.distances import accuracy
