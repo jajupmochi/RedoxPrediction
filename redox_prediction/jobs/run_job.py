@@ -29,15 +29,15 @@ Dataset_List = [
 ]
 Model_List = [
 	# baselines:
-	'mean', 'random',  # 0-1
+	'vc:mean', 'vc:random',  # 0-1
 	# "traditional" models:
-	'lr:s', 'lr:c',  # 2-3
-	'gpr:s', 'gpr:c',  # 4-5
-	'krr:s', 'krr:c',  # 6-7
-	'svr:s', 'svr:c',  # 8-9
-	'rf:s', 'rf:c',  # 10-11
-	'xgb:f', 'xgb:c',  # 12-13
-	'knn:f', 'knn:c',  # 14-15
+	'vc:lr_s', 'vc:lr_c',  # 2-3
+	'vc:gpr_s', 'vc:gpr_c',  # 4-5
+	'vc:krr_s', 'vc:krr_c',  # 6-7
+	'vc:svr_s', 'vc:svr_c',  # 8-9
+	'vc:rf_s', 'vc:rf_c',  # 10-11
+	'vc:xgb_s', 'vc:xgb_c',  # 12-13
+	'vc:knn_s', 'vc:knn_c',  # 14-15
 	# GEDs:
 	'ged:bp_random', 'ged:bp_fitted',  # 16-17
 	'ged:IPFP_random', 'ged:IPFP_fitted',  # 18-19
