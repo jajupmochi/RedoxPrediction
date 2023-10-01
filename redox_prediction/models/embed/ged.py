@@ -66,17 +66,49 @@ def compute_ged(
 		return dis
 
 
-def get_fitted_edit_costs(ds_name, method):
+def get_fitted_edit_costs(ds_name, method, descriptor, y_scaling=None):
 	# The edit costs are fitted using the method introduced in the ACPR 2023
 	# paper. The costs correspond to the best embedding space for each dataset
 	# are used.
 	if method == 'BIPARTITE':
+
 		if ds_name == 'MUTAG':
 			return np.array([2.4, 3.5, 5.8, 2.5, 1.7, 4.1])
+
 		elif ds_name == 'brem_togn_dGred':
-			return np.array([1.7, 2.3, 4.0, 2.9, 2.5, 5.4])
+			# The following 2 costs are only optimized for y_scaling "std" and
+			# used the jia2021 paper. todo: use jia2023 paper and optimize for all.
+			if descriptor == '1hot':
+				return np.array([4.2, 3.9, 4.9, 0.1, 0.1, 0.2])
+			elif descriptor == 'af1hot+3d-dis':
+				return np.array([2.1, 1.9, 3.2, 0.1, 0.1, 0.2])
+			# The following 2 costs are only optimized used the jia2023 paper
+			# for y_scaling "none" and for descriptor "atom_bond_types".
+			# todo: optimize for other y_scaling.
+			elif descriptor == 'atom_bond_types':
+				return np.array([1.7, 2.3, 4.0, 2.9, 2.5, 5.4])
+			elif descriptor == 'unlabeled':
+				return np.array([1.7, 2.3, 4.0, 2.9, 2.5, 5.4])
+			else:
+				raise ValueError('Unknown descriptor: {}.'.format(descriptor))
+
 		elif ds_name == 'brem_togn_dGox':
-			return np.array([1.5, 2.0, 3.5, 2.7, 2.5, 5.2])
+			# The following 2 costs are only optimized for y_scaling "std" and
+			# used the jia2021 paper. todo: use jia2023 paper and optimize for all.
+			if descriptor == '1hot':
+				return np.array([3.5, 3.2, 6.7, 0.1, 0.1, 0.2])
+			elif descriptor == 'af1hot+3d-dis':
+				return np.array([1.9, 1.8, 3.7, 0.1, 0.1, 0.2])
+			# The following 2 costs are only optimized used the jia2023 paper
+			# for y_scaling "none" and for descriptor "atom_bond_types".
+			# todo: optimize for other y_scaling.
+			elif descriptor == 'atom_bond_types':
+				return np.array([1.5, 2.0, 3.5, 2.7, 2.5, 5.2])
+			elif descriptor == 'unlabeled':
+				return np.array([1.5, 2.0, 3.5, 2.7, 2.5, 5.2])
+			else:
+				raise ValueError('Unknown descriptor: {}.'.format(descriptor))
+
 		else:
 			raise ValueError('Unknown dataset name: {}.'.format(ds_name))
 	else:

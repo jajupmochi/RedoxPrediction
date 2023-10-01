@@ -414,7 +414,9 @@ def evaluate_ged(
 	elif kwargs.get('model') == 'ged:bp_fitted':
 		from redox_prediction.models.embed.ged import get_fitted_edit_costs
 		param_grid = {
-			'edit_costs': [get_fitted_edit_costs(kwargs['ds_name'], 'BIPARTITE')],
+			'edit_costs': [get_fitted_edit_costs(
+				kwargs['ds_name'], 'BIPARTITE', descriptor,
+			)],
 			'edit_cost_fun': [edit_cost_function],
 			'method': ['BIPARTITE'],
 			'optim_method': ['init'],
