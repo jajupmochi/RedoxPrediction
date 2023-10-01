@@ -23,9 +23,18 @@ def run_xp(
 
 	if ds_name.startswith('brem_togn'):
 		from redox_prediction.dataset.get_data import get_get_data
-		Gn, y_all = get_get_data(ds_name, tasks['descriptor'])
-		node_labels = list(Gn[0].nodes[list(Gn[0].nodes())[0]].keys())
-		edge_labels = list(Gn[0].edges[list(Gn[0].edges())[0]].keys())
+		Gn, y_all = get_get_data(
+			ds_name,
+			tasks['descriptor'],
+			model=tasks['model']
+		)
+		if tasks['model'].startswith('vc:'):
+			# This is useless for vectorized models:
+			node_labels = []
+			edge_labels = []
+		else:
+			node_labels = list(Gn[0].nodes[list(Gn[0].nodes())[0]].keys())
+			edge_labels = list(Gn[0].edges[list(Gn[0].edges())[0]].keys())
 		node_attrs = []
 		edge_attrs = []
 	else:
@@ -39,11 +48,13 @@ def run_xp(
 		edge_labels = ds.edge_labels
 		node_attrs = ds.node_attrs
 		edge_attrs = ds.edge_attrs
-	for i, G in enumerate(Gn):
-		# Add id for each nx graph, for identification purposes in metric matrix:
-		G.graph['id'] = i
-		# Reorder nodes to prevent some bugs in some models: # todo: adjust the models
-		nx.convert_node_labels_to_integers(G, first_label=0, ordering='default')
+	if not tasks['model'].startswith('vc:'):
+		for i, G in enumerate(Gn):
+			# Add id for each nx graph, for identification purposes in metric matrix:
+			G.graph['id'] = i
+			# Reorder nodes to prevent some bugs in some models:
+			# todo: adjust the models
+			nx.convert_node_labels_to_integers(G, first_label=0, ordering='default')
 
 	resu = {}
 	resu['task'] = task
@@ -194,15 +205,15 @@ if __name__ == "__main__":
 	] if args.dataset is None else [args.dataset]
 	Model_List = [
 		# baselines:
-		'mean', 'random',  # 0-1
+		'vc:mean', 'vc:random',  # 0-1
 		# "traditional" models:
-		'lr:s', 'lr:c',  # 2-3
-		'gpr:s', 'gpr:c',  # 4-5
-		'krr:s', 'krr:c',  # 6-7
-		'svr:s', 'svr:c',  # 8-9
-		'rf:s', 'rf:c',  # 10-11
-		'xgb:f', 'xgb:c',  # 12-13
-		'knn:f', 'knn:c',  # 14-15
+		'vc:lr_s', 'vc:lr_c',  # 2-3
+		'vc:gpr_s', 'vc:gpr_c',  # 4-5
+		'vc:krr_s', 'vc:krr_c',  # 6-7
+		'vc:svr_s', 'vc:svr_c',  # 8-9
+		'vc:rf_s', 'vc:rf_c',  # 10-11
+		'vc:xgb_s', 'vc:xgb_c',  # 12-13
+		'vc:knn_s', 'vc:knn_c',  # 14-15
 		# GEDs:
 		'ged:bp_random', 'ged:bp_fitted',  # 16-17
 		'ged:IPFP_random', 'ged:IPFP_fitted',  # 18-19
@@ -238,8 +249,8 @@ if __name__ == "__main__":
 		task_grid = ParameterGrid(
 			{
 				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[2:3],
-				'descriptor': Descriptor_List[2:3],  # 'atom_bond_types'
+				'model': Model_List[12:13],
+				'descriptor': Descriptor_List[1:2],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[0:1],
 			}
