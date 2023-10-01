@@ -60,7 +60,7 @@ def evaluate_models(
 			read_resu_from_file=read_resu_from_file,
 			**kwargs
 		)
-	elif np.any([kwargs.get('model').startswith(key) for key in ['lr:', 'gkrr:', 'svr', 'knn']]):
+	elif kwargs.get('model').startswith('vc:'):
 		from redox_prediction.models.model_selection.vector_model import evaluate_vector_model
 		return evaluate_vector_model(
 			G_train, y_train, G_valid, y_valid, G_test, y_test,

@@ -8,7 +8,7 @@ get_data
 """
 
 
-def get_get_data(ds_name, descriptor):
+def get_get_data(ds_name, descriptor, model=None):
 	if ds_name.startswith('brem_togn'):
 		ds_name = ds_name.split('_')
 		target = ds_name[2]
@@ -23,20 +23,39 @@ def get_get_data(ds_name, descriptor):
 	}
 	ds_dir_feat = '../datasets/Redox/'
 
+	format_ = 'networkx'
+	if model is not None:
+		if model.startswith('vc:'):
+			format_ = 'vector'
+			if model.endswith('_c'):
+				statistics = 'A/C'
+			elif model.endswith('_s'):
+				statistics = 'A/S'
+			else:
+				raise ValueError(
+					'Unknown model for statistics: {0}.'.format(model)
+				)
+			ds_kwargs = {
+				**ds_kwargs,
+				'statistics': statistics,
+				'feats': descriptor
+			}
+
 	if descriptor == 'unlabeled':
 		graphs, y, _ = get_data(
-			ds_name, descriptor='smiles', format_='networkx', **ds_kwargs
+			ds_name, descriptor='smiles', format_=format_, **ds_kwargs
 		)
-		# Remove labels:
-		for G in graphs:
-			for node in G.nodes():
-				G.nodes[node].clear()
-			for edge in G.edges():
-				G.edges[edge].clear()
+		if model is None or not model.startswith('vc:'):
+			# Remove labels:
+			for G in graphs:
+				for node in G.nodes():
+					G.nodes[node].clear()
+				for edge in G.edges():
+					G.edges[edge].clear()
 
 	elif descriptor == 'atom_bond_types':
 		graphs, y, _ = get_data(
-			ds_name, descriptor='smiles', format_='networkx', **ds_kwargs
+			ds_name, descriptor='smiles', format_=format_, **ds_kwargs
 		)
 
 	# 2. Get descriptors: one-hot descriptors on nodes and edges.
@@ -50,7 +69,7 @@ def get_get_data(ds_name, descriptor):
 		# The string is used for the GEDLIB module of the graphkit-learn library.
 		ds_kwargs['feats_data_type'] = 'str'
 		graphs, y, _ = get_data(
-			ds_name, descriptor=featurizer, format_='networkx',
+			ds_name, descriptor=featurizer, format_=format_,
 			coords_dis=(True if descriptor.endswith('+3d-dis') else False),
 			**ds_kwargs
 		)
@@ -68,7 +87,7 @@ def get_get_data(ds_name, descriptor):
 def format_ds(ds, ds_name):
 	if ds_name not in ['Letter-high', 'Letter-med', 'Letter-low']:
 		ds.remove_labels(
-			node_attrs=ds.node_attrs, edge_attrs=ds.edge_attrs
+			node_attrs=ds.node_attrs, edge_attrs=ds.edge_attrsdescriptor
 		)  # @todo: ged can not deal with sym and unsym labels at the same time.
 	else:
 		# For Shortest Path Kernel:

@@ -8,6 +8,8 @@ Created on Fri Dec  3 14:48:39 2021
 import os
 import numpy as np
 
+import networkx as nx
+
 
 def to_rdkit_mols(data, descriptor='smiles+xyz_obabel',
                   ds_name='', ds_dir='', **kwargs
@@ -173,11 +175,45 @@ def to_vectors(
 ):
 	# 	data_tmp = to_smiles(data, ds_name, **kwargs)
 
+	statistics = kwargs.get('statistics', 'A/C')
+	statistics = statistics.split('/')
+	feat_type, stats_mode = statistics[0], statistics[1]
+
 	### Convert smiles to nxgraphs.
 	## if descriptor is a predefined string:
 	if isinstance(descriptor, str):
-		raise Exception(
-			'Your descriptor is a string, I do not know what to do yet :(')
+		if 'feats' in kwargs:
+
+			if kwargs.get('feats') == 'unlabeled':
+				data = to_nxgraphs(
+					data, ds_name.lower(), descriptor='smiles',
+					**kwargs
+				)
+				# Construct all 1 lists:
+				X = [[[1]] * nx.number_of_nodes(g) for g in data['X']]
+
+			elif kwargs.get('feats') == 'atom_bond_types':
+				data = to_nxgraphs(
+					data, ds_name.lower(), descriptor='smiles',
+					**kwargs
+				)
+				# todo:
+				# List all unique node labels and make it one-hot.
+				label_list = list(set([g.nodes[n]['symbol'] for g in data['X'] for n in g.nodes()]))
+				X = []
+				for g in data['X']:
+					x = []
+					for n in g.nodes():
+						x.append([1 if g.nodes[n]['symbol'] == l else 0 for l in label_list])
+					X.append(x)
+
+			else:
+				raise ValueError(
+					'Unknown feats: {0}.'.format(kwargs.get('feats'))
+				)
+		else:
+			raise Exception(
+				'Your descriptor is a string, I do not know what to do yet :(')
 
 	## if descriptor is a provided featurizer:
 	else:
@@ -186,31 +222,27 @@ def to_vectors(
 			data, ds_name, descriptor=descriptor, add_hs=add_hs,
 			verbose=verbose, **kwargs)
 
-		# to vectors:
-		statistics = kwargs.get('statistics', 'A/C')
-		statistics = statistics.split('/')
-		feat_type, stats_mode = statistics[0], statistics[1]
-
 		# Get node features.
 		if feat_type == 'A':  # 'A' means using node features.
 			X = data['X'][0]
 
-		# Compute statistics:
-		data['X'] = []
-		# Counts the no. of appearance of each feature in each graph through nodes in that graph.
-		if stats_mode.lower() == 'c':
-			for feat in X:
-				data['X'].append(np.sum(feat, 0))
-		# Use min, max, mean, and std features of each feature.
-		elif stats_mode.lower() == 's':
-			for feat in X:
-				data['X'].append(np.hstack((
-					np.min(feat, 0), np.max(feat, 0),
-					np.mean(feat, 0), np.std(feat, 0)))
-				)
-		else:
-			raise ValueError(
-				'Sorry I do not understand this stats_mode, do you mean "c" or "s"?')
+	# to vectors:
+	# Compute statistics:
+	data['X'] = []
+	# Counts the no. of appearance of each feature in each graph through nodes in that graph.
+	if stats_mode.lower() == 'c':
+		for feat in X:
+			data['X'].append(np.sum(feat, 0))
+	# Use min, max, mean, and std features of each feature.
+	elif stats_mode.lower() == 's':
+		for feat in X:
+			data['X'].append(np.hstack((
+				np.min(feat, 0), np.max(feat, 0),
+				np.mean(feat, 0), np.std(feat, 0)))
+			)
+	else:
+		raise ValueError(
+			'Sorry I do not understand this stats_mode, do you mean "c" or "s"?')
 
 	return data
 
@@ -245,8 +277,9 @@ def to_featurizer_format(data, ds_name,
 			data[k] = [data_tmp[k][i] for i in idx_true]
 
 	# Featurize:
-	graphs = descriptor.featurize(data['X'])
-	data['X'] = graphs
+	if not isinstance(descriptor, str):
+		graphs = descriptor.featurize(data['X'])
+		data['X'] = graphs
 
 	return data
 

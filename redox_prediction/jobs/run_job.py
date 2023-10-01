@@ -283,7 +283,7 @@ if __name__ == '__main__':
 	settings = {
 		'force_run': 'true',
 		'read_resu_from_file': 1,
-		'parallel': 'true',
+		'parallel': 'true',  # debug
 	}
 
 	# network settings:
@@ -295,10 +295,10 @@ if __name__ == '__main__':
 	# tasks:
 	params_grid = {
 		'dataset': Dataset_List[0:2],
-		'model': Model_List[24:25],
-		'descriptor': Descriptor_List[0:2],
+		'model': Model_List[2:4],
+		'descriptor': Descriptor_List[0:3],
 		'x_scaling': X_Scaling_List[0:1],
-		'y_scaling': Y_Scaling_List[2:3],
+		'y_scaling': Y_Scaling_List[0:1],
 	}
 
 	# # # This is for one by one running:
