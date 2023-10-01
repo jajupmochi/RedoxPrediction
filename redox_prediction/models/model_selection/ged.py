@@ -88,6 +88,9 @@ def predict(
 			# Convert to int before inverse transform:
 			y_pred_test = np.ravel(y_pred_test.astype(int))
 			y_test = np.ravel(y_test.astype(int))
+		else:
+			y_pred_test = y_pred_test.reshape(-1, 1)
+			y_test = y_test.reshape(-1, 1)
 		y_pred_test = y_scaler.inverse_transform(y_pred_test)
 		y_test = y_scaler.inverse_transform(y_test)
 	perf_test = perf_eval(y_pred_test, y_test)
@@ -384,7 +387,8 @@ def evaluate_ged(
 	from redox_prediction.models.model_selection.utils import \
 		get_params_grid_task
 	param_grid_task = get_params_grid_task(
-		'distance', model_type  # not the same as graph kernels.
+		'distance',  # not the same as graph kernels.
+		model_type
 	)
 
 	if kwargs.get('model') == 'ged:bp_random':

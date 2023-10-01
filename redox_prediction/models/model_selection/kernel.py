@@ -34,6 +34,8 @@ def predict(
 		perf_eval: object,
 		G_test: List[networkx.Graph] = None,
 		metric_mode: str = 'pred',
+		y_scaler: object = None,
+		model_type: str = 'reg',
 		**kwargs
 ):
 	# Initialize average meters:
@@ -74,6 +76,16 @@ def predict(
 	)
 
 	# Compute the performance:
+	if y_scaler is not None:
+		if model_type == 'classif':
+			# Convert to int before inverse transform:
+			y_pred_test = np.ravel(y_pred_test.astype(int))
+			y_test = np.ravel(y_test.astype(int))
+		else:
+			y_pred_test = y_pred_test.reshape(-1, 1)
+			y_test = y_test.reshape(-1, 1)
+		y_pred_test = y_scaler.inverse_transform(y_pred_test)
+		y_test = y_scaler.inverse_transform(y_test)
 	perf_test = perf_eval(y_pred_test, y_test)
 
 	return perf_test, y_pred_test, y_test, history
@@ -324,6 +336,7 @@ def model_selection_for_kernel(
 		best_model_task,
 		perf_eval,
 		metric_mode='matrix',
+		model_type=model_type,
 		**{**kwargs, 'pairwise_run_time': best_history['fit_time_metric'].avg}
 	)
 	history_valid = _init_all_history()
@@ -338,6 +351,7 @@ def model_selection_for_kernel(
 		best_model_task,
 		perf_eval,
 		metric_mode='matrix',
+		model_type=model_type,
 		**{**kwargs, 'pairwise_run_time': best_history['fit_time_metric'].avg}
 	)
 	history_test = _init_all_history()
