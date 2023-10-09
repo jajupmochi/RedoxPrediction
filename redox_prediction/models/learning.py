@@ -4,14 +4,13 @@ import pickle
 
 import time
 
-from joblib import Parallel, delayed
-
 import numpy as np
 
 from sklearn.model_selection import ShuffleSplit, StratifiedShuffleSplit
 from sklearn.model_selection import train_test_split
 
 from redox_prediction.utils.logging import PrintLogger
+from redox_prediction.utils.resource import get_computing_resource_info
 
 
 def split_data(D, y, train_index, test_index):
@@ -61,7 +60,8 @@ def evaluate_models(
 			**kwargs
 		)
 	elif kwargs.get('model').startswith('vc:'):
-		from redox_prediction.models.model_selection.vector_model import evaluate_vector_model
+		from redox_prediction.models.model_selection.vector_model import \
+			evaluate_vector_model
 		return evaluate_vector_model(
 			G_train, y_train, G_valid, y_valid, G_test, y_test,
 			model_type=model_type,
@@ -77,48 +77,61 @@ def evaluate_models(
 
 def process_split(
 		i, app_index, test_index, G_all, y_all, model_type, unlabeled,
-		descriptor, read_resu_from_file, kwargs
+		descriptor, read_resu_from_file,
+		**kwargs
 ):
 	"""
 	Process a single split.
 	"""
-	logging_file = os.path.join(kwargs.get('output_dir'), 'split_%d.log' % (i + 1))
-	sys.stdout = PrintLogger(logging_file)
+	from contextlib import redirect_stdout
+	from redox_prediction.utils.logging import StringAndStdoutWriter
 
-	print()
-	print('----- Split {0}/{1} -----'.format(i + 1, 10))
+	with redirect_stdout(StringAndStdoutWriter()) as op_str:
+		print()
+		print('----- Split {0}/{1} -----'.format(i + 1, 10))
 
-	start = time.time()
+		print('\nComputing resource info:')
+		print(get_computing_resource_info(return_json=True, return_joblib=True))
 
-	# Get split data
-	G_app, G_test, y_app, y_test = split_data(
-		G_all, y_all, app_index, test_index
+		start = time.time()
+
+		# Get split data
+		G_app, G_test, y_app, y_test = split_data(
+			G_all, y_all, app_index, test_index
+		)
+
+		# Split evaluation set
+		valid_size = 0.1 / (1 - 0.1)
+		op_splits = train_test_split(
+			G_app, y_app, app_index,
+			test_size=valid_size,
+			random_state=0,
+			shuffle=True,
+			stratify=None
+		)
+		G_train, G_valid, y_train, y_valid, _, _ = op_splits
+
+		cur_results = evaluate_models(
+			G_train, np.array(y_train),
+			G_valid, np.array(y_valid),
+			G_test, np.array(y_test),
+			model_type=model_type, unlabeled=unlabeled,
+			descriptor=descriptor,
+			read_resu_from_file=read_resu_from_file,
+			n_classes=len(np.unique(y_all)) if model_type == 'classif' else None,
+			**{**kwargs, 'split_idx': i + 1}
+		)
+
+		run_time = time.time() - start
+		cur_results = cur_results + (run_time,)
+
+	# Save the output string to file:
+	op_str = op_str.getvalue()
+	logging_file = os.path.join(
+		kwargs.get('output_dir'), 'split_%d.log' % (i + 1)
 	)
-
-	# Split evaluation set
-	valid_size = 0.1 / (1 - 0.1)
-	op_splits = train_test_split(
-		G_app, y_app, app_index,
-		test_size=valid_size,
-		random_state=0,
-		shuffle=True,
-		stratify=None
-	)
-	G_train, G_valid, y_train, y_valid, _, _ = op_splits
-
-	cur_results = evaluate_models(
-		G_train, np.array(y_train),
-		G_valid, np.array(y_valid),
-		G_test, np.array(y_test),
-		model_type=model_type, unlabeled=unlabeled,
-		descriptor=descriptor,
-		read_resu_from_file=read_resu_from_file,
-		n_classes=len(np.unique(y_all)) if model_type == 'classif' else None,
-		**{**kwargs, 'split_idx': i + 1}
-	)
-
-	run_time = time.time() - start
-	cur_results = cur_results + (run_time,)
+	with open(logging_file, 'w') as f:
+		f.write(op_str)
 
 	return i, cur_results
 
@@ -131,7 +144,10 @@ def xp_main(
 		descriptor='atom_bond_types',
 		output_file: str = None,
 		read_resu_from_file: int = 1,
-		parallel: bool = False,
+		# parallel: bool = False,
+		n_jobs_outer: int = 1,
+		# n_jobs_inner: int = 1,
+		n_jobs_params: int = 1,
 		**kwargs
 ):
 	"""
@@ -164,23 +180,242 @@ def xp_main(
 	else:
 		results = [None] * n_splits
 
-	if parallel:
+	if n_jobs_outer > 1:
 		# todo: skip existing results.
 
-		n_jobs = n_splits + 1
+		# n_jobs = n_splits + 1
 
-		results = Parallel(n_jobs=n_jobs)(
-			delayed(process_split)(
-				i, app_index, test_index, Gn, y_all, model_type, unlabeled,
-				descriptor, read_resu_from_file, kwargs
-			) for i, (app_index, test_index) in enumerate(split_scheme)
-		)
+		print('\nDistributing the outer CV loop to %d workers:' % n_jobs_outer)
+
+		# 1. Use joblib with Dask backends: this does not work for multiple nodes
+		# on a cluster:
+		#
+		# from joblib import parallel_backend, Parallel, delayed
+		# from dask.distributed import Client
+		#
+		# with Client(n_workers=n_jobs_outer) as client:
+		# 	with parallel_backend('dask'):
+		#
+		# 		print('Dask Client: %s' % client)
+		# 		print('Dask dashboard link: %s' % client.dashboard_link)
+		#
+		# 		results = Parallel()(
+		# 			delayed(process_split)(
+		# 				i, app_index, test_index, Gn, y_all, model_type, unlabeled,
+		# 				descriptor, read_resu_from_file,
+		# 				# n_jobs_inner=n_jobs_inner,
+		# 				n_jobs_params=n_jobs_params,
+		# 				**kwargs
+		# 			) for i, (app_index, test_index) in enumerate(split_scheme)
+		# 		)
+
+		# 2. Use Dask directly. This creates multiple dask threads, but does not
+		# work for multiple nodes on a cluster:
+		#
+		# import dask
+		#
+		# results = [dask.delayed(process_split)(
+		# 		i, app_index, test_index, Gn, y_all, model_type, unlabeled,
+		# 		descriptor, read_resu_from_file,
+		# 		# n_jobs_inner=n_jobs_inner,
+		# 		n_jobs_params=n_jobs_params,
+		# 		**kwargs
+		# 	) for i, (app_index, test_index) in enumerate(split_scheme)
+		# ]
+		# dask.compute(results)
+
+		# 3. Use dask_jobqueue to submit jobs to SLURM. This will submit work on
+		# each node as a separate job, and each job will have multiple threads.
+		# This can be problematic when the number of nodes is large, where some
+		# jobs will have to wait in a queue for a long time.
+		#
+		# if 'SLURM_JOB_ID' in os.environ:
+		# 	from dask_jobqueue import SLURMCluster
+		#
+		# 	cluster = SLURMCluster(
+		# 		queue='epyc2',
+		# 		#	    project='linlin',
+		# 		cores=min(n_jobs_params, 128),
+		# 		memory='64GB',
+		# 		walltime='01:00:00'
+		# 	)
+		# 	cluster.scale(jobs=n_jobs_outer)
+		# else:
+		# 	cluster = None
+		#
+		# import dask
+		# from dask.distributed import Client
+		#
+		# with Client(cluster, n_workers=n_jobs_outer) as client:
+		#
+		# 	print('Dask Client: %s' % client)
+		# 	print('Dask dashboard link: %s' % client.dashboard_link)
+		#
+		# 	results = [dask.delayed(process_split)(
+		# 			i, app_index, test_index, Gn, y_all, model_type, unlabeled,
+		# 			descriptor, read_resu_from_file,
+		# 			# n_jobs_inner=n_jobs_inner,
+		# 			n_jobs_params=n_jobs_params,
+		# 			**kwargs
+		# 		) for i, (app_index, test_index) in enumerate(split_scheme)
+		# 	]
+		# 	results = dask.compute(*results)
+		#
+		# 	# results = client.map(
+		# 	# 	process_split,
+		# 	# 	[
+		# 	# 		(
+		# 	# 			i, app_index, test_index, Gn, y_all, model_type,
+		# 	# 			unlabeled,
+		# 	# 			descriptor, read_resu_from_file,
+		# 	# 			# n_jobs_inner=n_jobs_inner,
+		# 	# 			n_jobs_params=n_jobs_params,
+		# 	# 			**kwargs
+		# 	# 		) for i, (app_index, test_index) in enumerate(split_scheme)
+		# 	# 	]
+		# 	# )
+		# 	# results = client.gather(results)
+
+		# 4. Use dask_mpi library to deploy Dask from within an existing MPI
+		# environment:
+
+		# # Check if `mpi4py` is installed:
+		# import importlib
+		# if importlib.util.find_spec('mpi4py') is not None:
+		#
+		# 	# Check if the current process is running under MPI:
+		# 	# import mpi4py
+		# 	from mpi4py import MPI
+		#
+		# 	comm = MPI.COMM_WORLD
+		# 	rank = comm.Get_rank()
+		# 	size = comm.Get_size()
+		#
+		# 	print('MPI rank: %d' % rank)
+		# 	print('MPI size: %d' % size)
+		#
+		# 	if size > 1:
+		# 		from dask_mpi import initialize
+		#
+		# 		initialize()
+
+		# import dask
+		# from dask.distributed import Client
+		#
+		# with Client(n_workers=n_jobs_outer) as client:
+		#
+		# 	print('Dask Client: %s' % client)
+		# 	print('Dask dashboard link: %s' % client.dashboard_link)
+		#
+		# 	paral_results = [dask.delayed(process_split)(
+		# 			i, app_index, test_index, Gn, y_all, model_type, unlabeled,
+		# 			descriptor, read_resu_from_file,
+		# 			# n_jobs_inner=n_jobs_inner,
+		# 			n_jobs_params=n_jobs_params,
+		# 			**kwargs
+		# 		) for i, (app_index, test_index) in enumerate(split_scheme)
+		# 	]
+		# 	paral_results = dask.compute(*paral_results)
+
+		# 5. Use MPI directly with joblib:
+
+		# Check if we are using Slurm and `mpi4py` is installed. If so, we will
+		# use MPI to parallelize the outer CV loop on the cluster over multiple
+		# nodes:
+		import importlib
+		if 'SLURM_JOB_ID' in os.environ and importlib.util.find_spec(
+				'mpi4py') is not None:
+
+			# Check if the current process is running under MPI:
+			# import mpi4py
+			from mpi4py import MPI
+
+			comm = MPI.COMM_WORLD
+			rank = comm.Get_rank()
+			size = comm.Get_size()
+
+			print('MPI rank: %d' % rank)
+			print('MPI size: %d' % size)
+
+			# List of tasks:
+			tasks = list(enumerate(split_scheme))
+
+			# Determine the chunk of tasks for this process
+			chunk_size = len(tasks) // size
+			start_idx = rank * chunk_size
+			end_idx = (rank + 1) * chunk_size if rank < size - 1 else len(tasks)
+
+			# Each process handles a different chunk of tasks
+			tasks = tasks[start_idx:end_idx]
+
+			# Print the tasks each process will handle
+			print('Process ranked {} will handle outer CV # {} to # {}.'.format(
+				rank, start_idx, end_idx - 1
+			))
+
+			from joblib import parallel_backend, Parallel, delayed
+
+			# Define a function to process a single task using the provided code
+			def process_task(task):
+				task_id, (app_index, test_index) = task
+				with parallel_backend(
+						'loky', inner_max_num_threads=n_jobs_params,
+				):
+					return process_split(
+						app_index, test_index, Gn, y_all, model_type, unlabeled,
+						descriptor, read_resu_from_file,
+						n_jobs_params=n_jobs_params,
+						**kwargs
+					)
+
+			# Parallelize the task processing using Joblib within the MPI process
+			results = Parallel(n_jobs=-1)(
+				delayed(process_task)(task) for task in tasks
+			)
+
+		# Otherwise we will use Joblib to parallelize the outer CV loop on a
+		# single node:
+		else:
+			from joblib import parallel_backend, Parallel, delayed
+			import multiprocessing
+
+			# Compute the maximum number of threads to use for each task:
+			inner_max_num_threads = min(n_jobs_params, multiprocessing.cpu_count() - 2)
+			# Compute the maximum number of tasks to be parallelized:
+			outer_max_num_threads = min(
+				n_jobs_outer, (multiprocessing.cpu_count() - 1) // (inner_max_num_threads + 1)
+			)
+
+			with parallel_backend(
+					'loky', inner_max_num_threads=inner_max_num_threads,
+			):
+				results = Parallel(n_jobs=outer_max_num_threads)(
+					delayed(process_split)(
+						i, app_index, test_index, Gn, y_all, model_type, unlabeled,
+						descriptor, read_resu_from_file,
+						n_jobs_params=n_jobs_params,
+						**kwargs
+					) for i, (app_index, test_index) in enumerate(split_scheme)
+				)
+
+		# results.visualize()
+
+		# print(client.scheduler_info())
+		# print(client.call_stack())
+		# print(client.get_scheduler_logs())
+		# print(client.get_task_stream())
+		# print(client.get_versions(check=True))
+		# print(client.get_worker_logs())
+		# print(client.has_what())
+		# print(client.list_datasets())
+		# print(client.nbytes())
+		# print(client.profile())
 
 		# Sort results by split index:
 		sorted_results = sorted(results, key=lambda x: x[0])
 
-		logging_file = os.path.join(kwargs['output_dir'], 'output.log')
-		sys.stdout = PrintLogger(logging_file)
+		# logging_file = os.path.join(kwargs['output_dir'], 'output.log')
+		# sys.stdout = PrintLogger(logging_file)
 
 		# Process the sorted results
 		for i, cur_results in sorted_results:
@@ -189,6 +424,8 @@ def xp_main(
 			save_split_to_file(results, read_resu_from_file, output_file, i)
 
 	else:
+		print('\nRunning the outer CV loop sequentially:')
+
 		for i, (app_index, test_index) in enumerate(split_scheme):
 			# if i > 0:  # debug: for debug only.
 			# 	break
@@ -202,7 +439,9 @@ def xp_main(
 
 			i, cur_results = process_split(
 				i, app_index, test_index, Gn, y_all, model_type, unlabeled,
-				descriptor, read_resu_from_file, kwargs
+				descriptor, read_resu_from_file,
+				n_jobs_params=n_jobs_params,
+				**kwargs
 			)
 
 			append_split_perf(results, i, cur_results)

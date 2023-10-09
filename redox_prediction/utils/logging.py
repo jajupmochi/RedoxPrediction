@@ -6,6 +6,7 @@ logging
 @Author: linlin
 @Date: 03.08.23
 """
+import io
 import sys
 import functools
 import time
@@ -236,20 +237,38 @@ class Logger(object):
 
 class PrintLogger:
 	def __init__(self, filename):
-		self.terminal = sys.stdout
+		self.stdout = sys.stdout
 		self.logfile = open(filename, "a")
 
 
 	def write(self, message):
-		self.terminal.write(message)
+		self.stdout.write(message)
 		self.logfile.write(message)
 
 
 	def flush(self):
-		pass
+		self.stdout.flush()
+		self.logfile.flush()
 
-	# def close(self):
-	# 	self.logfile.close()
+
+class StringAndStdoutWriter:
+	def __init__(self):
+		self.string_buffer = io.StringIO()
+		self.stdout = sys.stdout
+
+
+	def write(self, text):
+		self.string_buffer.write(text)
+		self.stdout.write(text)
+
+
+	def getvalue(self):
+		return self.string_buffer.getvalue()
+
+
+	def flush(self):
+		self.string_buffer.flush()
+		self.stdout.flush()
 
 
 def resu_to_serializable(

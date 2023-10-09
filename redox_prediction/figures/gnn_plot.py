@@ -20,6 +20,8 @@ def plot_perfs_vs_epochs(
 		show_fig=True,
 		title='',
 ):
+	# import matplotlib
+	# matplotlib.use('Agg')  # To be compatible with Dash.
 	import matplotlib.pyplot as plt
 	import seaborn as sns
 	colors = sns.color_palette('husl')[0:]
@@ -83,14 +85,35 @@ def plot_perfs_vs_epochs(
 	)  # , ncol=5, labelspacing=0.1, handletextpad=0.4, columnspacing=0.6)
 	# 	plt.savefig(fig_name + '.eps', format='eps', dpi=300, transparent=False, bbox_inches='tight')
 	# 	plt.savefig(fig_name + '.pdf', format='pdf', dpi=300, transparent=False, bbox_inches='tight')
-	plt.savefig(
-		fig_name + '.png', format='png', dpi=300, transparent=False,
-		bbox_inches='tight'
-	)
-	if show_fig:
-		plt.show()
-	plt.clf()
-	plt.close()
+	try:
+		plt.savefig(
+			fig_name + '.png', format='png', dpi=300, transparent=False,
+			bbox_inches='tight'
+		)
+		if show_fig:
+			plt.show()
+		plt.clf()
+		plt.close()
+	except Exception as e:
+		# This may happen when parallelizing the code.
+		# Try to save the figure again:
+		print('Warning: Exception when saving the figure. Trying again...')
+		try:
+			plt.savefig(
+				fig_name + '.png', format='png', dpi=300, transparent=False,
+				bbox_inches='tight'
+			)
+			if show_fig:
+				plt.show()
+			plt.clf()
+			plt.close()
+		except IndexError as e:
+			# todo
+			print('Warning: Exception when saving the figure. Skipping...')
+			print('e: ', e)
+		else:
+			print('Succeeded in saving the figure.')
+
 
 
 def plot_epoch_curves(

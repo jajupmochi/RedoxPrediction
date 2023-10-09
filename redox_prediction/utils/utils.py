@@ -36,10 +36,20 @@ def model_type_from_dataset(ds_name):
 
 def remove_useless_keys(task):
 	return task
-	# task_new = task.copy()
-	# if task_new['deep_model'] == 'none':
-	# 	del task_new['metric_target']
-	# 	del task_new['tricks']
-	# 	# if task_new['infer']
-	# 	del task_new['infer']
-	# return task_new
+
+
+# task_new = task.copy()
+# if task_new['deep_model'] == 'none':
+# 	del task_new['metric_target']
+# 	del task_new['tricks']
+# 	# if task_new['infer']
+# 	del task_new['infer']
+# return task_new
+
+
+def format_bytes(num):
+	for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+		if abs(num) < 1024.0:
+			return f"{num:.2f} {unit}"
+		num /= 1024.0
+	return f"{num:.2f} {unit}"

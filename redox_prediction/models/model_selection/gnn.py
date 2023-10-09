@@ -6,6 +6,7 @@ model_selection
 @Author: linlin
 @Date: 20.05.23
 """
+import sys
 import copy
 import multiprocessing
 import os
@@ -22,6 +23,7 @@ from torch_geometric.loader import DataLoader
 
 from redox_prediction.models.evaluation.gnn import predict_gnn
 from redox_prediction.utils.logging import AverageMeter
+from redox_prediction.utils.resource import get_computing_resource_info
 
 
 def fit_model(
@@ -99,73 +101,101 @@ def evaluate_parameters(
 		max_epochs=800,
 		if_tune_n_epochs: bool = False,
 		epochs_per_eval: int = 10,
-		verbose=True,
+		verbose: bool = True,
+		redirect_op_to_str: bool = False,
 		**kwargs
 ):
-	all_history = _init_all_history()
-
-	# Construct data loader:
-	train_loader = DataLoader(
-		dataset_train, batch_size=params['batch_size'], shuffle=False
-	)
-	valid_loader = DataLoader(
-		dataset_valid, batch_size=params['batch_size'], shuffle=False
-	)
-
-	# Train the model:
-	start_time = time.time()
-	model, history, valid_losses, valid_metrics = fit_model(
-		train_loader,
-		estimator,
-		params,
-		model_type,
-		max_epochs,
-		device,
-		valid_loader=valid_loader,
-		epochs_per_eval=epochs_per_eval,
-		verbose=verbose,
-		plot_loss=True,
-		**kwargs
-	)
-	if verbose:
-		print(
-			'Total time for training in this trial: {:.3f} s.'.format(
-				time.time() - start_time
-			)
-		)
-	perf_valid_list = np.array(valid_metrics)
-	valid_loss_list = np.array(valid_losses)
-
-	_update_history_1fold(all_history, history, None)
-
-	# if if_tune_n_epochs:
-	# 	# Average the metric over the inner CV folds for each epoch:
-	# 	perf_valid_list = np.array(perf_valid_list)
-	# 	perf_valid_list = np.mean(perf_valid_list, axis=0)
-	#
-	# Get the last index of the best metric and the corresponding number of epochs:
-	if model_type == 'reg':
-		best_idx = np.where(perf_valid_list == np.min(perf_valid_list))[0][-1]
-	elif model_type == 'classif':
-		best_idx = np.where(perf_valid_list == np.max(perf_valid_list))[0][-1]
+	from contextlib import redirect_stdout
+	if verbose and redirect_op_to_str:
+		# Redirect stdout to a string `op_str`:
+		import io
+		op_str = io.StringIO()
 	else:
-		raise ValueError('"model_type" must be either "reg" or "classif".')
-	perf_valid = perf_valid_list[best_idx]
-	best_n_epochs = (best_idx + 1) * epochs_per_eval
-	# else:
-	# perf_valid = np.mean([v[-1] for v in perf_valid_list])
-	# best_n_epochs = max_epochs
+		op_str = sys.stdout
 
-	# Show the best performance and the corresponding number of epochs:
-	if verbose:
-		print()
-		print('Best valid performance: {:.3f}'.format(perf_valid))
-		# if if_tune_n_epochs:  # todo
-		print('Best n_epochs: {}'.format(best_n_epochs))
+	with redirect_stdout(op_str):
+		if verbose:
+			print(
+				'\n---- Parameter settings {}/{} -----:'.format(
+					kwargs.get('params_idx') + 1, kwargs.get('n_params_sets')
+				)
+			)
+			print(params)
+
+			print('\nComputing resource info:')
+			print(get_computing_resource_info(return_json=True, return_joblib=True))
+
+		all_history = _init_all_history()
+
+		# Construct data loader:
+		train_loader = DataLoader(
+			dataset_train, batch_size=params['batch_size'], shuffle=False
+		)
+		valid_loader = DataLoader(
+			dataset_valid, batch_size=params['batch_size'], shuffle=False
+		)
+
+		# Train the model:
+		start_time = time.time()
+		model, history, valid_losses, valid_metrics = fit_model(
+			train_loader,
+			estimator,
+			params,
+			model_type,
+			max_epochs,
+			device,
+			valid_loader=valid_loader,
+			epochs_per_eval=epochs_per_eval,
+			verbose=verbose,
+			plot_loss=True,
+			**kwargs
+		)
+		if verbose:
+			print(
+				'Total time for training in this trial: {:.3f} s.'.format(
+					time.time() - start_time
+				)
+			)
+		perf_valid_list = np.array(valid_metrics)
+		valid_loss_list = np.array(valid_losses)
+
+		_update_history_1fold(all_history, history, None)
+
+		# if if_tune_n_epochs:
+		# 	# Average the metric over the inner CV folds for each epoch:
+		# 	perf_valid_list = np.array(perf_valid_list)
+		# 	perf_valid_list = np.mean(perf_valid_list, axis=0)
+		#
+		# Get the last index of the best metric and the corresponding number of epochs:
+		if model_type == 'reg':
+			best_idx = np.where(perf_valid_list == np.min(perf_valid_list))[0][-1]
+		elif model_type == 'classif':
+			best_idx = np.where(perf_valid_list == np.max(perf_valid_list))[0][-1]
+		else:
+			raise ValueError('"model_type" must be either "reg" or "classif".')
+		perf_valid = perf_valid_list[best_idx]
+		best_n_epochs = (best_idx + 1) * epochs_per_eval
+		# else:
+		# perf_valid = np.mean([v[-1] for v in perf_valid_list])
+		# best_n_epochs = max_epochs
+
+		# Show the best performance and the corresponding number of epochs:
+		if verbose:
+			print()
+			print('Best valid performance: {:.3f}'.format(perf_valid))
+			# if if_tune_n_epochs:  # todo
+			print('Best n_epochs: {}'.format(best_n_epochs))
 		# else:
 		# 	print('Best n_epochs is set to max_epochs: {}'.format(max_epochs))
 
-	return perf_valid, all_history, best_n_epochs, model
+	if verbose and redirect_op_to_str:
+		op_str = op_str.getvalue()
+	else:
+		op_str = None
+
+	return kwargs.get('params_idx'), (
+		perf_valid, all_history, best_n_epochs, model, params, op_str
+	)
 
 
 def model_selection_for_gnn(
@@ -174,8 +204,7 @@ def model_selection_for_gnn(
 		param_grid,
 		model_type,
 		max_epochs=800,
-		parallel=False,
-		n_jobs=multiprocessing.cpu_count(),
+		n_jobs_params: int = 1,
 		read_resu_from_file: int = 1,
 		verbose=True,
 		**kwargs
@@ -205,7 +234,9 @@ def model_selection_for_gnn(
 	else:
 		raise ValueError('"model_type" must be either "reg" or "classif".')
 	kwargs['y_scaler'] = y_scaler
-	y_train, y_valid, y_test = np.ravel(y_train), np.ravel(y_valid), np.ravel(y_test)
+	y_train, y_valid, y_test = np.ravel(y_train), np.ravel(y_valid), np.ravel(
+		y_test
+	)
 
 	# Convert NetworkX graphs to PyTorch-Geometric compatible dataset:
 	from redox_prediction.dataset.nn.nx import NetworkXGraphDataset
@@ -239,39 +270,113 @@ def model_selection_for_gnn(
 
 	# Do cross-validation:
 	param_list = list(ParameterGrid(param_grid))
-
 	perf_valid_best = (np.inf if model_type == 'reg' else -np.inf)
-	for idx, params in enumerate(param_list):  # debug: remove the [0:2]
-		if verbose:
-			print()
-			print(
-				'---- Parameter settings {}/{} -----:'.format(
-					idx + 1, len(param_list)
-				)
-			)
-			print(params)
 
-		perf_valid, all_history, best_n_epochs, model = evaluate_parameters(
-			dataset_train,
-			dataset_valid,
-			params,
-			estimator,
-			model_type,
-			device,
-			max_epochs=max_epochs,
-			verbose=verbose,
-			params_idx=str(idx),
-			read_resu_from_file=read_resu_from_file,
-			**kwargs
+	if n_jobs_params > 1:
+
+		# import dask
+		# from dask.distributed import Client
+
+		print(
+			'\nDistributing the parameter grid search to {} workers...'.format(
+				n_jobs_params
+			)
 		)
 
-		# Update the best parameters:
-		if check_if_valid_better(perf_valid, perf_valid_best, model_type):
-			best_model = model
-			perf_valid_best = perf_valid
-			params_best = copy.deepcopy(params)
-			best_best_n_epochs = best_n_epochs
-			best_history = copy.deepcopy(all_history)
+		# with Client(n_workers=n_jobs_params) as client:
+		#
+		# 	print('Dask Client: %s' % client)
+		# 	print('Dask dashboard link: %s' % client.dashboard_link)
+		#
+		# 	results = [dask.delayed(evaluate_parameters)(
+		# 			dataset_train,
+		# 			dataset_valid,
+		# 			params,
+		# 			estimator,
+		# 			model_type,
+		# 			device,
+		# 			max_epochs=max_epochs,
+		# 			verbose=verbose,
+		# 			params_idx=idx,
+		# 			n_params_sets=len(param_list),
+		# 			read_resu_from_file=read_resu_from_file,
+		# 			**kwargs
+		# 		) for idx, params in enumerate(param_list[0:2])
+		# 	]
+		# 	results = dask.compute(*results)
+
+		from joblib import Parallel, delayed
+		# from dask.distributed import Client
+
+		n_jobs = min(n_jobs_params, multiprocessing.cpu_count() - 1)
+
+		results = Parallel(n_jobs=n_jobs)(
+			delayed(evaluate_parameters)(
+				dataset_train,
+				dataset_valid,
+				params,
+				estimator,
+				model_type,
+				device,
+				max_epochs=max_epochs,
+				verbose=verbose,
+				params_idx=idx,
+				n_params_sets=len(param_list),
+				read_resu_from_file=read_resu_from_file,
+				redirect_op_to_str=True,
+				**kwargs
+			) for idx, params in enumerate(param_list)
+			# debug: remove the [0:2]
+		)
+
+		# Sort the results by idx:
+		results = sorted(results, key=lambda x: x[0])
+
+		# Find the best parameters using `check_if_valid_better` function:
+		for idx, (
+				perf_valid, all_history, best_n_epochs, model, params, op_str
+		) in results:
+			print(op_str)
+
+			# Update the best parameters:
+			if check_if_valid_better(
+					perf_valid, perf_valid_best, model_type
+			):
+				best_model = model
+				perf_valid_best = perf_valid
+				params_best = copy.deepcopy(params)
+				best_best_n_epochs = best_n_epochs
+				best_history = copy.deepcopy(all_history)
+
+	else:
+		print('\nRunning the parameter grid search sequentially...')
+
+		# debug: remove the [0:2]
+		for idx, params in enumerate(param_list):
+			_, (
+				perf_valid, all_history, best_n_epochs, model, params, _
+			) = evaluate_parameters(
+				dataset_train,
+				dataset_valid,
+				params,
+				estimator,
+				model_type,
+				device,
+				max_epochs=max_epochs,
+				verbose=verbose,
+				params_idx=idx,
+				n_params_sets=len(param_list),
+				read_resu_from_file=read_resu_from_file,
+				redirect_op_to_str=False,
+				**kwargs
+			)
+			# Update the best parameters:
+			if check_if_valid_better(perf_valid, perf_valid_best, model_type):
+				best_model = model
+				perf_valid_best = perf_valid
+				params_best = copy.deepcopy(params)
+				best_best_n_epochs = best_n_epochs
+				best_history = copy.deepcopy(all_history)
 
 	# params_best = copy.deepcopy(params)
 	# best_best_n_epochs = 970
@@ -373,7 +478,9 @@ def model_selection_for_gnn(
 		print('Best valid performance: {:.3f}'.format(perf_valid))
 		print('Best test performance: {:.3f}'.format(perf_test))
 		print('Best number of epochs: {}'.format(best_best_n_epochs))
-		_print_time_info(best_history, history_train, history_valid, history_test)
+		_print_time_info(
+			best_history, history_train, history_valid, history_test
+		)
 		print('Best params: ', params_best)
 
 	# Return the best model:
@@ -411,7 +518,7 @@ def evaluate_gnn(
 			'processing_steps': [3, 6, 9],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 2000  # debug
+		max_epochs = 2000
 
 		from redox_prediction.models.nn.mpnn import MPNN
 		estimator = MPNN
@@ -430,7 +537,7 @@ def evaluate_gnn(
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
 		}
-		max_epochs = 2000
+		max_epochs = 2000  # debug
 
 		from redox_prediction.models.nn.gcn import GCN
 		estimator = GCN
@@ -439,10 +546,15 @@ def evaluate_gnn(
 		# Get parameter grid:
 		from redox_prediction.models.nn.dgcnn import get_sort_pooling_k
 		# When ks consists of multiple 10s, keep only one of them:
-		ks = sorted((set([
-			get_sort_pooling_k(G_train + G_valid + G_test, perc, 10) for perc in [
-				0.6, 0.9]
-		])))
+		ks = sorted(
+			(set(
+				[
+					get_sort_pooling_k(G_train + G_valid + G_test, perc, 10) for
+					perc in [
+					0.6, 0.9]
+				]
+			))
+		)
 		param_grid = {
 			'lr': [10 ** -3, 10 ** -4],
 			'hidden_feats': [32, 64],
@@ -456,7 +568,8 @@ def evaluate_gnn(
 			'predictor_dropout': [0.5],
 			'predictor_clf_activation': ['log_softmax'],
 			'batch_size': [32, 64],
-			'dim_target': [len(set(np.concatenate((y_train, y_valid, y_test))))],
+			'dim_target': [
+				len(set(np.concatenate((y_train, y_valid, y_test))))],
 		}
 		max_epochs = 2000
 
