@@ -1,0 +1,5 @@
+
+apython:S5720u"BRename "graph_list" to "self" or add the missing "self" parameter.( ™É„8è¥Êë…1
+bpython:S5720"BRename "graph_list" to "self" or add the missing "self" parameter.( ™É„8é¥Êë…1
+zpython:S5549-"VRemove duplicate values for parameter "node_attr_names" in "get_attribute_names" call.(ê†Ñşÿÿÿÿ8é¥Êë…1
+ypython:S55494"URemove duplicate values for parameter "node_attr_names" in "get_all_attributes" call.(ê†Ñşÿÿÿÿ8é¥Êë…1

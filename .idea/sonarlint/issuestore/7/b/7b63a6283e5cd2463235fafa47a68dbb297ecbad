@@ -1,0 +1,22 @@
+
+Bpython:S125"Remove this commented out code.(ÒïÔöşÿÿÿÿ8á£³¾„1
+ypython:S117"VRename this parameter "MAX_SAMPLE" to match the regular expression ^[_a-z][a-z0-9_]*$.(ˆÎ‰µûÿÿÿÿ8á£³¾„1
+Ipython:S1481/"%Remove the unused local variable "e".(âéÄêşÿÿÿÿ8á£³¾„1
+Bpython:S125"Remove this commented out code.(Óş¹Şúÿÿÿÿ8á£³¾„1
+=python:S125"Remove this commented out code.(¦ÀÑ¹8á£³¾„1
+Bpython:S125"Remove this commented out code.(‚×£ìùÿÿÿÿ8á£³¾„1
+Bpython:S1256"Remove this commented out code.(ï‚´óüÿÿÿÿ8á£³¾„1
+ppython:S117;"MRename this parameter "Y" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ğ¡úàıÿÿÿÿ8á£³¾„1
+=python:S125D"Remove this commented out code.(Ùß¹ä8á£³¾„1
+Bpython:S125F"Remove this commented out code.(‚×£ìùÿÿÿÿ8á£³¾„1
+kpython:S117S"MRename this parameter "Y" to match the regular expression ^[_a-z][a-z0-9_]*$.(àĞ¡Ä8á£³¾„1
+Bpython:S125Z"Remove this commented out code.(‚×£ìùÿÿÿÿ8á£³¾„1
+Jpython:S1481ˆ"%Remove the unused local variable "e".(âéÄêşÿÿÿÿ8á£³¾„1
+Qpython:S1172—"2Remove the unused function parameter "y_distance".(»ïç-8á£³¾„1
+Qpython:S1172˜",Remove the unused function parameter "mode".(¹‚‘°ùÿÿÿÿ8á£³¾„1
+qpython:S117–"MRename this parameter "G" to match the regular expression ^[_a-z][a-z0-9_]*$.(¢ÖÓ–şÿÿÿÿ8á£³¾„1
+|python:S117¢"XRename this local variable "G_pairs" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ä²“Öûÿÿÿÿ8á£³¾„1
+=python:S125µ"Remove this commented out code.(½ÉÑ.8á£³¾„1
+>python:S125Å"Remove this commented out code.(ñª«ö8â£³¾„1
+Cpython:S125â"Remove this commented out code.(‚ú‡Óüÿÿÿÿ8â£³¾„1
+}python:S1542é"^Rename function "get_optimal_costs_GH2020" to match the regular expression ^[a-z_][a-z0-9_]*$.(âÇW8â£³¾„1

@@ -1,0 +1,12 @@
+
+Lpython:S1066?"/Merge this if statement with the enclosing one.(‘º™ûÿÿÿÿ
+;python:S125"Remove this commented out code.(ìöÙşÿÿÿÿ
+Tpython:S5754L"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+@python:S108Q")Either remove or fill this block of code.(ã‘Û¾
+Lpython:S1172†".Remove the unused function parameter "kwargs".(…Ñ¨øÿÿÿÿ
+Jpython:S1172ƒ",Remove the unused function parameter "tool".(È—ñºúÿÿÿÿ
+Ipython:S1172Ë"0Remove the unused function parameter "use_bohr".(ğÌå„
+Ppython:S1172Ì"7Remove the unused function parameter "complete_coords".(‘ûÄ³
+opython:S117Ô"XRename this local variable "with_GA" to match the regular expression ^[_a-z][a-z0-9_]*$.(£R
+<python:S125¼"Remove this commented out code.(øÅÕíúÿÿÿÿ
+kpython:S117Ç"SRename this parameter "with_GA" to match the regular expression ^[_a-z][a-z0-9_]*$.(»Ø§â

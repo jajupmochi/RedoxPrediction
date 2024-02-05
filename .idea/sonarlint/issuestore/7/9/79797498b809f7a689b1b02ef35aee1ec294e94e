@@ -1,0 +1,24 @@
+
+Mpython:S1066"/Merge this if statement with the enclosing one.(è¸ºùÿÿÿÿ
+6python:S125"Remove this commented out code.(¦Œ˜
+Rpython:S1172S"5Remove the unused function parameter "allowable_set".(ñÄ¼ıÿÿÿÿ
+;python:S125{"Remove this commented out code.(ÂµŞîıÿÿÿÿ
+Mpython:S1172~"5Remove the unused function parameter "allowable_set".(Ñ³æ©
+Npython:S1172œ"5Remove the unused function parameter "allowable_set".(´³âí
+Mpython:S1172ö"5Remove the unused function parameter "allowable_set".(¥–ç
+Upython:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+Spython:S1172’"5Remove the unused function parameter "allowable_set".(ìÃéÔüÿÿÿÿ
+Ppython:S1172’"2Remove the unused function parameter "return_dim".(ìÃéÔüÿÿÿÿ
+Vpython:S112¹">Replace this generic exception class with a more specific one.(ÉÛŞÁ
+Spython:S1172İ"5Remove the unused function parameter "allowable_set".(™Á¤¤ÿÿÿÿÿ
+Npython:S1172ï"5Remove the unused function parameter "allowable_set".(ô«»˜
+fpython:S116£"NRename this field "add_Hs" to match the regular expression ^[_a-z][_a-z0-9]*$.(ÿªÇé
+jpython:S117Ó"RRename this parameter "add_Hs" to match the regular expression ^[_a-z][a-z0-9_]*$.(÷Œ¿Ê
+vpython:S5717Õ"]Change this default value to "None" and initialize this parameter inside the function/method.(€„ûò
+{python:S5717Ş"]Change this default value to "None" and initialize this parameter inside the function/method.(•Ù¨…úÿÿÿÿ
+<python:S125÷"Remove this commented out code.(±È×áùÿÿÿÿ
+7python:S125¢"Remove this commented out code.(ÎÙ–ü
+rpython:S3776¬"TRefactor this function to reduce its Cognitive Complexity from 24 to the 15 allowed.(Œ«íëÿÿÿÿÿ
+7python:S125¯"Remove this commented out code.(º™›
+rpython:S3776Û"TRefactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.(º‘‡»úÿÿÿÿ
+Upython:S5754å"<Specify an exception class to catch or reraise the exception(ˆÊÉ·

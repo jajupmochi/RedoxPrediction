@@ -1,0 +1,23 @@
+
+fpython:S1192"MDefine a constant instead of duplicating this literal '../datasets/' 3 times.(¨¶‰ƒ
+xpython:S1192Ê"_Define a constant instead of duplicating this literal '/../datasets/Redox/db_bremond/' 4 times.(Ù±á 
+ˆpython:S1192í"jDefine a constant instead of duplicating this literal '/../datasets/Redox/db_bremond/pbe0_dG.csv' 5 times.(¸–‰ÿÿÿÿÿ
+6python:S125M"Remove this commented out code.(ûÛŠ•
+rpython:S3776Ø"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(ÂÊÍÎıÿÿÿÿ
+Hpython:S1172"/Remove the unused function parameter "format_".(½ˆ
+Apython:S108°")Either remove or fill this block of code.(ã‘Û¾
+~python:S930÷"fRemove 1 unexpected arguments; '_load_bremond_or_tognetti_xyz' expects at most 6 positional arguments.(¹è‹
+Kpython:S1172"2Remove the unused function parameter "descriptor".(áË—Í
+Kpython:S1172"-Remove the unused function parameter "level".(×ˆÈÌøÿÿÿÿ
+rpython:S3776Š"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(ŒĞ°èüÿÿÿÿ
+Apython:S108¿")Either remove or fill this block of code.(ã‘Û¾
+Kpython:S1172Ç"2Remove the unused function parameter "descriptor".(áË—Í
+mpython:S3776Ä"TRefactor this function to reduce its Cognitive Complexity from 27 to the 15 allowed.(îé¦æ
+Apython:S108ô")Either remove or fill this block of code.(ã‘Û¾
+Apython:S108–")Either remove or fill this block of code.(ã‘Û¾
+rpython:S3776ÿ"TRefactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed.(Ôµùüÿÿÿÿ
+7python:S125†"Remove this commented out code.(»áğí
+Mpython:S1172¶"/Remove the unused function parameter "format_".(÷Á£ÿúÿÿÿÿ
+Ppython:S1172¶"2Remove the unused function parameter "descriptor".(÷Á£ÿúÿÿÿÿ
+Ppython:S1172À"2Remove the unused function parameter "descriptor".(­ùÙ»ùÿÿÿÿ
+Mpython:S1172À"/Remove the unused function parameter "format_".(­ùÙ»ùÿÿÿÿ

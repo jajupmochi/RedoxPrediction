@@ -1,0 +1,11 @@
+
+qpython:S3776"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(ú„Úüùÿÿÿÿ
+…python:S5864'"mFix this "__getitem__" operation; Previous type checks suggest that "hidden_feats" does not have this method.(¯¡£Þ
+5python:S1258"Remove this commented out code.(è¬Ý	
+6python:S125a"Remove this commented out code.(ùÅý÷
+ipython:S107n"MMethod "__init__" has 21 parameters, which is greater than the 13 authorized.( Ðàþüÿÿÿÿ
+<python:S125•"Remove this commented out code.(Ó…èÝÿÿÿÿÿ
+7python:S125™"Remove this commented out code.(›¬ìù
+†python:S5864¢"mFix this "__getitem__" operation; Previous type checks suggest that "hidden_feats" does not have this method.(©®²ü
+<python:S125´"Remove this commented out code.(ïþá´ýÿÿÿÿ
+7python:S125Î"Remove this commented out code.(ùÅý÷

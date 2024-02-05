@@ -10,6 +10,7 @@
     </dynamicCommends>
     <chatChannels>
       <chatChannel>
+        <option name="model" value="gpt-3.5-turbo" />
         <option name="messages" />
       </chatChannel>
     </chatChannels>

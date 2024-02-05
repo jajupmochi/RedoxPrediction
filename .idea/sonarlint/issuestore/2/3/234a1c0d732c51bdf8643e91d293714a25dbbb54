@@ -1,0 +1,10 @@
+
+6python:S125"Remove this commented out code.(εύ¬™
+6python:S125R"Remove this commented out code.(εύ¬™
+;python:S125u"Remove this commented out code.(©¬Δ¨ύÿÿÿÿ
+qpython:S117δ"YRename this local variable "idx_2D3D" to match the regular expression ^[_a-z][a-z0-9_]*$.(ρύθ§
+rpython:S117ι"ZRename this local variable "idx_V2000" to match the regular expression ^[_a-z][a-z0-9_]*$.(¶η¥’
+qpython:S117•"YRename this local variable "idx_2D3D" to match the regular expression ^[_a-z][a-z0-9_]*$.(ρύθ§
+rpython:S117"ZRename this local variable "idx_V2000" to match the regular expression ^[_a-z][a-z0-9_]*$.(¶η¥’
+jpython:S117Ώ"RRename this parameter "add_Hs" to match the regular expression ^[_a-z][a-z0-9_]*$.(¥Αψ
+7python:S125π"Remove this commented out code.(¨ύÒ­
