@@ -1,0 +1,11 @@
+
+=python:S125"Remove this commented out code.(ÒÜ 8êÑäª°1
+opython:S1854B"KRemove this assignment to local variable 'Client'; the value is never used.(ª‘Šòÿÿÿÿÿ8êÑäª°1
+Npython:S1481L"*Remove the unused local variable "client".(ú­ûĞúÿÿÿÿ8êÑäª°1
+Bpython:S125S"Remove this commented out code.(†ĞÌùÿÿÿÿ8êÑäª°1
+Ipython:S1481q"*Remove the unused local variable "client".(æìÔí8êÑäª°1
+=python:S125g"Remove this commented out code.(Ñ¤İİ8êÑäª°1
+=python:S125l"Remove this commented out code.(¦–É8êÑäª°1
+=python:S125p"Remove this commented out code.(Üõù£8êÑäª°1
+<python:S125y"Remove this commented out code.(Ê›òG8êÑäª°1
+Bpython:S125"Remove this commented out code.(Ù«¡´üÿÿÿÿ8ëÑäª°1

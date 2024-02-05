@@ -1,0 +1,22 @@
+
+’python:S1192<"uDefine a constant instead of duplicating this literal "mode must be either 'classification' or 'regression'" 3 times.(¼ëç¼ÿÿÿÿÿ
+wpython:S1192‰"YDefine a constant instead of duplicating this literal 'This class requires dgl.' 4 times.(¶ë×Þùÿÿÿÿ
+Tpython:S5754
+"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+qpython:S3776#"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(ÄÁšÃþÿÿÿÿ
+rpython:S3776 "TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(ÄÁšÃþÿÿÿÿ
+@python:S5603ê"(Remove this unused function declaration.(Œ¿©
+<python:S125ú"Remove this commented out code.(ËÉú—ûÿÿÿÿ
+qpython:S117ˆ"TRename this local variable "X_b" to match the regular expression ^[_a-z][a-z0-9_]*$.(½áÓÞüÿÿÿÿ
+zpython:S117"]Rename this local variable "multiConvMol" to match the regular expression ^[_a-z][a-z0-9_]*$.(óÈªûÿÿÿÿ
+Gpython:S1481‡")Remove the unused local variable "epoch".(ïžÄ¤ûÿÿÿÿ
+jpython:S107É"MMethod "__init__" has 15 parameters, which is greater than the 13 authorized.(ÄÁšÃþÿÿÿÿ
+Upython:S5754ˆ"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+Upython:S5754Œ"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+jpython:S107–"MMethod "__init__" has 16 parameters, which is greater than the 13 authorized.(ÄÁšÃþÿÿÿÿ
+Upython:S5754…"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+Upython:S5754‚"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+Upython:S5754†"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+jpython:S107Š"MMethod "__init__" has 14 parameters, which is greater than the 13 authorized.(ÄÁšÃþÿÿÿÿ
+<python:S125Ï"Remove this commented out code.(Ö¦† þÿÿÿÿ
+Upython:S5754ë"<Specify an exception class to catch or reraise the exception(ˆÊÉ·

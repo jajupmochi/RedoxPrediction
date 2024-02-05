@@ -1,0 +1,38 @@
+
+;python:S125"Remove this commented out code.(’«¬×üÿÿÿÿ
+;python:S125"Remove this commented out code.(ç•¥İùÿÿÿÿ
+;python:S1251"Remove this commented out code.(š…ÖÑüÿÿÿÿ
+;python:S125D"Remove this commented out code.(´Éæşÿÿÿÿ
+qpython:S3776G"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(şš…Ğşÿÿÿÿ
+rpython:S3776§"TRefactor this function to reduce its Cognitive Complexity from 27 to the 15 allowed.(Úæ£Ôûÿÿÿÿ
+Ipython:S1172é"0Remove the unused function parameter "n_layers".(ˆŞßÄ
+Hpython:S1172é"/Remove the unused function parameter "backend".(ˆŞßÄ
+epython:S117ò"MRename this parameter "D" to match the regular expression ^[_a-z][a-z0-9_]*$.(½ê«é
+npython:S117ó"VRename this local variable "D_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ô«ƒ
+tpython:S117ô"WRename this local variable "D_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(”œÍ±ıÿÿÿÿ
+epython:S117ò"MRename this parameter "F" to match the regular expression ^[_a-z][a-z0-9_]*$.(½ê«é
+spython:S117÷"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(òŠÙ’ıÿÿÿÿ
+tpython:S117ø"WRename this local variable "F_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(†Ù˜üÿÿÿÿ
+Fpython:S1172œ"-Remove the unused function parameter "refit".(‡Í¹¯
+7python:S125Æ"Remove this commented out code.(Ü²Õ”
+Xpython:S1172€":Remove the unused function parameter "return_train_score".(û‰Ö³ùÿÿÿÿ
+Epython:S1172¶",Remove the unused function parameter "mode".(Õºœ¬
+kpython:S1542¶"RRename function "evaluate_GNN" to match the regular expression ^[a-z_][a-z0-9_]*$.(Õºœ¬
+Lpython:S1481í".Replace unused local variable "loss" with "_".(íĞê‹üÿÿÿÿ
+spython:S117€"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÎÃù‚ûÿÿÿÿ
+tpython:S117€"WRename this local variable "F_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÎÃù‚ûÿÿÿÿ
+spython:S117€"VRename this local variable "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÎÃù‚ûÿÿÿÿ
+tpython:S117€"WRename this local variable "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÎÃù‚ûÿÿÿÿ
+upython:S117‡"XRename this local variable "G_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(Âœ¼¢ıÿÿÿÿ
+upython:S117‡"XRename this local variable "G_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(Âœ¼¢ıÿÿÿÿ
+opython:S117¹"WRename this local variable "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹ìÁ…
+upython:S117¶"XRename this local variable "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(±¢Èáıÿÿÿÿ
+upython:S117¸"XRename this local variable "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(ô•ı©ûÿÿÿÿ
+dpython:S1542Ê"LRename function "xp_GCN" to match the regular expression ^[a-z_][a-z0-9_]*$.( ºÚ{
+Npython:S1481€"0Replace unused local variable "F_test" with "_".(ÎÃù‚ûÿÿÿÿ
+lpython:S3776Ê"TRefactor this function to reduce its Cognitive Complexity from 31 to the 15 allowed.( ºÚ{
+7python:S125Ú"Remove this commented out code.(Œ¹ó…
+6python:S125î"Remove this commented out code.(·İëz
+<python:S125µ"Remove this commented out code.(÷—·şÿÿÿÿ
+7python:S125º"Remove this commented out code.(Ö„à¼
+7python:S125Ğ"Remove this commented out code.(Âé˜·

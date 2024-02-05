@@ -1,0 +1,17 @@
+
+Dpython:S1172",Remove the unused function parameter "mode".(®±˜ü
+Ipython:S1172"1Remove the unused function parameter "unlabeled".(®±˜ü
+Ipython:S1172"1Remove the unused function parameter "ed_method".(®±˜ü
+Epython:S1172"-Remove the unused function parameter "G_app".(çœ´§
+Fpython:S1172".Remove the unused function parameter "y_test".(çœ´§
+Fpython:S1172".Remove the unused function parameter "kwargs".(†Ï’¡
+Jpython:S1172"2Remove the unused function parameter "descriptor".(¢ï‡ç
+Fpython:S1172".Remove the unused function parameter "G_test".(çœ´§
+hpython:S117"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+ipython:S117"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+ipython:S1542"QRename function "compute_D_y" to match the regular expression ^[a-z_][a-z0-9_]*$.(äØØê
+hpython:S117,"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+ipython:S117,"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+mpython:S1542+"URename function "compute_D_embed" to match the regular expression ^[a-z_][a-z0-9_]*$.(™§†Í
+kpython:S117¼"NRename this parameter "G1" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ø·‹ùÿÿÿÿ
+kpython:S117¼"NRename this parameter "G2" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ø·‹ùÿÿÿÿ

@@ -1,0 +1,15 @@
+
+;python:S125*"Remove this commented out code.(€ßæâûÿÿÿÿ
+6python:S125G"Remove this commented out code.(“ˆØ¹
+;python:S125K"Remove this commented out code.(çæ¤øùÿÿÿÿ
+<python:S125ç"Remove this commented out code.(˜³ ½ÿÿÿÿÿ
+7python:S125ï"Remove this commented out code.(¿šœÁ
+<python:S125õ"Remove this commented out code.(‚›õûúÿÿÿÿ
+7python:S125û"Remove this commented out code.(ºÙÇË
+Wpython:S905Ž":Remove or refactor this statement; it has no side effects.(­ÌŠïùÿÿÿÿ
+epython:S117·"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(úâÄ
+jpython:S1542·"QRename function "MPNNDataset" to match the regular expression ^[a-z_][a-z0-9_]*$.(úâÄ
+6python:S125¸"Remove this commented out code.(ØùéK
+=python:S1481…"%Remove the unused local variable "i".(—»•?
+hpython:S1542Ò"ORename function "MPNNModel" to match the regular expression ^[a-z_][a-z0-9_]*$.(÷¹·Ø
+<python:S125Ž"Remove this commented out code.(åÉž¯úÿÿÿÿ

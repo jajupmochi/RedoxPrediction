@@ -1,0 +1,27 @@
+
+kpython:S1192Ğ"MDefine a constant instead of duplicating this literal '/../outputs/' 5 times.(É²†ùúÿÿÿÿ
+epython:S1192…"GDefine a constant instead of duplicating this literal '/kfold' 3 times.(ªİó¶ıÿÿÿÿ
+6python:S125"Remove this commented out code.(“Ö“Î
+;python:S1251"Remove this commented out code.(‹¼±¨ÿÿÿÿÿ
+;python:S125;"Remove this commented out code.( Î‰Óÿÿÿÿÿ
+Lpython:S1172E"/Remove the unused function parameter "scale_x".(õò‚õûÿÿÿÿ
+jpython:S1854¶"LRemove this assignment to local variable 'history'; the value is never used.(Îèßÿÿÿÿÿ
+tpython:S117n"XRename this local variable "MAE_all" to match the regular expression ^[_a-z][a-z0-9_]*$.(®ã·èøÿÿÿÿ
+upython:S117‰"XRename this local variable "MAE_cur" to match the regular expression ^[_a-z][a-z0-9_]*$.(Á’Ÿóøÿÿÿÿ
+tpython:S117m"XRename this local variable "MAE_min" to match the regular expression ^[_a-z][a-z0-9_]*$.(¸ÒÉĞüÿÿÿÿ
+ipython:S117D"RRename this parameter "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+jpython:S117D"SRename this parameter "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+jpython:S117D"SRename this parameter "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+lpython:S3776D"TRefactor this function to reduce its Cognitive Complexity from 34 to the 15 allowed.(è†ıá
+spython:S117©"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+upython:S117©"XRename this local variable "F_tests" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+epython:S117Ş"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ÿ”›­
+spython:S117©"VRename this local variable "X_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+opython:S117¥"WRename this local variable "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+ppython:S117¥"XRename this local variable "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+ppython:S117¥"XRename this local variable "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+Opython:S1481©"1Replace unused local variable "F_tests" with "_".(¹Ù¬Âûÿÿÿÿ
+rpython:S3776İ"TRefactor this function to reduce its Cognitive Complexity from 35 to the 15 allowed.( …øÿÿÿÿ
+7python:S125ñ"Remove this commented out code.(‘óßˆ
+<python:S125"Remove this commented out code.(ùÇ¥€üÿÿÿÿ
+7python:S125Ø"Remove this commented out code.(Âé˜·

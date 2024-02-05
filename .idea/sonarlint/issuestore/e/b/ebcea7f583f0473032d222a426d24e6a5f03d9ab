@@ -1,0 +1,27 @@
+
+jpython:S1192l"MDefine a constant instead of duplicating this literal '/../outputs/' 4 times.(É²†ùúÿÿÿÿ
+epython:S1192¢"GDefine a constant instead of duplicating this literal '/kfold' 3 times.(ªİó¶ıÿÿÿÿ
+6python:S125"Remove this commented out code.(“Ö“Î
+;python:S125."Remove this commented out code.(‹¼±¨ÿÿÿÿÿ
+;python:S1258"Remove this commented out code.( Î‰Óÿÿÿÿÿ
+Gpython:S1172A"/Remove the unused function parameter "X_valid".(è†ıá
+Gpython:S1172A"/Remove the unused function parameter "X_train".(è†ıá
+Lpython:S1172B"/Remove the unused function parameter "scale_x".(õò‚õûÿÿÿÿ
+Fpython:S1172A".Remove the unused function parameter "X_test".(è†ıá
+ipython:S117A"RRename this parameter "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+jpython:S117A"SRename this parameter "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+jpython:S117A"SRename this parameter "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+Ppython:S1481G"3Remove the unused local variable "use_best_params".(û½¤œùÿÿÿÿ
+6python:S125r"Remove this commented out code.(æ÷„ÿ
+spython:S117Æ"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+upython:S117Æ"XRename this local variable "F_tests" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+dpython:S117z"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ÿ”›­
+spython:S117Æ"VRename this local variable "X_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+opython:S117Â"WRename this local variable "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+ppython:S117Â"XRename this local variable "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+ppython:S117Â"XRename this local variable "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+Opython:S1481Æ"1Replace unused local variable "F_tests" with "_".(¹Ù¬Âûÿÿÿÿ
+qpython:S3776y"TRefactor this function to reduce its Cognitive Complexity from 35 to the 15 allowed.( …øÿÿÿÿ
+7python:S125"Remove this commented out code.(‘óßˆ
+<python:S125­"Remove this commented out code.(ùÇ¥€üÿÿÿÿ
+7python:S125ö"Remove this commented out code.(Âé˜·

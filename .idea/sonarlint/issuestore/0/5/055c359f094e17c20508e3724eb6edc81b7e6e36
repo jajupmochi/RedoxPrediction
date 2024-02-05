@@ -1,0 +1,8 @@
+
+spython:S107µ"TFunction "fit_model_gnn" has 17 parameters, which is greater than the 13 authorized.(‚ÒÎû8¬½ÃØ­1
+[python:S1481™"6Replace unused local variable "y_pred_valid" with "_".(¡äˆãùÿÿÿÿ8­½ÃØ­1
+\python:S1481À"<Remove the unused local variable "early_stopping_min_delta".(ÅˆÓª8­½ÃØ­1
+[python:S1481™"6Replace unused local variable "y_true_valid" with "_".(¡äˆãùÿÿÿÿ8­½ÃØ­1
+ypython:S3776´"TRefactor this function to reduce its Cognitive Complexity from 77 to the 15 allowed.(ÓËãñùÿÿÿÿ8­½ÃØ­1
+{python:S930”"WAdd 1 missing arguments; '_save_model_states' expects at least 12 positional arguments.(‘»“Úøÿÿÿÿ8­½ÃØ­1
+{python:S930«"WAdd 1 missing arguments; '_save_model_states' expects at least 12 positional arguments.(‘»“Úøÿÿÿÿ8­½ÃØ­1

@@ -1,0 +1,6 @@
+
+Fpython:S1172".Remove the unused function parameter "kwargs".(ÿ†øó
+5python:S36267"Remove this redundant return.(ÙãŞŸ
+jpython:S117"SRename this parameter "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(„Ÿº
+Jpython:S1481,"2Remove the unused local variable "gram_mat_train".(çæÈ
+;python:S125"Remove this commented out code.(‹ˆó¤úÿÿÿÿ

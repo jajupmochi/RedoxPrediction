@@ -1,0 +1,21 @@
+
+epython:S1192"LDefine a constant instead of duplicating this literal '../outputs/' 5 times.(¢é¿
+5python:S125"Remove this commented out code.(’ñÂ
+Lpython:S1172#"/Remove the unused function parameter "scale_x".(õò‚õûÿÿÿÿ
+tpython:S117B"XRename this local variable "MAE_all" to match the regular expression ^[_a-z][a-z0-9_]*$.(®ã·èøÿÿÿÿ
+tpython:S117X"XRename this local variable "MAE_cur" to match the regular expression ^[_a-z][a-z0-9_]*$.(Á’Ÿóøÿÿÿÿ
+tpython:S117A"XRename this local variable "MAE_min" to match the regular expression ^[_a-z][a-z0-9_]*$.(¸ÒÉĞüÿÿÿÿ
+ipython:S117""RRename this parameter "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+jpython:S117""SRename this parameter "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+jpython:S117""SRename this parameter "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+spython:S117Ä"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+upython:S117Ä"XRename this local variable "F_tests" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+epython:S117"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(ĞéÅ
+spython:S117Ä"VRename this local variable "X_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+tpython:S117Ä"WRename this local variable "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+ppython:S117Ò"XRename this local variable "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ïæ«Ï
+ppython:S117Ò"XRename this local variable "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ïæ«Ï
+Opython:S1481Ä"1Replace unused local variable "F_tests" with "_".(¹Ù¬Âûÿÿÿÿ
+<python:S125±"Remove this commented out code.(ùÇ¥€üÿÿÿÿ
+7python:S125Ï"Remove this commented out code.(¹Í£Î
+7python:S125ñ"Remove this commented out code.(Âé˜·

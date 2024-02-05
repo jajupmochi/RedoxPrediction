@@ -1,0 +1,8 @@
+
+xpython:S3776"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(ú„Úüùÿÿÿÿ8´ð±€®1
+‘python:S5864$"mFix this "__getitem__" operation; Previous type checks suggest that "hidden_feats" does not have this method.(ÑÎ™àþÿÿÿÿ8µð±€®1
+=python:S125b"Remove this commented out code.(ùÅý÷8·ð±€®1
+>python:S125©"Remove this commented out code.(›¬ìù8»ð±€®1
+python:S5864³"mFix this "__getitem__" operation; Previous type checks suggest that "hidden_feats" does not have this method.(©®²ü8¼ð±€®1
+Cpython:S125Â"Remove this commented out code.(ïþá´ýÿÿÿÿ8½ð±€®1
+>python:S125Ü"Remove this commented out code.(ùÅý÷8¾ð±€®1

@@ -1,0 +1,8 @@
+
+kpython:S117"NRename this parameter "Gi" to match the regular expression ^[_a-z][a-z0-9_]*$.(îÚ€|8÷”ÁÖ®1
+qpython:S117"NRename this parameter "Gj" to match the regular expression ^[_a-z][a-z0-9_]*$.(ê½Ú£şÿÿÿÿ8ù”ÁÖ®1
+=python:S1257"Remove this commented out code.(İ¥¶8ú”ÁÖ®1
+Upython:S1172E"1Remove the unused function parameter "y_scaling".(êÜª†ûÿÿÿÿ8ü”ÁÖ®1
+xpython:S3776E"TRefactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed.(êÜª†ûÿÿÿÿ8ÕÀŞÖ®1
+Spython:S1135W"4Complete the task associated to this "TODO" comment.(­í¯™8úô×Ö®1
+Spython:S1135h"4Complete the task associated to this "TODO" comment.(­í¯™8×ÀŞÖ®1

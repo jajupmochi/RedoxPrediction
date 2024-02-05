@@ -1,0 +1,23 @@
+
+kpython:S117"MRename this parameter "D" to match the regular expression ^[_a-z][a-z0-9_]*$.(×“Ş8¯‡”¦±1
+tpython:S117"VRename this local variable "D_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ô«ƒ8¯‡”¦±1
+zpython:S117"WRename this local variable "D_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(”œÍ±ıÿÿÿÿ8¯‡”¦±1
+Ppython:S1172"1Remove the unused function parameter "unlabeled".( ­Ä8¯‡”¦±1
+upython:S117"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(¥æøÿÿÿÿ8¯‡”¦±1
+vpython:S117"SRename this parameter "G_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(¥æøÿÿÿÿ8¯‡”¦±1
+vpython:S117"SRename this parameter "G_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(¥æøÿÿÿÿ8¯‡”¦±1
+Bpython:S125"Remove this commented out code.(Ä€û„ûÿÿÿÿ8¯‡”¦±1
+opython:S117O"QRename this parameter "G_all" to match the regular expression ^[_a-z][a-z0-9_]*$.(’ÒÏã8¯‡”¦±1
+ypython:S117c"VRename this local variable "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.( …İşÿÿÿÿ8¯‡”¦±1
+zpython:S117c"WRename this local variable "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.( …İşÿÿÿÿ8¯‡”¦±1
+{python:S117p"XRename this local variable "G_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(äí×–üÿÿÿÿ8¯‡”¦±1
+{python:S117p"XRename this local variable "G_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(äí×–üÿÿÿÿ8¯‡”¦±1
+rpython:S117"NRename this parameter "Gn" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÏşÓªøÿÿÿÿ8¯‡”¦±1
+ypython:S3776Œ"TRefactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed.(ä˜Ö¢ıÿÿÿÿ8¯‡”¦±1
+=python:S125§"Remove this commented out code.(·İëz8¯‡”¦±1
+Cpython:S125»"Remove this commented out code.(øÿµşÿÿÿÿ8¯‡”¦±1
+Ypython:S1135¹"4Complete the task associated to this "TODO" comment.(à®Î™øÿÿÿÿ8¯‡”¦±1
+Cpython:S125¯"Remove this commented out code.(Ü¹Şşÿÿÿÿ8¯‡”¦±1
+Qpython:S1481é"1Replace unused local variable "task_id" with "_".(³İ»¥8¯‡”¦±1
+Cpython:S125”"Remove this commented out code.(µ«¡òÿÿÿÿÿ8¯‡”¦±1
+Cpython:S125¢"Remove this commented out code.(õ®›úÿÿÿÿ8¯‡”¦±1

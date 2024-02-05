@@ -1,0 +1,41 @@
+
+epython:S1192"GDefine a constant instead of duplicating this literal '/kfold' 3 times.(ªİó¶ıÿÿÿÿ
+epython:S1192È"LDefine a constant instead of duplicating this literal '../outputs/' 5 times.(¢é¿
+;python:S125"Remove this commented out code.(ÚØÇäøÿÿÿÿ
+6python:S125"Remove this commented out code.(“Ö“Î
+6python:S125"Remove this commented out code.(¥‹Î
+6python:S125$"Remove this commented out code.(³ÒıĞ
+lpython:S15423"ORename function "R_squared" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÆÔÏ¶şÿÿÿÿ
+6python:S125J"Remove this commented out code.(¯¦·¥
+6python:S125Q"Remove this commented out code.(Ò·ŠÙ
+5python:S125v"Remove this commented out code.(Ç¡Ä
+7python:S125ß"Remove this commented out code.(¦öö¢
+<python:S125Ç"Remove this commented out code.(·®øŸùÿÿÿÿ
+<python:S125Ü"Remove this commented out code.(ŒµîŠşÿÿÿÿ
+rpython:S3776‰"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(°¼§“üÿÿÿÿ
+Mpython:S1172Í"/Remove the unused function parameter "scale_x".(õò‚õûÿÿÿÿ
+mpython:S1854¯"ORemove this assignment to local variable 'batch_size'; the value is never used.(¬–Ñşÿÿÿÿ
+upython:S117¬"XRename this local variable "MAE_all" to match the regular expression ^[_a-z][a-z0-9_]*$.(®ã·èøÿÿÿÿ
+upython:S117 "XRename this local variable "MAE_cur" to match the regular expression ^[_a-z][a-z0-9_]*$.(Á’Ÿóøÿÿÿÿ
+upython:S117«"XRename this local variable "MAE_min" to match the regular expression ^[_a-z][a-z0-9_]*$.(¸ÒÉĞüÿÿÿÿ
+jpython:S117Ì"RRename this parameter "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+kpython:S117Ì"SRename this parameter "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+kpython:S117Ì"SRename this parameter "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ıá
+mpython:S3776Ì"TRefactor this function to reduce its Cognitive Complexity from 36 to the 15 allowed.(è†ıá
+7python:S125ó"Remove this commented out code.(¢ëê£
+7python:S125è"Remove this commented out code.(™´
+spython:S117¥"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+upython:S117¥"XRename this local variable "F_tests" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+epython:S117Ú"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ÿ”›­
+spython:S117¥"VRename this local variable "X_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+opython:S117¡"WRename this local variable "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+ppython:S117¡"XRename this local variable "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+ppython:S117¡"XRename this local variable "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜÚêâ
+Hpython:S1481Ó"/Replace unused local variable "model" with "_".(ìùç¨
+Opython:S1481¥"1Replace unused local variable "F_tests" with "_".(¹Ù¬Âûÿÿÿÿ
+rpython:S3776Ù"TRefactor this function to reduce its Cognitive Complexity from 35 to the 15 allowed.( …øÿÿÿÿ
+7python:S125í"Remove this commented out code.(‘óßˆ
+<python:S125Œ"Remove this commented out code.(ùÇ¥€üÿÿÿÿ
+ipython:S930¥"EAdd 1 missing arguments; 'split_data' expects 4 positional arguments.(¹Ù¬Âûÿÿÿÿ8Ù€İ®®1
+dpython:S930¨"EAdd 1 missing arguments; 'split_data' expects 4 positional arguments.(«ê™À8Ù€İ®®1
+7python:S125×"Remove this commented out code.(Âé˜·

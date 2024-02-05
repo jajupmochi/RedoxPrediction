@@ -1,0 +1,21 @@
+
+ˆpython:S1192”"pDefine a constant instead of duplicating this literal '"model_type" must be either "reg" or "classif".' 4 times.(ÂñÓz
+Spython:S1172%"6Remove the unused function parameter "print_interval".(¤ä¯–üÿÿÿÿ
+Gpython:S1172&"/Remove the unused function parameter "verbose".(’ûÿµ
+Ipython:S1172$"1Remove the unused function parameter "plot_loss".(í²
+Gpython:S1481x"/Replace unused local variable "model" with "_".(°£œÆ
+Qpython:S1135\"4Complete the task associated to this "TODO" comment.(Èó¦¤ÿÿÿÿÿ
+mpython:S5655ˆ"OChange this argument; Function "_update_history_1fold" expects a different type(ˆï‡Şüÿÿÿÿ
+Npython:S1172§"0Remove the unused function parameter "parallel".(©Ÿ¡–ûÿÿÿÿ
+Lpython:S1172¨".Remove the unused function parameter "n_jobs".(ßŞİûÿÿÿÿ
+ipython:S117¢"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+jpython:S117¢"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+Spython:S1481¥"5Replace unused local variable "y_true_test" with "_".(«ıŸüÿÿÿÿ
+Mpython:S1481•"4Replace unused local variable "y_true_app" with "_".(Ò¸»Š
+rpython:S3776¡"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(¹÷›Èùÿÿÿÿ
+Rpython:S1135¦"4Complete the task associated to this "TODO" comment.(Èó¦¤ÿÿÿÿÿ
+hpython:S5655°"OChange this argument; Function "_update_history_1fold" expects a different type(†êáœ
+Kpython:S1172Ä"2Remove the unused function parameter "descriptor".(¢ï‡ç
+ipython:S117Â"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+jpython:S117Â"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+Tpython:S1172¨"6Remove the unused function parameter "rm_unused_keys".(ŠÂùşüÿÿÿÿ

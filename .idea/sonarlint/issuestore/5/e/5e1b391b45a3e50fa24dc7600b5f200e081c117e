@@ -1,0 +1,14 @@
+
+epython:S1192Œ"MDefine a constant instead of duplicating this literal 'Train errors' 3 times.(µ¦Â
+lpython:S3776"TRefactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.(£åÌŸ
+;python:S125"Remove this commented out code.(Ğ”™§şÿÿÿÿ
+Jpython:S1481Y"2Replace unused local variable "interval" with "_".(Ã©€
+kpython:S3776J"TRefactor this function to reduce its Cognitive Complexity from 26 to the 15 allowed.(âÕ
+rpython:S3776ˆ"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(§úĞîüÿÿÿÿ
+>python:S1481£"%Remove the unused local variable "i".(Æ®Úœ
+vpython:S117·"YRename this local variable "barWidth" to match the regular expression ^[_a-z][a-z0-9_]*$.(ıÚüÿÿÿÿ
+<python:S125¾"Remove this commented out code.(êëØáıÿÿÿÿ
+7python:S125Ü"Remove this commented out code.(Îó‹ı
+<python:S125È"Remove this commented out code.(¾¹¿‚ûÿÿÿÿ
+6python:S125ã"Remove this commented out code.(¸ÏÒh
+gpython:S3358ƒ"IExtract this nested conditional expression into an independent statement.(‰µ™íúÿÿÿÿ

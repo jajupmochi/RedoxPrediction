@@ -1,0 +1,24 @@
+
+Tpython:S1066¶"/Merge this if statement with the enclosing one.(è¸ºùÿÿÿÿ8µÏß·­1
+=python:S125"Remove this commented out code.(¦Œ˜8·Ïß·­1
+Ypython:S1172Y"5Remove the unused function parameter "allowable_set".(ñÄ¼ıÿÿÿÿ8¸Ïß·­1
+Cpython:S125ˆ"Remove this commented out code.(ÂµŞîıÿÿÿÿ8¸Ïß·­1
+Upython:S1172Š"5Remove the unused function parameter "allowable_set".(Ñ³æ©8¸Ïß·­1
+Upython:S1172¨"5Remove the unused function parameter "allowable_set".(´³âí8¸Ïß·­1
+Tpython:S1172‘"5Remove the unused function parameter "allowable_set".(¥–ç8¸Ïß·­1
+\python:S5754¨"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8¸Ïß·­1
+Zpython:S1172­"5Remove the unused function parameter "allowable_set".(ìÃéÔüÿÿÿÿ8¸Ïß·­1
+Wpython:S1172­"2Remove the unused function parameter "return_dim".(ìÃéÔüÿÿÿÿ8¸Ïß·­1
+]python:S112Õ">Replace this generic exception class with a more specific one.(’‹â±8¸Ïß·­1
+Zpython:S1172ÿ"5Remove the unused function parameter "allowable_set".(™Á¤¤ÿÿÿÿÿ8¸Ïß·­1
+Upython:S1172‘"5Remove the unused function parameter "allowable_set".(ô«»˜8¸Ïß·­1
+mpython:S116Ê"NRename this field "add_Hs" to match the regular expression ^[_a-z][_a-z0-9]*$.(ÿªÇé8¸Ïß·­1
+qpython:S117ú"RRename this parameter "add_Hs" to match the regular expression ^[_a-z][a-z0-9_]*$.(÷Œ¿Ê8¸Ïß·­1
+}python:S5717ü"]Change this default value to "None" and initialize this parameter inside the function/method.(€„ûò8¸Ïß·­1
+‚python:S5717…"]Change this default value to "None" and initialize this parameter inside the function/method.(•Ù¨…úÿÿÿÿ8¸Ïß·­1
+Cpython:S125"Remove this commented out code.(±È×áùÿÿÿÿ8¸Ïß·­1
+>python:S125É"Remove this commented out code.(ÎÙ–ü8¸Ïß·­1
+ypython:S3776Ô"TRefactor this function to reduce its Cognitive Complexity from 24 to the 15 allowed.(Œ«íëÿÿÿÿÿ8¸Ïß·­1
+>python:S125×"Remove this commented out code.(º™›8¸Ïß·­1
+ypython:S3776•"TRefactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.(º‘‡»úÿÿÿÿ8¸Ïß·­1
+\python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8¸Ïß·­1

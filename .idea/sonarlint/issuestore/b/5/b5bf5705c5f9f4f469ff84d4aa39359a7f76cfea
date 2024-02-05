@@ -1,0 +1,41 @@
+
+jpython:S1192ó"LDefine a constant instead of duplicating this literal '../outputs/' 5 times.(·¿¡Ïüÿÿÿÿ
+6python:S125"Remove this commented out code.(“Ö“Î
+;python:S125"Remove this commented out code.(•š£ùøÿÿÿÿ
+lpython:S1542,"ORename function "R_squared" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÆÔÏ¶þÿÿÿÿ
+6python:S125C"Remove this commented out code.(¯¦·¥
+qpython:S1186y"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ÎÎñ˜
+{python:S5717–"]Change this default value to "None" and initialize this parameter inside the function/method.(Ï¨àüøÿÿÿÿ
+<python:S125â"Remove this commented out code.(‹¼±¨ÿÿÿÿÿ
+<python:S125ë"Remove this commented out code.( Î‰Óÿÿÿÿÿ
+{python:S117ã"^Rename this local variable "EarlyStopping" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÇÄÇçúÿÿÿÿ
+upython:S117©"XRename this local variable "MAE_all" to match the regular expression ^[_a-z][a-z0-9_]*$.(®ã·èøÿÿÿÿ
+upython:S117‘"XRename this local variable "MAE_cur" to match the regular expression ^[_a-z][a-z0-9_]*$.(Á’Ÿóøÿÿÿÿ
+upython:S117¨"XRename this local variable "MAE_min" to match the regular expression ^[_a-z][a-z0-9_]*$.(¸ÒÉÐüÿÿÿÿ
+python:S117é"bRename this local variable "ReduceLROnPlateau" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜúòÝÿÿÿÿÿ
+ypython:S117ò"\Rename this local variable "TensorBoard" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÏùšÈúÿÿÿÿ
+jpython:S117ï"RRename this parameter "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ýá
+kpython:S117ï"SRename this parameter "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ýá
+kpython:S117ï"SRename this parameter "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(è†ýá
+Mpython:S1481ò"/Remove the unused local variable "TensorBoard".(ÏùšÈúÿÿÿÿ
+mpython:S3776ï"TRefactor this function to reduce its Cognitive Complexity from 27 to the 15 allowed.(è†ýá
+7python:S125Î"Remove this commented out code.(™´
+spython:S117"VRename this local variable "F_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+upython:S117"XRename this local variable "F_tests" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+epython:S117Ê"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÐéÅ
+spython:S117"VRename this local variable "X_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+tpython:S117"WRename this local variable "X_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹Ù¬Âûÿÿÿÿ
+ppython:S117›"XRename this local variable "X_train" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ïæ«Ï
+ppython:S117›"XRename this local variable "X_valid" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ïæ«Ï
+Gpython:S1481Š"/Remove the unused local variable "cur_results".(ùÈ“x
+Opython:S1481"1Replace unused local variable "F_tests" with "_".(¹Ù¬Âûÿÿÿÿ
+Jpython:S1481›"1Replace unused local variable "X_valid" with "_".(Ïæ«Ï
+Jpython:S1481›"1Replace unused local variable "y_valid" with "_".(Ïæ«Ï
+Npython:S1481"0Replace unused local variable "X_test" with "_".(¹Ù¬Âûÿÿÿÿ
+Jpython:S1481›"1Replace unused local variable "y_train" with "_".(Ïæ«Ï
+Npython:S1481"0Replace unused local variable "y_test" with "_".(¹Ù¬Âûÿÿÿÿ
+Jpython:S1481›"1Replace unused local variable "X_train" with "_".(Ïæ«Ï
+mpython:S3776Ê"TRefactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed.(ÐéÅ
+7python:S125Ý"Remove this commented out code.(‘óßˆ
+<python:S125ú"Remove this commented out code.(ùÇ¥€üÿÿÿÿ
+7python:S125ö"Remove this commented out code.(ÖÂåÎ

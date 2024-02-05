@@ -1,0 +1,18 @@
+
+hpython:S117"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹È’û
+ipython:S117"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹È’û
+qpython:S1542"TRename function "_compute_D_gnn" to match the regular expression ^[a-z_][a-z0-9_]*$.(‚Äëþþÿÿÿÿ
+Mpython:S1481"0Replace unused local variable "params" with "_".(ðÎÍ¤þÿÿÿÿ
+;python:S125"Remove this commented out code.(éýÎ×øÿÿÿÿ
+Ipython:S1172."1Remove the unused function parameter "ed_method".(®±˜ü
+Ipython:S1172."1Remove the unused function parameter "unlabeled".(®±˜ü
+Jpython:S1172/"2Remove the unused function parameter "descriptor".(¢ï‡ç
+hpython:S117,"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+ipython:S117,"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+kpython:S1542+"SRename function "compute_D_gcn" to match the regular expression ^[a-z_][a-z0-9_]*$.(ïí½ã
+Ipython:S1172P"1Remove the unused function parameter "unlabeled".(®±˜ü
+Ipython:S1172P"1Remove the unused function parameter "ed_method".(®±˜ü
+Jpython:S1172Q"2Remove the unused function parameter "descriptor".(¢ï‡ç
+hpython:S117N"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+ipython:S117N"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
+kpython:S1542M"SRename function "compute_D_gat" to match the regular expression ^[a-z_][a-z0-9_]*$.(ß¦üÂ

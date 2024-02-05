@@ -1,0 +1,19 @@
+
+dpython:S117#"MRename this parameter "U" to match the regular expression ^[_a-z][a-z0-9_]*$.(ì¾‰ı
+dpython:S117#"MRename this parameter "V" to match the regular expression ^[_a-z][a-z0-9_]*$.(ì¾‰ı
+;python:S125"Remove this commented out code.(•š£ùøÿÿÿÿ
+upython:S117@"YRename this local variable "D_matrix" to match the regular expression ^[_a-z][a-z0-9_]*$.(ŠÕı¡şÿÿÿÿ
+ppython:S117A"YRename this local variable "L_matrix" to match the regular expression ^[_a-z][a-z0-9_]*$.(œÿà¼
+6python:S125b"Remove this commented out code.(ïÈ¬
+ipython:S117v"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(Â¸¯¨şÿÿÿÿ
+opython:S1542v"RRename function "DSGCNDataset" to match the regular expression ^[a-z_][a-z0-9_]*$.(Â¸¯¨şÿÿÿÿ
+5python:S125w"Remove this commented out code.(ØùéK
+<python:S125¸"Remove this commented out code.(¸Ò´éûÿÿÿÿ
+<python:S125½"Remove this commented out code.(¸Ò´éûÿÿÿÿ
+kpython:S3776Ô"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(Œ”/
+Cpython:S1481—"%Remove the unused local variable "i".(Ö„ÄÕúÿÿÿÿ
+7python:S125ã"Remove this commented out code.(“éòÂ
+jpython:S107"MMethod "__init__" has 18 parameters, which is greater than the 13 authorized.(ÄÁšÃşÿÿÿÿ
+Upython:S1481Ó"7Replace unused local variable "edge_features" with "_".(¬”¢üÿÿÿÿ
+Tpython:S1481Ó"6Replace unused local variable "pair_indices" with "_".(¬”¢üÿÿÿÿ
+7python:S125†"Remove this commented out code.(îó­Å

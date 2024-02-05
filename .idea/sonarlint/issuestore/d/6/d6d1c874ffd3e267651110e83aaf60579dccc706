@@ -1,0 +1,9 @@
+
+¼python:S1192¥"›Define a constant instead of duplicating this literal r"""/../models/
+echo Working directory : $PWD
+echo Local work dir_file : $LOCAL_WORK_DIR
+""" 3 times.(àô¨8ØÈ¿©±1
+kpython:S1192Ù"KDefine a constant instead of duplicating this literal r""".cpu.""" 3 times.(ó£¡½8ÙÈ¿©±1
+=python:S125"Remove this commented out code.(ÊÀä–8ÙÈ¿©±1
+Bpython:S125Q"Remove this commented out code.(úÇÔ€úÿÿÿÿ8ÙÈ¿©±1
+Tpython:S1135ı"4Complete the task associated to this "TODO" comment.(’åæø8ÙÈ¿©±1

@@ -1,0 +1,25 @@
+
+gpython:S1854<"ORemove this assignment to local variable 'edge_feats'; the value is never used.(ÀëóÇ
+cpython:S117"MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ëý»D
+ipython:S1542"QRename function "EGNNDataset" to match the regular expression ^[a-z_][a-z0-9_]*$.(›èÖÅ
+Gpython:S1481^"/Remove the unused local variable "num_species".(»›°á
+rpython:S3776Œ"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(„ý™Šÿÿÿÿÿ
+7python:S125¡"Remove this commented out code.(Ïƒ§Á
+rpython:S3776Ú"TRefactor this function to reduce its Cognitive Complexity from 66 to the 15 allowed.(ÿ¨ÀËþÿÿÿÿ
+mpython:S3776ð"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(Ñí“¹
+|python:S101”"_Rename class "E_GCL" to match the regular expression ^_?([A-Z_][a-zA-Z0-9]*|[a-z_][a-z0-9_]*)$.(×íîÿÿÿÿÿ
+epython:S107"MMethod "__init__" has 14 parameters, which is greater than the 13 authorized.(Í¨›‚
+<python:S125É"Remove this commented out code.(ÖÔµÙþÿÿÿÿ
+Kpython:S1481Ú"-Replace unused local variable "col" with "_".(é®Åþÿÿÿÿ
+Kpython:S1481è"-Replace unused local variable "col" with "_".(é®Åþÿÿÿÿ
+Fpython:S1481‚"-Replace unused local variable "agg" with "_".(þ¯ó÷
+<python:S125ƒ"Remove this commented out code.(å³‰Ãýÿÿÿÿ
+python:S101ˆ"dRename class "E_GCL_mask" to match the regular expression ^_?([A-Z_][a-zA-Z0-9]*|[a-z_][a-z0-9_]*)$.(ÚéúÔþÿÿÿÿ
+7python:S125—"Remove this commented out code.(ôÑï’
+Rpython:S2638š"4Remove parameter edge_mask or provide default value.(Ê×½Çøÿÿÿÿ
+Kpython:S1481›"-Replace unused local variable "col" with "_".(é®Åþÿÿÿÿ
+Rpython:S1481§"4Replace unused local variable "coord_diff" with "_".(ñËåÝúÿÿÿÿ
+Kpython:S1481°"-Replace unused local variable "agg" with "_".(îÁéýÿÿÿÿ
+6python:S125¯"Remove this commented out code.(‘ÜÕ4
+jpython:S107Ê"MMethod "__init__" has 23 parameters, which is greater than the 13 authorized.( Ðàþüÿÿÿÿ
+rpython:S3776É"TRefactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed.(ú„Úüùÿÿÿÿ
