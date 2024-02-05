@@ -6,78 +6,78 @@ Created on Wed Jun 15 12:23:15 2022
 @author: ljia
 """
 
-#%% Tensorflow
-
-import tensorflow as tf
-from tensorflow.keras import layers
-
-
-class GlobalAverageMaxPooling1D(layers.Layer):
-
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-# 		self.ave_pooling = layers.GlobalAveragePooling1D()
-# 		self.max_pooling = layers.GlobalMaxPooling1D()
-
-
-	def call(self, inputs):
-		# if inputs is a ragged tensor.
-		if isinstance(inputs, tf.RaggedTensor):
-			ave = tf.math.reduce_mean(inputs, axis=1)
-			max_ = tf.math.reduce_max(inputs, axis=1)
-			rst = tf.concat((ave, max_), axis=1)
-			rst = tf.stack([i for i in rst])
-			return rst
-		elif isinstance(inputs, list):
-			ave = tf.stack([tf.math.reduce_mean(i, axis=0) for i in inputs])
-			max_ = tf.stack([tf.math.reduce_max(i, axis=0) for i in inputs])
-			rst = tf.concat((ave, max_), axis=1)
-			return rst
-		else:
-			ave = tf.math.reduce_mean(inputs, axis=1)
-			max_ = tf.math.reduce_max(inputs, axis=1)
-			rst = tf.concat((ave, max_), axis=1)
-			return rst
-
-
-class GlobalAveragePooling1D(layers.Layer):
-
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-
-
-	def call(self, inputs):
-		# if inputs is a ragged tensor.
-		if isinstance(inputs, tf.RaggedTensor):
-			rst = tf.math.reduce_mean(inputs, axis=1)
-			rst = tf.stack([i for i in rst])
-			return rst
-		elif isinstance(inputs, list):
-			rst = tf.stack([tf.math.reduce_mean(i, axis=0) for i in inputs])
-			return rst
-		else:
-			rst = tf.math.reduce_mean(inputs, axis=1)
-			return rst
-
-
-class GlobalMaxPooling1D(layers.Layer):
-
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-
-
-	def call(self, inputs):
-		# if inputs is a ragged tensor.
-		if isinstance(inputs, tf.RaggedTensor):
-			rst = tf.math.reduce_max(inputs, axis=1)
-			rst = tf.stack([i for i in rst])
-			return rst
-		elif isinstance(inputs, list):
-			rst = tf.stack([tf.math.reduce_max(i, axis=0) for i in inputs])
-			return rst
-		else:
-			rst = tf.math.reduce_max(inputs, axis=1)
-			return rst
+# #%% Tensorflow
+#
+# import tensorflow as tf
+# from tensorflow.keras import layers
+#
+#
+# class GlobalAverageMaxPooling1D(layers.Layer):
+#
+# 	def __init__(self, **kwargs):
+# 		super().__init__(**kwargs)
+# # 		self.ave_pooling = layers.GlobalAveragePooling1D()
+# # 		self.max_pooling = layers.GlobalMaxPooling1D()
+#
+#
+# 	def call(self, inputs):
+# 		# if inputs is a ragged tensor.
+# 		if isinstance(inputs, tf.RaggedTensor):
+# 			ave = tf.math.reduce_mean(inputs, axis=1)
+# 			max_ = tf.math.reduce_max(inputs, axis=1)
+# 			rst = tf.concat((ave, max_), axis=1)
+# 			rst = tf.stack([i for i in rst])
+# 			return rst
+# 		elif isinstance(inputs, list):
+# 			ave = tf.stack([tf.math.reduce_mean(i, axis=0) for i in inputs])
+# 			max_ = tf.stack([tf.math.reduce_max(i, axis=0) for i in inputs])
+# 			rst = tf.concat((ave, max_), axis=1)
+# 			return rst
+# 		else:
+# 			ave = tf.math.reduce_mean(inputs, axis=1)
+# 			max_ = tf.math.reduce_max(inputs, axis=1)
+# 			rst = tf.concat((ave, max_), axis=1)
+# 			return rst
+#
+#
+# class GlobalAveragePooling1D(layers.Layer):
+#
+# 	def __init__(self, **kwargs):
+# 		super().__init__(**kwargs)
+#
+#
+# 	def call(self, inputs):
+# 		# if inputs is a ragged tensor.
+# 		if isinstance(inputs, tf.RaggedTensor):
+# 			rst = tf.math.reduce_mean(inputs, axis=1)
+# 			rst = tf.stack([i for i in rst])
+# 			return rst
+# 		elif isinstance(inputs, list):
+# 			rst = tf.stack([tf.math.reduce_mean(i, axis=0) for i in inputs])
+# 			return rst
+# 		else:
+# 			rst = tf.math.reduce_mean(inputs, axis=1)
+# 			return rst
+#
+#
+# class GlobalMaxPooling1D(layers.Layer):
+#
+# 	def __init__(self, **kwargs):
+# 		super().__init__(**kwargs)
+#
+#
+# 	def call(self, inputs):
+# 		# if inputs is a ragged tensor.
+# 		if isinstance(inputs, tf.RaggedTensor):
+# 			rst = tf.math.reduce_max(inputs, axis=1)
+# 			rst = tf.stack([i for i in rst])
+# 			return rst
+# 		elif isinstance(inputs, list):
+# 			rst = tf.stack([tf.math.reduce_max(i, axis=0) for i in inputs])
+# 			return rst
+# 		else:
+# 			rst = tf.math.reduce_max(inputs, axis=1)
+# 			return rst
 
 
 #%% Pytorch

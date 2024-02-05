@@ -130,3 +130,9 @@ w
 G.idea/sonarlint/issuestore/7/d/7dcbcac050e0b486cf2f4432828dc7d925d904e6,5/b/5b89161a383245a4834b725c894332749ec54fe7
 w
 G.idea/sonarlint/issuestore/d/8/d85426f13de9453b1c0576762aab35bdb3abfab6,a/5/a50fd89347f35587d1f9498f372d64d4d537a5f6
+R
+"redox_prediction/models/run_xps.py,7/3/73ae4458078f81dbd5c41954a8ea5398b7a351e0
+R
+"redox_prediction/models/readout.py,8/1/81cd0cf087efc60d66f6f6bfa0a223521297963a
+S
+#redox_prediction/models/learning.py,6/a/6ae504159e85b5a593db8af089bc306e81e08dea

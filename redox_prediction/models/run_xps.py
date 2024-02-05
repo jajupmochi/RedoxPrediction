@@ -203,7 +203,7 @@ if __name__ == "__main__":
 	# parallel = (False if args.parallel is None else args.parallel == 'true')
 	n_jobs_outer = (1 if args.n_jobs_outer is None else args.n_jobs_outer)
 	# n_jobs_inner = (1 if args.n_jobs_inner is None else args.n_jobs_inner)
-	n_jobs_params = (3 if args.n_jobs_params is None else args.n_jobs_params)
+	n_jobs_params = (1 if args.n_jobs_params is None else args.n_jobs_params)
 
 	# Network settings.
 	epochs_per_eval = 10 if args.epochs_per_eval is None else args.epochs_per_eval
@@ -273,9 +273,9 @@ if __name__ == "__main__":
 	else:  # This is mainly for testing purpose: debug
 		task_grid = ParameterGrid(
 			{
-				'dataset': Dataset_List[0:1],  # 'MUTAG'
-				'model': Model_List[26:27],
-				'descriptor': Descriptor_List[2:3],  # 'atom_bond_types'
+				'dataset': Dataset_List[0:2],  # 'MUTAG'
+				'model': Model_List[28:29],
+				'descriptor': Descriptor_List[3:4],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],
 			}

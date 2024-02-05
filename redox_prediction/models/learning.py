@@ -123,13 +123,14 @@ def process_split(
 		)
 
 		run_time = time.time() - start
-		cur_results = cur_results + (run_time,)
+		cur_results = cur_results + (run_time, y_train, y_valid, y_test)
 
 	# Save the output string to file:
 	op_str = op_str.getvalue()
 	logging_file = os.path.join(
 		kwargs.get('output_dir'), 'split_%d.log' % (i + 1)
 	)
+	os.makedirs(os.path.dirname(logging_file), exist_ok=True)
 	with open(logging_file, 'w') as f:
 		f.write(op_str)
 
@@ -492,6 +493,7 @@ def append_split_perf(results, split_idx, results_to_save):
 				'history_test',
 				'params_best',
 				'split_total_run_time',
+				'y_true_train', 'y_true_valid', 'y_true_test'
 			]
 	):
 		cur_results[key] = results_to_save[i]
