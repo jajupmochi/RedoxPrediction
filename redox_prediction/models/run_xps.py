@@ -263,7 +263,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		task_grid = ParameterGrid(
 			{
-				'dataset': Dataset_List[0:1],  # 'MUTAG'
+				'dataset': Dataset_List[0:1],  # 'Redox'
 				'model': Model_List[0:1],
 				'descriptor': Descriptor_List[0:1],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
@@ -273,9 +273,9 @@ if __name__ == "__main__":
 	else:  # This is mainly for testing purpose: debug
 		task_grid = ParameterGrid(
 			{
-				'dataset': Dataset_List[0:2],  # 'MUTAG'
-				'model': Model_List[28:29],
-				'descriptor': Descriptor_List[3:4],  # 'atom_bond_types'
+				'dataset': Dataset_List[0:1],  # 'Redox'
+				'model': Model_List[9:10],
+				'descriptor': Descriptor_List[1:2],  # 'atom_bond_types'
 				'x_scaling': X_Scaling_List[0:1],
 				'y_scaling': Y_Scaling_List[2:3],
 			}
