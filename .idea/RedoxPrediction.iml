@@ -10,6 +10,13 @@
       <excludeFolder url="file://$MODULE_DIR$/graph-metric-learning/models/.pytest_cache" />
       <excludeFolder url="file://$MODULE_DIR$/graph-metric-learning/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/venv1" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/datasets/Acrylates" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/datasets/Poly200R/balloon.sdf" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/datasets/Polyacrylates200/balloon.sdf.GA" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/datasets/Polyacrylates200/balloon.sdf.noGA" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/datasets/Polyacrylates200/obabel.sdf" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/datasets/Thermophysical" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/figures/redox_prediction" />
       <excludeFolder url="file://$MODULE_DIR$/redox_prediction/jobs/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/redox_prediction/models/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/redox_prediction/outputs" />

@@ -128,6 +128,19 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+
+#.idea:
+.idea/sonarlint/
+
+# VSCode:
+.vscode/
+
 # figures:
 redox_prediction/figures/redox_prediction/
 figures/miccio/
@@ -139,3 +152,4 @@ outputs/
 # datasets:
 redox_prediction/datasets/
 !redox_prediction/datasets/Redox/
+
