@@ -252,7 +252,8 @@ def model_selection_for_kernel(
 				kernel_options=params,
 				parallel=parallel,
 				n_jobs=n_jobs,
-				read_resu_from_file=read_resu_from_file,
+				# todo: It is now forced to read metric matrix from file.
+				read_resu_from_file=1,
 				params_idx=str(idx),
 				reorder_graphs=True,
 				**kwargs

@@ -136,7 +136,7 @@ cython_debug/
 
 
 # .idea:
-.idea/sonarlint/
+.idea/sonarlint/*
 
 # VSCode:
 .vscode/

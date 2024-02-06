@@ -44,7 +44,7 @@ def get_entire_metric_matrix(
 			print('\nLoading model from file...')
 			resu = pickle.load(open(fn_model, 'rb'))
 			return resu['model'], resu['run_time'], resu[
-				'model'].gram_matrix  # todo: not correct for ged models
+				'model'].metric_matrix
 
 	# Reorder graphs if specified:
 	if reorder_graphs:
@@ -71,8 +71,8 @@ def get_entire_metric_matrix(
 	try:
 		# Save metric matrix so that we can load it from file later:
 		metric_matrix = model.fit_transform(
-			graphs, save_gm_train=True
-		)  # todo: not correct for ged models
+			graphs, save_mm_train=True
+		)
 	except FloatingPointError as e:
 		print(
 			'Encountered FloatingPointError while fitting the model with '
@@ -82,8 +82,7 @@ def get_entire_metric_matrix(
 		raise e
 
 	# Save history:
-	n_pairs = len(graphs) * (
-			len(graphs) + 1) / 2  # todo: not correct for ged models # For GEDs it is n * (n - 1) / 2.
+	n_pairs = model.n_pairs
 	run_time = AverageMeter()
 	run_time.update(model.run_time / n_pairs, n_pairs)
 

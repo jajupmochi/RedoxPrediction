@@ -31,10 +31,12 @@ def print_latex_results(results, mode, rm_valid=False):
 		final_perf[key] = str_latex
 	# time cost:
 	print()
-	for key in ['history_train', 'history_valid', 'history_test']:
+	for key in ['history_train', 'history_valid', 'history_test', 'best_history']:
 		final_perf[key] = {}
 		print(key + ':')
 		for key2 in [
+			# For vector models:
+			'fit_time', 'pred_time',
 			# for graph kernel models:
 			'pred_time_metric', 'pred_time_task', 'pred_time_total',
 			# for GNN models:

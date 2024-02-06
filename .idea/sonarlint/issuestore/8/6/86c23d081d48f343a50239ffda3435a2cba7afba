@@ -1,8 +1,8 @@
 
 python:S1192¯"pDefine a constant instead of duplicating this literal '"model_type" must be either "reg" or "classif".' 3 times.(ÂñÓz8„ì†¥±1
-Npython:S1172("/Remove the unused function parameter "verbose".(’ûÿµ8…ì†¥±1
-Upython:S1172'"6Remove the unused function parameter "print_interval".(Î³‹’8…ì†¥±1
 Ppython:S1172&"1Remove the unused function parameter "plot_loss".(í²8…ì†¥±1
+Upython:S1172'"6Remove the unused function parameter "print_interval".(Î³‹’8…ì†¥±1
+Npython:S1172("/Remove the unused function parameter "verbose".(’ûÿµ8…ì†¥±1
 Spython:S1481 "3Remove the unused local variable "valid_loss_list".(ä¢Ğè8…ì†¥±1
 tpython:S5655¢"OChange this argument; Function "_update_history_1fold" expects a different type(ˆï‡Şüÿÿÿÿ8…ì†¥±1
 mpython:S6729«"MUse "np.nonzero" when only the condition parameter is provided to "np.where".(øÛá°8ÙÛ÷ÆÅ1

@@ -2,41 +2,41 @@
 hpython:S117"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹È’û
 ipython:S117"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(¹È’û
 zpython:S1542"]Rename function "_compute_D_graph_kernel" to match the regular expression ^[a-z_][a-z0-9_]*$.(æ¶ã¯øÿÿÿÿ
-Ppython:S1481"3Replace unused local variable "param_out" with "_".(ùÒ°ùşÿÿÿÿ
 Opython:S1481"2Replace unused local variable "param_in" with "_".(ùÒ°ùşÿÿÿÿ
+Ppython:S1481"3Replace unused local variable "param_out" with "_".(ùÒ°ùşÿÿÿÿ
 ;python:S125"Remove this commented out code.(éıÎ×øÿÿÿÿ
-Opython:S11721"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
-Ipython:S11722"1Remove the unused function parameter "unlabeled".(®±˜ü
-Jpython:S11723"2Remove the unused function parameter "descriptor".(¢ï‡ç
 Ipython:S11722"1Remove the unused function parameter "ed_method".(®±˜ü
+Ipython:S11722"1Remove the unused function parameter "unlabeled".(®±˜ü
+Opython:S11721"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
+Jpython:S11723"2Remove the unused function parameter "descriptor".(¢ï‡ç
 hpython:S1170"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 ipython:S1170"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 python:S1542/"dRename function "compute_D_shortest_path_kernel" to match the regular expression ^[a-z_][a-z0-9_]*$.(Šÿ¢¼ùÿÿÿÿ
-Opython:S1172R"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
-Ipython:S1172S"1Remove the unused function parameter "ed_method".(®±˜ü
-Jpython:S1172T"2Remove the unused function parameter "descriptor".(¢ï‡ç
 Ipython:S1172S"1Remove the unused function parameter "unlabeled".(®±˜ü
+Jpython:S1172T"2Remove the unused function parameter "descriptor".(¢ï‡ç
+Ipython:S1172S"1Remove the unused function parameter "ed_method".(®±˜ü
+Opython:S1172R"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
 hpython:S117Q"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 ipython:S117Q"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 python:S1542P"dRename function "compute_D_structural_sp_kernel" to match the regular expression ^[a-z_][a-z0-9_]*$.(´‹»¬ıÿÿÿÿ
-Opython:S1172v"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
 Jpython:S1172x"2Remove the unused function parameter "descriptor".(¢ï‡ç
-Ipython:S1172w"1Remove the unused function parameter "ed_method".(®±˜ü
 Ipython:S1172w"1Remove the unused function parameter "unlabeled".(®±˜ü
+Ipython:S1172w"1Remove the unused function parameter "ed_method".(®±˜ü
+Opython:S1172v"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
 hpython:S117u"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 ipython:S117u"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 xpython:S1542t"[Rename function "compute_D_path_kernel" to match the regular expression ^[a-z_][a-z0-9_]*$.(€É«èûÿÿÿÿ
-Ppython:S1172•"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
 Jpython:S1172–"1Remove the unused function parameter "unlabeled".(®±˜ü
 Jpython:S1172–"1Remove the unused function parameter "ed_method".(®±˜ü
 Kpython:S1172—"2Remove the unused function parameter "descriptor".(¢ï‡ç
+Ppython:S1172•"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
 ipython:S117”"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 jpython:S117”"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 |python:S1542“"^Rename function "compute_D_treelet_kernel" to match the regular expression ^[a-z_][a-z0-9_]*$.(È±çıøÿÿÿÿ
-Jpython:S1172½"1Remove the unused function parameter "unlabeled".(®±˜ü
-Kpython:S1172¾"2Remove the unused function parameter "descriptor".(¢ï‡ç
 Ppython:S1172¼"2Remove the unused function parameter "y_distance".(ôâìÇüÿÿÿÿ
+Kpython:S1172¾"2Remove the unused function parameter "descriptor".(¢ï‡ç
 Jpython:S1172½"1Remove the unused function parameter "ed_method".(®±˜ü
+Jpython:S1172½"1Remove the unused function parameter "unlabeled".(®±˜ü
 ipython:S117»"QRename this parameter "G_app" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 jpython:S117»"RRename this parameter "G_test" to match the regular expression ^[_a-z][a-z0-9_]*$.(çœ´§
 ~python:S1542º"`Rename function "compute_D_wlsubtree_kernel" to match the regular expression ^[a-z_][a-z0-9_]*$.(½¦š·úÿÿÿÿ

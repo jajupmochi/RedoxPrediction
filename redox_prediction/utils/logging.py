@@ -8,8 +8,10 @@ logging
 """
 import io
 import sys
-import functools
 import time
+
+import functools
+import types
 
 import numpy as np
 
@@ -288,102 +290,57 @@ def resu_to_serializable(
 		The converted results.
 	"""
 	import torch
-	from gklearn.kernels import GraphKernel
 	from redox_prediction.models.nn.utils import nn_to_dict
+	from sklearn.base import BaseEstimator
 	from redox_prediction.models.embed.kernel import estimator_to_dict
 
-	resu_serializable = {}
-	for key in resu.keys():
-		# Convert the AverageMeter to a dict:
-		if isinstance(resu[key], AverageMeter):
-			resu_serializable[key] = resu[key].to_dict(with_history=False)
+	def custom_serializer(obj):
+		"""Custom serializer function for non-serializable types."""
+		if isinstance(obj, np.ndarray):
+			return obj.tolist()
+		elif isinstance(obj, np.int64):
+			return int(obj)
+		elif isinstance(obj, np.float32):
+			return float(obj)
+		elif isinstance(obj, np.float64):
+			return float(obj)
+		elif isinstance(obj, np.bool_):
+			return bool(obj)
+		elif isinstance(obj, torch.Tensor):
+			return obj.tolist()
+		elif isinstance(obj, functools.partial):
+			return {
+				'__partial__': True, 'func': obj.func, 'args': obj.args,
+				'keywords': obj.keywords
+			}
+		elif isinstance(obj, types.FunctionType):
+			return {
+				'__function__': True, 'module': obj.__module__,
+				'name': obj.__name__
+			}
 
 		# Convert the subclasses of torch.nn.Module to a dict:
-		elif issubclass(type(resu[key]), torch.nn.Module):
-			resu_serializable[key] = nn_to_dict(
-				resu[key], with_state_dict=False
-			)
-
-		# Convert the `gklearn.models.graph_kernel.GraphKernel` to a dict:
-		elif issubclass(type(resu[key]), GraphKernel):
-			resu_serializable[key] = kernel_to_dict(resu[key])
-
-		# Convert the numpy.ndarray to a list:
-		elif isinstance(resu[key], np.ndarray):
-			resu_serializable[key] = resu[key].tolist()
-
-		# Convert a list to a dict only if it is a list of dicts
-		# (for results of trials):
-		elif isinstance(resu[key], list) and len(resu[key]) > 0 and isinstance(
-				resu[key][0], dict
-		):
-			resu_serializable[key] = {}
-			for idx, val in enumerate(resu[key]):
-				resu_serializable[key][idx] = resu_to_serializable(val)
-
-		# Convert a tuple to a dict only if it is a list of estimators
-		# (when using kernels/geds + predictors):
-		elif isinstance(resu[key], tuple) and len(resu[key]) > 0 and issubclass(
-				type(resu[key][0]), GraphKernel
-		):
-			resu_serializable[key] = {}
-			for idx, val in enumerate(resu[key]):
-				resu_serializable[key][idx] = estimator_to_dict(val)
-
-		# Convert a dict to a dict only if it is a dict of dicts:
-		elif isinstance(resu[key], dict):
-			resu_serializable[key] = resu_to_serializable(resu[key])
-
-		# Convert partial functions to a dict:
-		# This can happen in `params_best` in the results of each trial for
-		# models such as `Treelet`.
-		elif isinstance(resu[key], functools.partial):
-			resu_serializable[key] = str(resu[key])
-
-		# Convert functions to a dict:
-		# This can happen in `params_best` in the results of each trial for
-		# models such as `ShortestPath`.
-		elif hasattr(resu[key], '__call__'):
-			resu_serializable[key] = resu[key].__module__ + '.' + resu[
-				key].__name__
-
-		# Convert the type `float32` to `float`:
-		elif type(resu[key]) == np.float32:
-			resu_serializable[key] = float(resu[key])
-		elif isinstance(resu[key], list) and len(resu[key]) > 0 and type(
-				resu[key][0]
-		) == np.float32:
-			resu_serializable[key] = [float(val) for val in resu[key]]
-
-		# Convert the type `int64` to `int`:
-		elif type(resu[key]) == np.int64:
-			resu_serializable[key] = int(resu[key])
-		elif isinstance(resu[key], list) and len(resu[key]) > 0 and type(
-				resu[key][0]
-		) == np.int64:
-			resu_serializable[key] = [int(val) for val in resu[key]]
-
+		elif isinstance(obj, torch.nn.Module):
+			return nn_to_dict(obj, with_state_dict=False)
+		# Convert the sklearn.estimator (including GraphKernel, GEDModel) to a dict:
+		elif isinstance(obj, BaseEstimator):
+			return estimator_to_dict(obj)
+		# Convert the AverageMeter to a dict:
+		elif isinstance(obj, AverageMeter):
+			return obj.to_dict(with_history=False)
 		else:
-			resu_serializable[key] = resu[key]
-
-		# todo
-		try:
-			import json
-			json.dumps(resu_serializable[key])
-		except TypeError:
-			print()
-			print(
-				'The following key is ignored because it is not json serializable:'
+			raise TypeError(
+				"Object of type {} is not JSON serializable".format(type(obj))
 			)
-			# print('resu_serializable[key]: ', resu_serializable[key])
-			# print('resu[key]: ', resu[key])
-			print('key: ', key)
-			print('type(resu[key]): ', type(resu[key]))
-			print(
-				'type(resu_serializable[key]): ', type(resu_serializable[key])
-			)
-			# raise ValueError('resu_serializable[key] is not json serializable.')
-			# Delete the key:
-			del resu_serializable[key]
 
-	return resu_serializable
+
+	try:
+		import json
+		# Use json.loads to convert the string to a dictionary:
+		resu_json = json.loads(json.dumps(resu, default=custom_serializer))
+	except TypeError:
+		raise ValueError(
+			'resu_serializable[key] is not json serializable.'
+		)
+
+	return resu_json

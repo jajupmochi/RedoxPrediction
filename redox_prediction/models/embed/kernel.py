@@ -230,6 +230,8 @@ def estimator_to_dict(
 		The converted estimator.
 	"""
 	dict_est = {
+		'__estimator__': True,
+		'module': estimator.__module__,
 		'name': estimator.__class__.__name__,
 		'params': estimator.get_params(),
 	}
