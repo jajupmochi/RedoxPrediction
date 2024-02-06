@@ -127,8 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# figures:
+redox_prediction/figures/redox_prediction/
 figures/miccio/
 figures/mpnn_attention/
 figures/treelet_kernel_krr/
 outputs/
 !outputs/mpnn_tranformer/*.md
+
+# datasets:
+redox_prediction/datasets/
+!redox_prediction/datasets/Redox/

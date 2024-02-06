@@ -10,6 +10,9 @@
       <excludeFolder url="file://$MODULE_DIR$/graph-metric-learning/models/.pytest_cache" />
       <excludeFolder url="file://$MODULE_DIR$/graph-metric-learning/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/venv1" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/jobs/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/models/.ipynb_checkpoints" />
+      <excludeFolder url="file://$MODULE_DIR$/redox_prediction/outputs" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (python3.8.16_20230817v1)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
