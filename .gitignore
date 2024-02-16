@@ -161,3 +161,4 @@ redox_prediction/models/deprecated/
 
 # misc:
 *.btr
+virtualenv/

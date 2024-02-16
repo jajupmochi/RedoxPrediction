@@ -16,17 +16,20 @@ The `RedoxPrediction` project is the code for the paper
 
 ## How to use?
 
+### Prerequisites:
+
+- Python version 3.8 or higher.
+
 ### Install the prerequisite libraries:
 
 ```
-python3 -m pip install graphkit-learn
-python3 -m pip install seaborn
-# The followings are required to run the GNN models:
-python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-python3 -m pip install torch-geometric pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.0+cu118.html
+python3 -m pip install -r requirements.txt
+git clone https://github.com/jajupmochi/graphkit-learn
+cd graphkit-learn
+python setup.py [develop] [--user]
 ```
 
-NVIDIA GPU and driver is required to run the GNN models. 
+If you want to run the GNN models on GPUs, NVIDIA GPU and driver is required. 
 Check [this tutorial](https://zhuanlan.zhihu.com/p/634250809) for more information.
 
 ### Install the library

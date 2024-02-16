@@ -174,4 +174,5 @@ def main(fn_name1, fn_name2):
 if __name__ == '__main__':
 	fn_name1 = '../outputs/UBELIX/results.brem_togn_dGred.af1hot+3d-dis.nn:mpnn.none.std.json'
 	fn_name2 = '../outputs/UBELIX/results.brem_togn_dGox.1hot.nn:mpnn.none.std.json'
+	# Remove '/UBELIX/' for experiments on local machine.
 	main(fn_name1, fn_name2)

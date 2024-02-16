@@ -1,50 +1,63 @@
-conda install tensorflow~=2.4
-conda install deepchem -c conda-forge 
-conda install rdkit -c conda-forge 
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
-conda install pyg -c pyg -c conda-forge
-conda install -c dglteam dgl-cuda11.3
-conda install dgllife -c dglteam
+# conda install tensorflow~=2.4
+# conda install deepchem -c conda-forge
+# conda install rdkit -c conda-forge
+# conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+# conda install pyg -c pyg -c conda-forge
+# conda install -c dglteam dgl-cuda11.3
+# conda install dgllife -c dglteam
 
 #conda update -c conda-forge deepchem
 #conda install numexpr
 #conda update pandas
 
 
-python3 -m pip install --no-cache-dir --user tensorflow~=2.4
-python3 -m pip install --no-cache-dir --user deepchem
-python3 -m pip install --no-cache-dir --user rdkit-pypi
-python3 -m pip install --no-cache-dir --user torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
-python3 -m pip install --no-cache-dir --user torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.10.0+cu113.html
-python3 -m pip install --no-cache-dir --user dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
-python3 -m pip install --no-cache-dir --user dgllife
+# python3 -m pip install --no-cache-dir --user tensorflow~=2.4
+# python3 -m pip install --no-cache-dir --user deepchem
+# python3 -m pip install --no-cache-dir --user rdkit-pypi
+# python3 -m pip install --no-cache-dir --user torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+# python3 -m pip install --no-cache-dir --user torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.10.0+cu113.html
+# python3 -m pip install --no-cache-dir --user dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
+# python3 -m pip install --no-cache-dir --user dgllife
 
-
-# tensorflow~=2.11.0
-numpy~=1.24.2
-scikit-learn~=1.2.1
-xgboost~=2.0.0
-#~=1.7.4
-# keras~=2.11.0
-torch~=2.0.1+cu118
-#~=1.10.0+cu113
-deepchem~=2.7.1
-#~=2.7.1
-networkx~=3.0
-pandas~=1.5.3
-matplotlib~=3.7.0
-rdkit~=2022.9.5
-# ipython~=8.11.0
+setuptools
+# The lateset versions of these dependencies no longer support Python 3.8 or will
+# introduce some unexpected errors. Therefore, even though graphkit-learn can
+# install some of the latest versions of these dependencies, we will use the
+# following versions to avoid any issues.
+numpy~=1.24.4
 scipy~=1.8.1
+matplotlib~=3.7.2
+contourpy~=1.1.0 # This library is used by matplotlib and no longer supports Python 3.8.
+networkx~=3.0
+scikit-learn~=1.2.2
 tqdm~=4.66.1
-#~=4.64.1
-seaborn~=0.12.2
-setuptools~=56.0.0
 joblib~=1.3.2
-ipython~=8.12.2
-psutil # System monitoring.
+# git+https://github.com/jajupmochi/graphkit-learn.git@v0.2.x # todo
+# graphkit-learn==0.2.1.post20240206154638 # for graph kernel and GED calculation.
+rdkit~=2022.9.5
+pandas~=1.5.3
+seaborn~=0.12.2
+xgboost~=2.0.0 # This is for the XGBoost model.
+# The following dependencies are for deep learning.
+#torch>=2.0.1+cpu
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch~=2.0.1 #+cu118
+torchvision
+torchaudio
+-f https://data.pyg.org/whl/torch-2.0.0+cu118.html
+torch_scatter
+torch_sparse
+torch_cluster
+torch_spline_conv
+torch-geometric~=2.3.1
+deepchem~=2.7.1
+# #
+# #torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# -f https://data.pyg.org/whl/torch-2.0.0+cu118.html
+# psutil # System monitoring.
 #"dask[complete]" # This is for parallelizing the code.
 #graphviz # This is for visualizing Dask.
 #dask_jobqueue # This is for parallelizing onto multiple nodes on a cluster.
 #dask_mpi
-mpi4py
+# mpi4py

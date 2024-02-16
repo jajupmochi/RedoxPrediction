@@ -81,7 +81,7 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 
 	# Format data.
 	if format_ is None:  # Return the output format of the featurizer.
-		from dataset.format_dataset import to_featurizer_format
+		from ..dataset.format_dataset import to_featurizer_format
 		data = to_featurizer_format(
 			data, ds_name=ds_name.lower(),
 			descriptor=descriptor,
@@ -89,11 +89,11 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 		)
 
 	elif format_.lower() == 'smiles':
-		from dataset.format_dataset import to_smiles
+		from ..dataset.format_dataset import to_smiles
 		data = to_smiles(data, ds_name.lower(), **kwargs)
 
 	elif format_.lower() == 'networkx':
-		from dataset.format_dataset import to_nxgraphs
+		from ..dataset.format_dataset import to_nxgraphs
 		data = to_nxgraphs(
 			data, ds_name.lower(), descriptor=descriptor,
 			**kwargs
@@ -101,7 +101,7 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 
 	elif format_.lower() == 'rdkit':
 		ds_dir = get_ds_dir(ds_name.lower())
-		from dataset.format_dataset import to_rdkit_mols
+		from ..dataset.format_dataset import to_rdkit_mols
 		data = to_rdkit_mols(
 			data, ds_name=ds_name.lower(),
 			descriptor=descriptor,
@@ -109,7 +109,7 @@ def load_dataset(ds_name, descriptor='smiles', format_='smiles', **kwargs):
 		)
 
 	elif format_.lower() == 'vector':
-		from dataset.format_dataset import to_vectors
+		from ..dataset.format_dataset import to_vectors
 		data = to_vectors(
 			data, ds_name=ds_name.lower(),
 			descriptor=descriptor, **kwargs
