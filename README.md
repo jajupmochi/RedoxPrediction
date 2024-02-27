@@ -63,7 +63,7 @@ The outputs will be stored in the `redox_prediction/outputs/` directory.
 The details of the dataset can be found in the following repository:
 [ORedOx159](https://github.com/ANRMoMoPlasm/ORedOx159).
 
-Notice: in this project, the introduced dataset is also used by the name `Redox` or `brem_togn`.
+Notice: in this project, the introduced dataset is also referred to by the name `Redox` or `brem_togn`.
 
 ## Model illustrations
 

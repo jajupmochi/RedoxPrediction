@@ -6,6 +6,7 @@ Gpython:S1481^"/Remove the unused local variable "num_species".(»›°á
 rpython:S3776Œ"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(„ı™Šÿÿÿÿÿ
 7python:S125¡"Remove this commented out code.(Ïƒ§Á
 rpython:S3776Ú"TRefactor this function to reduce its Cognitive Complexity from 66 to the 15 allowed.(ÿ¨ÀËşÿÿÿÿ
+rpython:S6729ß"MUse "np.nonzero" when only the condition parameter is provided to "np.where".(Ë‹ÿ±ÿÿÿÿÿ8ÆõÄõ×1
 mpython:S3776ğ"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(Ñí“¹
 |python:S101”"_Rename class "E_GCL" to match the regular expression ^_?([A-Z_][a-zA-Z0-9]*|[a-z_][a-z0-9_]*)$.(×íîÿÿÿÿÿ
 epython:S107"MMethod "__init__" has 14 parameters, which is greater than the 13 authorized.(Í¨›‚

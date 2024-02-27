@@ -132,8 +132,6 @@ w
 G.idea/sonarlint/issuestore/d/8/d85426f13de9453b1c0576762aab35bdb3abfab6,a/5/a50fd89347f35587d1f9498f372d64d4d537a5f6
 R
 "redox_prediction/models/run_xps.py,7/3/73ae4458078f81dbd5c41954a8ea5398b7a351e0
-R
-"redox_prediction/models/readout.py,8/1/81cd0cf087efc60d66f6f6bfa0a223521297963a
 S
 #redox_prediction/models/learning.py,6/a/6ae504159e85b5a593db8af089bc306e81e08dea
 …
@@ -25482,3 +25480,23 @@ b
 +redox_prediction/dataset/compute_results.py,7/6/76ebe841901f9183ab9727fab55d3d1b30be77af
 \
 ,redox_prediction/models/evaluation/kernel.py,4/0/40802a3a81999722f76341c376519464e1cf767b
+T
+$redox_prediction/models/embed/ged.py,1/b/1bca0892f4fd0c4eea64e8d6e5c6882b8929d26e
+]
+-redox_prediction/models/egnn_model_pytorch.py,d/6/d619ce061085a28f4062c54e00c12f9fc50cdaa0
+O
+requirements (another copy).txt,6/b/6b2949ef613dedbfd9ae76d1b9ac8225296532a5
+G
+requirements (copy).txt,b/1/b1ec9f87044c0f5fc910f1f53a3c6e7df85e679b
+X
+(redox_prediction/dataset/load_dataset.py,1/3/139212d9adfbd18b5013b0bdfea9f635e7d8f784
+P
+ redox_prediction/jobs/run_job.py,d/6/d6d1c874ffd3e267651110e83aaf60579dccc706
+T
+$redox_prediction/dataset/get_data.py,8/8/8849a49bea0b450561018e7b0f3213e3f2058f40
+R
+"redox_prediction/models/nn/mpnn.py,a/8/a82d7bae6327a48fb1ccdb10ea198fb1af3d78ab
+U
+%redox_prediction/models/nn/readout.py,f/8/f89d70b5b56c5b305988705eff779d2d8dc2c3e1
+S
+#redox_prediction/models/nn/dgcnn.py,6/4/64e63fc6da36ad8f84d3984cf449881520645963
