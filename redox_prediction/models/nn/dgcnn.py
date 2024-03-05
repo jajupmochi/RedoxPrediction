@@ -46,10 +46,20 @@ logging.captureWarnings(True)
 
 class DGCNNConv(MessagePassing):
 	"""
-	Extended from tuorial on GCNs of Pytorch Geometrics
+	Deep Graph Convolutional Neural Network (DGCNN) convolutional layer.
+
+	Parameters
+	----------
+	in_channels : int
+		The dimension of input features.
+
+	out_channels : int
+		The dimension of the output features.
+
+	Notes
+	-----
+	Extended from tutorial on GCNs of Pytorch Geometrics.
 	"""
-
-
 	def __init__(self, in_channels, out_channels):
 		super(DGCNNConv, self).__init__(aggr='add')  # "Add" aggregation.
 		self.lin = nn.Linear(in_channels, out_channels)
@@ -58,6 +68,17 @@ class DGCNNConv(MessagePassing):
 
 
 	def forward(self, x, edge_index):
+		"""
+		Forward pass of the model.
+
+		Parameters
+		----------
+		x : Tensor
+			The input features.
+
+		edge_index : Tensor
+			The edge index.
+		"""
 		# x has shape [N, in_channels]
 		# edge_index has shape [2, E]
 
@@ -72,6 +93,20 @@ class DGCNNConv(MessagePassing):
 
 
 	def message(self, x_j, edge_index, size):
+		"""
+		Message passing of the model.
+
+		Parameters
+		----------
+		x_j : Tensor
+			The input features.
+
+		edge_index : Tensor
+			The edge index.
+
+		size : tuple
+			The size of the input features.
+		"""
 		# x_j has shape [E, out_channels]
 
 		# Step 3: Normalize node features.
@@ -86,6 +121,14 @@ class DGCNNConv(MessagePassing):
 
 
 	def update(self, aggr_out):
+		"""
+		Update the model.
+
+		Parameters
+		----------
+		aggr_out : Tensor
+			The aggregated output.
+		"""
 		# aggr_out has shape [N, out_channels]
 
 		# Step 5: Return new node embeddings.
@@ -101,7 +144,37 @@ class DGCNNConv(MessagePassing):
 
 class DGCNN(nn.Module):
 	"""
-	Uses fixed architecture.
+	Deep Graph Convolutional Neural Network (DGCNN) for graph regression and classification.
+
+	Parameters
+	----------
+	in_feats : int
+		The dimension of input features.
+
+	dim_target : int
+		The dimension of the target.
+
+	k : int
+		The number of nodes to hold for each graph for the sortpooling.
+
+	hidden_feats : int
+		The dimension of the hidden features.
+
+	message_steps : int
+		The number of message passing steps / layers.
+
+	predictor_hidden_feats : int
+		The dimension of the hidden features of the predictor.
+
+	predictor_clf_activation : str
+		The activation function of the predictor.
+
+	mode : str
+		The mode of the model, either 'regression' or 'classification'.
+		(Default value = 'regression')
+
+	**kwargs
+		Other parameters.
 	"""
 
 
@@ -167,6 +240,18 @@ class DGCNN(nn.Module):
 
 
 	def forward(self, data, output='prediction'):
+		"""
+		Forward pass of the model.
+
+		Parameters
+		----------
+		data : Data
+			The input data.
+
+		output : str
+			The output type.
+			(Default value = 'prediction')
+		"""
 
 		# data = Batch.from_data_list([self.dataset[i] for i in index])
 		# Implement Equation 4.2 of the paper i.e. concat all layers' graph representations and apply linear model
@@ -211,6 +296,19 @@ def get_sort_pooling_k(
 	"""
 	Get the first dimension of the sort pooling output according to the
 	percentile of the number of nodes in the graphs.
+
+	Parameters
+	----------
+	graphs : List[Union[Data, nx.Graph]]
+		The list of graphs.
+
+	percentile : float
+		The percentile of the number of nodes to take.
+		(Default value = 0.6)
+
+	min_k : int
+		The minimum value of the sort pooling output.
+		(Default value = 10)
 
 	Notes
 	-----
