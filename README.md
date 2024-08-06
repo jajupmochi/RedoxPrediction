@@ -60,10 +60,11 @@ The outputs will be stored in the `redox_prediction/outputs/` directory.
 
 ## Data description
 
-The details of the dataset can be found in the following repository:
-[ORedOx159](https://github.com/ANRMoMoPlasm/ORedOx159).
+The details of the dataset can be found in the following repositories:
+- [ORedOx159](https://github.com/ANRMoMoPlasm/ORedOx159): a chemical dataset containing 159 reduction and oxidation potentials of 159 organic molecules.
+- [DivRedOx19](https://github.com/ANRMoMoPlasm/DivRedOx19): a chemical dataset containing 19 reduction and oxidation potentials of 19 diverse organic molecules.
 
-Notice: in this project, the introduced dataset is also referred to by the name `Redox` or `brem_togn`.
+Notice: in this project, the mix of the two datasets is used, which is referred to by the name `Redox` or `brem_togn`.
 
 ## Model illustrations
 
