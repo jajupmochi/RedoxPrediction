@@ -2,7 +2,7 @@
 
 [//]: # ([![DOI]&#40;https://zenodo.org/badge/DOI/10.5281/zenodo.5560005.svg&#41;]&#40;https://doi.org/10.5281/zenodo.5560005&#41;)
 [//]: # ([![ACPR 2023]&#40;https://img.shields.io/badge/ACPR-2023-blue&#41;]&#40;https://ericlab.org/acpr2023/&#41;)
-[![ChemRxiv](https://img.shields.io/badge/ChemRxiv-black)](https://chemrxiv.org/engage/chemrxiv/article-details/654bb7202c3c11ed71fc350b)
+[![ChemRxiv](https://img.shields.io/badge/ChemRxiv-black)]([https://chemrxiv.org/engage/chemrxiv/article-details/654bb7202c3c11ed71fc350b](https://doi.org/10.26434/chemrxiv-2023-gmpmg-v2))
 ![License](https://img.shields.io/github/license/jajupmochi/RedoxPrediction.svg?color=blue)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 ![Stars](https://img.shields.io/github/stars/jajupmochi/RedoxPrediction?color=yellow)
@@ -10,7 +10,9 @@
 [![jajupmochi](https://img.shields.io/twitter/follow/jajupmochi?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=jajupmochi) 
 
 The `RedoxPrediction` project is the code for the paper 
-[Predicting Redox Potentials by Graph-Based Machine Learning Methods](https://doi.org/10.1002/jcc.27380) ([preprint](https://chemrxiv.org/engage/chemrxiv/article-details/654bb7202c3c11ed71fc350b)).
+[Predicting Redox Potentials by Graph-Based Machine Learning Methods](https://doi.org/10.1002/jcc.27380).
+
+[[preprint](https://www.researchgate.net/publication/381676453_Predicting_redox_potentials_by_graph-based_machine_learning_methods): We recommend to read this version, since a few minor modifications are added into this version compared to the ChemRxiv version.]
 
 [//]: # (published in the proceedings of [ACPR 2023]&#40;https://ericlab.org/acpr2023/&#41;.)
 
