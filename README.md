@@ -10,7 +10,7 @@
 [![jajupmochi](https://img.shields.io/twitter/follow/jajupmochi?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=jajupmochi) 
 
 The `RedoxPrediction` project is the code for the paper 
-[Predicting Redox Potentials by Graph-Based Machine Learning Methods](whatwhat?) ([preprint](https://chemrxiv.org/engage/chemrxiv/article-details/654bb7202c3c11ed71fc350b)).
+[Predicting Redox Potentials by Graph-Based Machine Learning Methods](https://doi.org/10.1002/jcc.27380) ([preprint](https://chemrxiv.org/engage/chemrxiv/article-details/654bb7202c3c11ed71fc350b)).
 
 [//]: # (published in the proceedings of [ACPR 2023]&#40;https://ericlab.org/acpr2023/&#41;.)
 
@@ -107,9 +107,16 @@ models, in log-scaled with base 10, and in seconds:
 
 ## Citation
 
-If you have used this library in your publication, please cite the following paper (coming soon):
+If you have used this library in your publication, please cite the following paper:
 
 ```
+@article{jia2024predicting,
+  title={Predicting redox potentials by graph-based machine learning methods},
+  author={Jia, Linlin and Br{\'e}mond, {\'E}ric and Zaida, Larissa and Ga{\"u}zere, Benoit and Tognetti, Vincent and Joubert, Laurent},
+  journal={Journal of computational chemistry},
+  year={2024},
+  publisher={Wiley Online Library}
+}
 ```
 
 ## Acknowledgments
